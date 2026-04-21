@@ -13,15 +13,11 @@
       --rojo: #CC0000; --rojo-oscuro: #990000;
       --gris: #1a1a1a; --gris-medio: #2d2d2d; --gris-campo: #222;
       --blanco: #ffffff; --texto-muted: #888; --borde: #3a3a3a;
+      --verde: #16a34a;
     }
     body { font-family: 'Barlow', sans-serif; background: var(--gris); color: var(--blanco); min-height: 100vh; }
 
-    /* ── HEADER ── */
-    header {
-      background: var(--gris); border-bottom: 3px solid var(--rojo);
-      padding: 0 2rem; display: flex; align-items: center; justify-content: space-between;
-      height: 70px; position: sticky; top: 0; z-index: 100;
-    }
+    header { background: var(--gris); border-bottom: 3px solid var(--rojo); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 70px; position: sticky; top: 0; z-index: 100; }
     .header-logo { display: flex; align-items: center; gap: 1rem; }
     .logo-circle { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; flex-shrink: 0; display: block; }
     .logo-circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -30,94 +26,84 @@
     #btnLogout { display: none; background: transparent; border: 1px solid #444; color: var(--texto-muted); padding: 0.4rem 1rem; border-radius: 3px; cursor: pointer; font-family: 'Barlow', sans-serif; font-size: 0.85rem; letter-spacing: 1px; transition: border-color 0.15s, color 0.15s; }
     #btnLogout:hover { border-color: var(--rojo); color: var(--blanco); }
 
-    /* ── LOGIN ── */
-    #loginScreen {
-      display: flex; align-items: center; justify-content: center;
-      min-height: calc(100vh - 70px); padding: 2rem;
-    }
-    .login-box {
-      background: var(--gris-medio); border: 1px solid var(--borde); border-top: 4px solid var(--rojo);
-      border-radius: 2px; padding: 2.5rem 2rem; width: 100%; max-width: 380px;
-    }
+    #loginScreen { display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 70px); padding: 2rem; }
+    .login-box { background: var(--gris-medio); border: 1px solid var(--borde); border-top: 4px solid var(--rojo); border-radius: 2px; padding: 2.5rem 2rem; width: 100%; max-width: 380px; }
     .login-box h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 1.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.4rem; }
     .login-box p { color: var(--texto-muted); font-size: 0.85rem; margin-bottom: 1.75rem; }
     .login-box label { display: block; font-size: 0.75rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; margin-bottom: 0.4rem; }
-    .login-box input {
-      width: 100%; background: var(--gris-campo); border: 1px solid var(--borde); border-radius: 3px;
-      padding: 0.75rem 1rem; color: var(--blanco); font-family: 'Barlow', sans-serif; font-size: 1rem;
-      outline: none; transition: border-color 0.15s; margin-bottom: 1rem;
-    }
+    .login-box input { width: 100%; background: var(--gris-campo); border: 1px solid var(--borde); border-radius: 3px; padding: 0.75rem 1rem; color: var(--blanco); font-family: 'Barlow', sans-serif; font-size: 1rem; outline: none; transition: border-color 0.15s; margin-bottom: 1rem; }
     .login-box input:focus { border-color: var(--rojo); }
-    .login-box button {
-      width: 100%; background: var(--rojo); color: var(--blanco); border: none; border-radius: 3px;
-      padding: 0.85rem; font-family: 'Barlow Condensed', sans-serif; font-size: 1.05rem; font-weight: 700;
-      letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: background 0.15s; margin-top: 0.5rem;
-    }
+    .login-box button { width: 100%; background: var(--rojo); color: var(--blanco); border: none; border-radius: 3px; padding: 0.85rem; font-family: 'Barlow Condensed', sans-serif; font-size: 1.05rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: background 0.15s; margin-top: 0.5rem; }
     .login-box button:hover { background: var(--rojo-oscuro); }
     .login-box button:disabled { background: #555; cursor: not-allowed; }
     .login-error { display: none; color: #f87171; font-size: 0.85rem; margin-top: 0.75rem; }
 
-    /* ── ADMIN PANEL ── */
-    #adminPanel { display: none; padding: 2rem 1.5rem 4rem; max-width: 1100px; margin: 0 auto; }
-
+    #adminPanel { display: none; padding: 2rem 1.5rem 4rem; max-width: 1300px; margin: 0 auto; }
     .panel-header { margin-bottom: 2rem; }
     .panel-header h1 { font-family: 'Barlow Condensed', sans-serif; font-size: 2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
     .panel-header p { color: var(--texto-muted); font-size: 0.9rem; margin-top: 0.3rem; }
 
-    /* Filtros */
-    .filters {
-      background: var(--gris-medio); border: 1px solid var(--borde); border-radius: 2px;
-      padding: 1.25rem 1.5rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;
-      margin-bottom: 2rem;
-    }
-    .filter-group { display: flex; flex-direction: column; gap: 0.4rem; min-width: 180px; flex: 1; }
+    .filters { background: var(--gris-medio); border: 1px solid var(--borde); border-radius: 2px; padding: 1.25rem 1.5rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; margin-bottom: 2rem; }
+    .filter-group { display: flex; flex-direction: column; gap: 0.4rem; min-width: 160px; flex: 1; }
     .filter-group label { font-size: 0.72rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; }
-    .filter-group select {
-      background: var(--gris-campo); border: 1px solid var(--borde); border-radius: 3px;
-      padding: 0.6rem 0.9rem; color: var(--blanco); font-family: 'Barlow', sans-serif;
-      font-size: 0.95rem; outline: none; transition: border-color 0.15s; appearance: none; cursor: pointer;
-    }
-    .filter-group select:focus { border-color: var(--rojo); }
-    .btn-refresh {
-      background: var(--rojo); color: var(--blanco); border: none; border-radius: 3px;
-      padding: 0.6rem 1.25rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.95rem;
-      font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
-      transition: background 0.15s; white-space: nowrap;
-    }
+    .filter-group select { background: var(--gris-campo); border: 1px solid var(--borde); border-radius: 3px; padding: 0.6rem 0.9rem; color: var(--blanco); font-family: 'Barlow', sans-serif; font-size: 0.95rem; outline: none; appearance: none; cursor: pointer; }
+    .btn-refresh { background: var(--rojo); color: var(--blanco); border: none; border-radius: 3px; padding: 0.6rem 1.25rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.95rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
     .btn-refresh:hover { background: var(--rojo-oscuro); }
 
-    /* Resumen */
-    .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-    .summary-card {
-      background: var(--gris-medio); border: 1px solid var(--borde); border-top: 3px solid var(--rojo);
-      border-radius: 2px; padding: 1.25rem 1.5rem;
-    }
-    .summary-card .num { font-family: 'Barlow Condensed', sans-serif; font-size: 2.5rem; font-weight: 800; line-height: 1; }
-    .summary-card .lbl { font-size: 0.75rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--texto-muted); margin-top: 0.3rem; }
+    .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .summary-card { background: var(--gris-medio); border: 1px solid var(--borde); border-top: 3px solid var(--rojo); border-radius: 2px; padding: 1.1rem 1.25rem; }
+    .summary-card.s-verde { border-top-color: var(--verde); }
+    .summary-card .num { font-family: 'Barlow Condensed', sans-serif; font-size: 2rem; font-weight: 800; line-height: 1; }
+    .summary-card .num.verde { color: #4ade80; }
+    .summary-card .lbl { font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--texto-muted); margin-top: 0.3rem; }
 
-    /* Tablas */
     .section-block { margin-bottom: 2.5rem; }
     .section-block h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--texto-muted); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--borde); }
-
     .table-wrap { overflow-x: auto; border-radius: 2px; border: 1px solid var(--borde); }
-    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    thead th { background: var(--gris-medio); padding: 0.75rem 1rem; text-align: left; font-size: 0.72rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; border-bottom: 1px solid var(--borde); white-space: nowrap; }
-    tbody tr { border-bottom: 1px solid #2a2a2a; transition: background 0.1s; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+    thead th { background: var(--gris-medio); padding: 0.7rem 0.75rem; text-align: left; font-size: 0.68rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; border-bottom: 1px solid var(--borde); white-space: nowrap; }
+    tbody tr { border-bottom: 1px solid #252525; transition: background 0.1s; }
     tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: rgba(255,255,255,0.03); }
-    tbody td { padding: 0.75rem 1rem; color: var(--blanco); vertical-align: middle; }
-    .badge {
-      display: inline-block; padding: 0.2rem 0.6rem; border-radius: 2px; font-size: 0.75rem;
-      font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
-    }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+    tbody tr.baja-row { opacity: 0.4; }
+    tbody td { padding: 0.6rem 0.75rem; color: var(--blanco); vertical-align: middle; }
+
+    .badge { display: inline-block; padding: 0.18rem 0.5rem; border-radius: 2px; font-size: 0.7rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
     .badge-karting { background: rgba(204,0,0,0.15); color: #f87171; border: 1px solid rgba(204,0,0,0.3); }
     .badge-tns { background: rgba(59,130,246,0.12); color: #93c5fd; border: 1px solid rgba(59,130,246,0.25); }
     .badge-tmz { background: rgba(168,85,247,0.12); color: #d8b4fe; border: 1px solid rgba(168,85,247,0.25); }
-    .badge-reg { background: rgba(34,197,94,0.12); color: #86efac; border: 1px solid rgba(34,197,94,0.25); }
+    .badge-pagado { background: rgba(22,163,74,0.15); color: #4ade80; border: 1px solid rgba(22,163,74,0.3); }
+    .badge-pendiente { background: rgba(234,179,8,0.12); color: #fde047; border: 1px solid rgba(234,179,8,0.25); }
+    .badge-baja { background: rgba(100,100,100,0.15); color: #999; border: 1px solid #444; }
+
+    .acciones { display: flex; gap: 0.35rem; }
+    .btn-accion { border: none; border-radius: 2px; padding: 0.28rem 0.55rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
+    .btn-pago { background: rgba(22,163,74,0.2); color: #4ade80; border: 1px solid rgba(22,163,74,0.4); }
+    .btn-pago:hover { background: rgba(22,163,74,0.35); }
+    .btn-baja { background: rgba(100,100,100,0.2); color: #aaa; border: 1px solid #444; }
+    .btn-baja:hover { background: rgba(100,100,100,0.35); }
 
     .empty { padding: 2rem; text-align: center; color: var(--texto-muted); font-size: 0.9rem; }
-
     .loading { padding: 2rem; text-align: center; color: var(--texto-muted); font-size: 0.9rem; }
+
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--gris-medio); border: 1px solid var(--borde); border-top: 4px solid var(--verde); border-radius: 2px; padding: 2rem; width: 100%; max-width: 400px; }
+    .modal.rojo-top { border-top-color: var(--rojo); }
+    .modal h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 1.3rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.3rem; }
+    .modal .modal-sub { color: var(--texto-muted); font-size: 0.85rem; margin-bottom: 1.5rem; }
+    .modal label { display: block; font-size: 0.75rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; margin-bottom: 0.4rem; margin-top: 1rem; }
+    .modal input, .modal select, .modal textarea { width: 100%; background: var(--gris-campo); border: 1px solid var(--borde); border-radius: 3px; padding: 0.65rem 0.9rem; color: var(--blanco); font-family: 'Barlow', sans-serif; font-size: 0.95rem; outline: none; transition: border-color 0.15s; appearance: none; }
+    .modal input:focus, .modal select:focus, .modal textarea:focus { border-color: var(--rojo); }
+    .modal textarea { resize: vertical; min-height: 80px; }
+    .modal-btns { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+    .modal-btns button { flex: 1; padding: 0.75rem; border: none; border-radius: 3px; font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: background 0.15s; }
+    .btn-confirmar-verde { background: var(--verde); color: var(--blanco); }
+    .btn-confirmar-verde:hover { background: #15803d; }
+    .btn-confirmar-rojo { background: var(--rojo); color: var(--blanco); }
+    .btn-confirmar-rojo:hover { background: var(--rojo-oscuro); }
+    .btn-cancelar { background: #333; color: var(--texto-muted); }
+    .btn-cancelar:hover { background: #444; color: var(--blanco); }
 
     footer { border-top: 1px solid #333; padding: 1.5rem 2rem; text-align: center; color: var(--texto-muted); font-size: 0.8rem; }
   </style>
@@ -132,7 +118,6 @@
   <button id="btnLogout">Cerrar sesión</button>
 </header>
 
-<!-- LOGIN -->
 <div id="loginScreen">
   <div class="login-box">
     <h2>Acceso Admin</h2>
@@ -146,14 +131,48 @@
   </div>
 </div>
 
-<!-- ADMIN PANEL -->
+<!-- MODAL PAGO -->
+<div class="modal-overlay" id="modalPago">
+  <div class="modal">
+    <h3>Registrar pago</h3>
+    <p class="modal-sub" id="modalPagoNombre"></p>
+    <label>Monto (UYU)</label>
+    <input type="number" id="pagoMonto" placeholder="0" min="0" step="1">
+    <label>Fecha de pago</label>
+    <input type="date" id="pagoFecha">
+    <label>Medio de pago</label>
+    <select id="pagoMedio">
+      <option value="">Seleccioná...</option>
+      <option value="efectivo">Efectivo</option>
+      <option value="transferencia">Transferencia</option>
+    </select>
+    <div class="modal-btns">
+      <button class="btn-cancelar" onclick="cerrarModal('modalPago')">Cancelar</button>
+      <button class="btn-confirmar-verde" id="btnConfirmarPago">Confirmar pago</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BAJA -->
+<div class="modal-overlay" id="modalBaja">
+  <div class="modal rojo-top">
+    <h3>Registrar baja</h3>
+    <p class="modal-sub" id="modalBajaNombre"></p>
+    <label>Motivo de baja</label>
+    <textarea id="bajaMotivo" placeholder="Descripción del motivo..."></textarea>
+    <div class="modal-btns">
+      <button class="btn-cancelar" onclick="cerrarModal('modalBaja')">Cancelar</button>
+      <button class="btn-confirmar-rojo" id="btnConfirmarBaja">Confirmar baja</button>
+    </div>
+  </div>
+</div>
+
 <div id="adminPanel">
   <div class="panel-header">
     <h1>Inscripciones 2026</h1>
-    <p>Reportes del Campeonato Regional SAC</p>
+    <p>Campeonato Regional SAC</p>
   </div>
 
-  <!-- Filtros -->
   <div class="filters">
     <div class="filter-group">
       <label>Fecha de carrera</label>
@@ -171,120 +190,63 @@
     <div class="filter-group">
       <label>Categoría</label>
       <select id="filtroCategoria">
-        <option value="">Todas las categorías</option>
+        <option value="">Todas</option>
         <option value="karting">Karting</option>
         <option value="turismo">Turismo (TNS/TMZ)</option>
         <option value="regularidad">Regularidad</option>
       </select>
     </div>
+    <div class="filter-group">
+      <label>Estado pago</label>
+      <select id="filtroPago">
+        <option value="">Todos</option>
+        <option value="pagado">Pagados</option>
+        <option value="pendiente">Pendientes</option>
+      </select>
+    </div>
     <button class="btn-refresh" id="btnCargar">Actualizar</button>
   </div>
 
-  <!-- Resumen -->
   <div class="summary-cards">
-    <div class="summary-card">
-      <div class="num" id="totalKarting">—</div>
-      <div class="lbl">Karting</div>
-    </div>
-    <div class="summary-card">
-      <div class="num" id="totalTurismo">—</div>
-      <div class="lbl">Turismo</div>
-    </div>
-    <div class="summary-card">
-      <div class="num" id="totalRegularidad">—</div>
-      <div class="lbl">Regularidad</div>
-    </div>
-    <div class="summary-card">
-      <div class="num" id="totalGeneral">—</div>
-      <div class="lbl">Total inscriptos</div>
-    </div>
+    <div class="summary-card"><div class="num" id="totalKarting">—</div><div class="lbl">Karting</div></div>
+    <div class="summary-card"><div class="num" id="totalTurismo">—</div><div class="lbl">Turismo</div></div>
+    <div class="summary-card"><div class="num" id="totalRegularidad">—</div><div class="lbl">Regularidad</div></div>
+    <div class="summary-card"><div class="num" id="totalGeneral">—</div><div class="lbl">Total</div></div>
+    <div class="summary-card s-verde"><div class="num verde" id="totalPagados">—</div><div class="lbl">Pagados</div></div>
+    <div class="summary-card s-verde"><div class="num verde" id="totalRecaudado">—</div><div class="lbl">Recaudado UYU</div></div>
   </div>
 
-  <!-- Tabla Karting -->
   <div class="section-block" id="secKarting">
     <h2>Karting</h2>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Piloto</th>
-            <th>Fecha carrera</th>
-            <th>Cilindrada</th>
-            <th>Nº Kart</th>
-            <th>Departamento</th>
-            <th>Fecha nac.</th>
-            <th>Inscripto</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyKarting"><tr><td colspan="7" class="loading">Cargando...</td></tr></tbody>
-      </table>
-    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Piloto</th><th>Fecha</th><th>Cilindrada</th><th>Nº Kart</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody id="tbodyKarting"><tr><td colspan="10" class="loading">Cargando...</td></tr></tbody>
+    </table></div>
   </div>
 
-  <!-- Tabla Turismo -->
   <div class="section-block" id="secTurismo">
     <h2>Turismo — TNS / TMZ</h2>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Piloto</th>
-            <th>Fecha carrera</th>
-            <th>Categoría</th>
-            <th>Nº Auto</th>
-            <th>Marca / Modelo</th>
-            <th>Equipo</th>
-            <th>Gomas</th>
-            <th>Pastillas</th>
-            <th>Discos</th>
-            <th>Inscripto</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyTurismo"><tr><td colspan="10" class="loading">Cargando...</td></tr></tbody>
-      </table>
-    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Piloto</th><th>Fecha</th><th>Cat.</th><th>Nº Auto</th><th>Marca/Modelo</th><th>Equipo</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody id="tbodyTurismo"><tr><td colspan="12" class="loading">Cargando...</td></tr></tbody>
+    </table></div>
   </div>
 
-  <!-- Tabla Regularidad -->
   <div class="section-block" id="secRegularidad">
     <h2>Regularidad</h2>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Piloto</th>
-            <th>Navegante</th>
-            <th>Fecha carrera</th>
-            <th>Vehículo</th>
-            <th>Nº Auto</th>
-            <th>Inscripto</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyRegularidad"><tr><td colspan="6" class="loading">Cargando...</td></tr></tbody>
-      </table>
-    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Piloto</th><th>Navegante</th><th>Fecha</th><th>Vehículo</th><th>Nº Auto</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody id="tbodyRegularidad"><tr><td colspan="11" class="loading">Cargando...</td></tr></tbody>
+    </table></div>
   </div>
 
-  <!-- Resumen por fecha -->
   <div class="section-block">
-    <h2>Inscripciones por fecha</h2>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Karting</th>
-            <th>TNS</th>
-            <th>TMZ</th>
-            <th>Regularidad</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyPorFecha"><tr><td colspan="6" class="loading">Cargando...</td></tr></tbody>
-      </table>
-    </div>
+    <h2>Resumen por fecha</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Fecha</th><th>Karting</th><th>TNS</th><th>TMZ</th><th>Regularidad</th><th>Total</th><th>Pagados</th><th>Recaudado (UYU)</th></tr></thead>
+      <tbody id="tbodyPorFecha"><tr><td colspan="8" class="loading">Cargando...</td></tr></tbody>
+    </table></div>
   </div>
-
 </div>
 
 <footer>Salto Automóvil Club &mdash; Panel Administrativo &mdash; 2026</footer>
@@ -305,26 +267,13 @@
     '2026-11-29': '7º — 28/29 Noviembre',
   };
 
-  function fmtFecha(iso) {
-    if (!iso) return '—';
-    return FECHAS[iso] || iso;
-  }
+  function fmtFecha(iso) { return FECHAS[iso] || iso || '—'; }
+  function fmtDate(iso) { if (!iso) return '—'; const [y,m,d] = iso.split('-'); return `${d}/${m}/${y}`; }
+  function val(v) { return (v != null && v !== '') ? v : '—'; }
+  function fmtMonto(v) { return v != null ? `$ ${Number(v).toLocaleString('es-UY')}` : '—'; }
+  function capFirst(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : '—'; }
 
-  function fmtDate(iso) {
-    if (!iso) return '—';
-    const [y, m, d] = iso.split('-');
-    return `${d}/${m}/${y}`;
-  }
-
-  function fmtTs(iso) {
-    if (!iso) return '—';
-    const d = new Date(iso);
-    return d.toLocaleDateString('es-UY') + ' ' + d.toLocaleTimeString('es-UY', { hour: '2-digit', minute: '2-digit' });
-  }
-
-  function val(v) { return v ?? '—'; }
-
-  // ── AUTH ──
+  // AUTH
   async function checkSession() {
     const { data: { session } } = await sb.auth.getSession();
     if (session) showPanel();
@@ -336,30 +285,18 @@
     const btn = document.getElementById('btnLogin');
     const err = document.getElementById('loginError');
     err.style.display = 'none';
-    btn.disabled = true;
-    btn.textContent = 'Ingresando...';
-
+    btn.disabled = true; btn.textContent = 'Ingresando...';
     const { error } = await sb.auth.signInWithPassword({ email, password: pass });
-    if (error) {
-      err.style.display = 'block';
-      btn.disabled = false;
-      btn.textContent = 'Ingresar';
-    } else {
-      showPanel();
-    }
+    if (error) { err.style.display = 'block'; btn.disabled = false; btn.textContent = 'Ingresar'; }
+    else showPanel();
   });
-
-  document.getElementById('inputPass').addEventListener('keydown', e => {
-    if (e.key === 'Enter') document.getElementById('btnLogin').click();
-  });
-
+  document.getElementById('inputPass').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btnLogin').click(); });
   document.getElementById('btnLogout').addEventListener('click', async () => {
     await sb.auth.signOut();
     document.getElementById('adminPanel').style.display = 'none';
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('btnLogout').style.display = 'none';
   });
-
   function showPanel() {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('adminPanel').style.display = 'block';
@@ -367,150 +304,195 @@
     cargarDatos();
   }
 
-  // ── DATOS ──
+  // MODAL
+  let modalCtx = null;
+  function cerrarModal(id) { document.getElementById(id).classList.remove('open'); modalCtx = null; }
+  document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); }));
+
+  function abrirModalPago(tabla, id, nombre) {
+    modalCtx = { tabla, id };
+    document.getElementById('modalPagoNombre').textContent = nombre;
+    document.getElementById('pagoMonto').value = '';
+    document.getElementById('pagoFecha').value = new Date().toISOString().split('T')[0];
+    document.getElementById('pagoMedio').value = '';
+    document.getElementById('modalPago').classList.add('open');
+  }
+
+  function abrirModalBaja(tabla, id, nombre) {
+    modalCtx = { tabla, id };
+    document.getElementById('modalBajaNombre').textContent = nombre;
+    document.getElementById('bajaMotivo').value = '';
+    document.getElementById('modalBaja').classList.add('open');
+  }
+
+  document.getElementById('btnConfirmarPago').addEventListener('click', async () => {
+    if (!modalCtx) return;
+    const medio = document.getElementById('pagoMedio').value;
+    if (!medio) { alert('Seleccioná el medio de pago.'); return; }
+    const monto = parseFloat(document.getElementById('pagoMonto').value);
+    const fecha = document.getElementById('pagoFecha').value;
+    const btn = document.getElementById('btnConfirmarPago');
+    btn.disabled = true; btn.textContent = 'Guardando...';
+    const { error } = await sb.from(modalCtx.tabla).update({
+      pago_confirmado: true,
+      pago_monto: isNaN(monto) ? null : monto,
+      pago_fecha: fecha || null,
+      pago_medio: medio,
+    }).eq('id', modalCtx.id);
+    btn.disabled = false; btn.textContent = 'Confirmar pago';
+    if (!error) { cerrarModal('modalPago'); cargarDatos(); }
+    else alert('Error al guardar. Intentá nuevamente.');
+  });
+
+  document.getElementById('btnConfirmarBaja').addEventListener('click', async () => {
+    if (!modalCtx) return;
+    const motivo = document.getElementById('bajaMotivo').value.trim();
+    const btn = document.getElementById('btnConfirmarBaja');
+    btn.disabled = true; btn.textContent = 'Guardando...';
+    const { error } = await sb.from(modalCtx.tabla).update({
+      baja: true,
+      baja_motivo: motivo || null,
+    }).eq('id', modalCtx.id);
+    btn.disabled = false; btn.textContent = 'Confirmar baja';
+    if (!error) { cerrarModal('modalBaja'); cargarDatos(); }
+    else alert('Error al guardar. Intentá nuevamente.');
+  });
+
+  // DATOS
   document.getElementById('btnCargar').addEventListener('click', cargarDatos);
+
+  async function queryTabla(tabla, filtroFecha, filtroPago) {
+    let q = sb.from(tabla).select('*').order('created_at', { ascending: false });
+    if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
+    if (filtroPago === 'pagado') q = q.eq('pago_confirmado', true);
+    if (filtroPago === 'pendiente') q = q.eq('pago_confirmado', false);
+    const { data } = await q;
+    return data || [];
+  }
 
   async function cargarDatos() {
     const filtroFecha = document.getElementById('filtroFecha').value;
     const filtroCat = document.getElementById('filtroCategoria').value;
+    const filtroPago = document.getElementById('filtroPago').value;
 
-    const mostrarKarting = !filtroCat || filtroCat === 'karting';
-    const mostrarTurismo = !filtroCat || filtroCat === 'turismo';
-    const mostrarRegularidad = !filtroCat || filtroCat === 'regularidad';
+    const mostrarK = !filtroCat || filtroCat === 'karting';
+    const mostrarT = !filtroCat || filtroCat === 'turismo';
+    const mostrarR = !filtroCat || filtroCat === 'regularidad';
 
-    document.getElementById('secKarting').style.display = mostrarKarting ? '' : 'none';
-    document.getElementById('secTurismo').style.display = mostrarTurismo ? '' : 'none';
-    document.getElementById('secRegularidad').style.display = mostrarRegularidad ? '' : 'none';
+    document.getElementById('secKarting').style.display = mostrarK ? '' : 'none';
+    document.getElementById('secTurismo').style.display = mostrarT ? '' : 'none';
+    document.getElementById('secRegularidad').style.display = mostrarR ? '' : 'none';
 
-    let [kData, tData, rData] = [[], [], []];
+    const [kData, tData, rData] = await Promise.all([
+      mostrarK ? queryTabla('inscripciones_karting', filtroFecha, filtroPago) : Promise.resolve([]),
+      mostrarT ? queryTabla('inscripciones_turismo', filtroFecha, filtroPago) : Promise.resolve([]),
+      mostrarR ? queryTabla('inscripciones_regularidad', filtroFecha, filtroPago) : Promise.resolve([]),
+    ]);
 
-    if (mostrarKarting) {
-      let q = sb.from('inscripciones_karting').select('*').order('created_at', { ascending: false });
-      if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
-      const { data } = await q;
-      kData = data || [];
-    }
+    const todos = [...kData, ...tData, ...rData];
+    const pagados = todos.filter(r => r.pago_confirmado);
+    const recaudado = pagados.reduce((s, r) => s + (parseFloat(r.pago_monto) || 0), 0);
 
-    if (mostrarTurismo) {
-      let q = sb.from('inscripciones_turismo').select('*').order('created_at', { ascending: false });
-      if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
-      const { data } = await q;
-      tData = data || [];
-    }
-
-    if (mostrarRegularidad) {
-      let q = sb.from('inscripciones_regularidad').select('*').order('created_at', { ascending: false });
-      if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
-      const { data } = await q;
-      rData = data || [];
-    }
-
-    // Totales
     document.getElementById('totalKarting').textContent = kData.length;
     document.getElementById('totalTurismo').textContent = tData.length;
     document.getElementById('totalRegularidad').textContent = rData.length;
-    document.getElementById('totalGeneral').textContent = kData.length + tData.length + rData.length;
+    document.getElementById('totalGeneral').textContent = todos.length;
+    document.getElementById('totalPagados').textContent = pagados.length;
+    document.getElementById('totalRecaudado').textContent = `$ ${recaudado.toLocaleString('es-UY')}`;
 
-    // Tabla karting
-    const tbK = document.getElementById('tbodyKarting');
-    if (kData.length === 0) {
-      tbK.innerHTML = '<tr><td colspan="7" class="empty">Sin inscripciones</td></tr>';
-    } else {
-      tbK.innerHTML = kData.map(r => `
-        <tr>
+    // Karting
+    document.getElementById('tbodyKarting').innerHTML = kData.length === 0
+      ? '<tr><td colspan="10" class="empty">Sin inscripciones</td></tr>'
+      : kData.map(r => `<tr class="${r.baja ? 'baja-row' : ''}">
           <td>${val(r.nombre)}</td>
           <td>${fmtFecha(r.fecha_carrera)}</td>
           <td><span class="badge badge-karting">${val(r.cilindrada)}</span></td>
           <td>${val(r.numero_kart)}</td>
-          <td>${val(r.departamento)}</td>
-          <td>${fmtDate(r.fecha_nacimiento)}</td>
-          <td>${fmtTs(r.created_at)}</td>
+          <td><span class="badge ${r.pago_confirmado ? 'badge-pagado' : 'badge-pendiente'}">${r.pago_confirmado ? 'Pagado' : 'Pendiente'}</span></td>
+          <td>${fmtMonto(r.pago_monto)}</td>
+          <td>${capFirst(r.pago_medio)}</td>
+          <td>${fmtDate(r.pago_fecha)}</td>
+          <td>${r.baja ? `<span class="badge badge-baja" title="${r.baja_motivo || ''}">Baja</span>` : '—'}</td>
+          <td><div class="acciones">
+            ${!r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_karting','${r.id}','${r.nombre}')">Pago</button>` : ''}
+            ${!r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_karting','${r.id}','${r.nombre}')">Baja</button>` : ''}
+          </div></td>
         </tr>`).join('');
-    }
 
-    // Tabla turismo
-    const tbT = document.getElementById('tbodyTurismo');
-    if (tData.length === 0) {
-      tbT.innerHTML = '<tr><td colspan="10" class="empty">Sin inscripciones</td></tr>';
-    } else {
-      tbT.innerHTML = tData.map(r => `
-        <tr>
+    // Turismo
+    document.getElementById('tbodyTurismo').innerHTML = tData.length === 0
+      ? '<tr><td colspan="12" class="empty">Sin inscripciones</td></tr>'
+      : tData.map(r => `<tr class="${r.baja ? 'baja-row' : ''}">
           <td>${val(r.nombre)}</td>
           <td>${fmtFecha(r.fecha_carrera)}</td>
           <td><span class="badge ${r.categoria === 'TNS' ? 'badge-tns' : 'badge-tmz'}">${val(r.categoria)}</span></td>
           <td>${val(r.numero_auto)}</td>
           <td>${val(r.marca_modelo)}</td>
           <td>${val(r.nombre_equipo)}</td>
-          <td>${val(r.cantidad_gomas)}</td>
-          <td>${val(r.cantidad_pastillas)}</td>
-          <td>${val(r.cantidad_discos)}</td>
-          <td>${fmtTs(r.created_at)}</td>
+          <td><span class="badge ${r.pago_confirmado ? 'badge-pagado' : 'badge-pendiente'}">${r.pago_confirmado ? 'Pagado' : 'Pendiente'}</span></td>
+          <td>${fmtMonto(r.pago_monto)}</td>
+          <td>${capFirst(r.pago_medio)}</td>
+          <td>${fmtDate(r.pago_fecha)}</td>
+          <td>${r.baja ? `<span class="badge badge-baja" title="${r.baja_motivo || ''}">Baja</span>` : '—'}</td>
+          <td><div class="acciones">
+            ${!r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_turismo','${r.id}','${r.nombre}')">Pago</button>` : ''}
+            ${!r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_turismo','${r.id}','${r.nombre}')">Baja</button>` : ''}
+          </div></td>
         </tr>`).join('');
-    }
 
-    // Tabla regularidad
-    const tbR = document.getElementById('tbodyRegularidad');
-    if (rData.length === 0) {
-      tbR.innerHTML = '<tr><td colspan="6" class="empty">Sin inscripciones</td></tr>';
-    } else {
-      tbR.innerHTML = rData.map(r => `
-        <tr>
+    // Regularidad
+    document.getElementById('tbodyRegularidad').innerHTML = rData.length === 0
+      ? '<tr><td colspan="11" class="empty">Sin inscripciones</td></tr>'
+      : rData.map(r => `<tr class="${r.baja ? 'baja-row' : ''}">
           <td>${val(r.nombre_piloto)}</td>
           <td>${val(r.nombre_navegante)}</td>
           <td>${fmtFecha(r.fecha_carrera)}</td>
           <td>${[r.marca, r.modelo, r.anio].filter(Boolean).join(' ') || '—'}</td>
           <td>${val(r.numero_auto)}</td>
-          <td>${fmtTs(r.created_at)}</td>
+          <td><span class="badge ${r.pago_confirmado ? 'badge-pagado' : 'badge-pendiente'}">${r.pago_confirmado ? 'Pagado' : 'Pendiente'}</span></td>
+          <td>${fmtMonto(r.pago_monto)}</td>
+          <td>${capFirst(r.pago_medio)}</td>
+          <td>${fmtDate(r.pago_fecha)}</td>
+          <td>${r.baja ? `<span class="badge badge-baja" title="${r.baja_motivo || ''}">Baja</span>` : '—'}</td>
+          <td><div class="acciones">
+            ${!r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Pago</button>` : ''}
+            ${!r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Baja</button>` : ''}
+          </div></td>
         </tr>`).join('');
-    }
 
-    // Tabla por fecha — siempre con todos los datos sin filtro de categoría
     await cargarPorFecha(filtroFecha);
   }
 
   async function cargarPorFecha(filtroFecha) {
-    // Traemos todos sin filtro de categoría para el resumen
-    let qK = sb.from('inscripciones_karting').select('fecha_carrera');
-    let qT = sb.from('inscripciones_turismo').select('fecha_carrera, categoria');
-    let qR = sb.from('inscripciones_regularidad').select('fecha_carrera');
+    const [{ data: kAll }, { data: tAll }, { data: rAll }] = await Promise.all([
+      sb.from('inscripciones_karting').select('fecha_carrera, pago_confirmado, pago_monto, baja'),
+      sb.from('inscripciones_turismo').select('fecha_carrera, categoria, pago_confirmado, pago_monto, baja'),
+      sb.from('inscripciones_regularidad').select('fecha_carrera, pago_confirmado, pago_monto, baja'),
+    ]);
 
-    if (filtroFecha) {
-      qK = qK.eq('fecha_carrera', filtroFecha);
-      qT = qT.eq('fecha_carrera', filtroFecha);
-      qR = qR.eq('fecha_carrera', filtroFecha);
-    }
-
-    const [{ data: kAll }, { data: tAll }, { data: rAll }] = await Promise.all([qK, qT, qR]);
-
-    // Agrupar por fecha
-    const fechas = Object.keys(FECHAS);
-    const rows = fechas.map(f => {
-      const k = (kAll || []).filter(r => r.fecha_carrera === f).length;
-      const tns = (tAll || []).filter(r => r.fecha_carrera === f && r.categoria === 'TNS').length;
-      const tmz = (tAll || []).filter(r => r.fecha_carrera === f && r.categoria === 'TMZ').length;
-      const reg = (rAll || []).filter(r => r.fecha_carrera === f).length;
-      const total = k + tns + tmz + reg;
-      return { f, k, tns, tmz, reg, total };
+    const rows = Object.keys(FECHAS).map(f => {
+      const k = (kAll || []).filter(r => r.fecha_carrera === f && !r.baja);
+      const tns = (tAll || []).filter(r => r.fecha_carrera === f && r.categoria === 'TNS' && !r.baja);
+      const tmz = (tAll || []).filter(r => r.fecha_carrera === f && r.categoria === 'TMZ' && !r.baja);
+      const reg = (rAll || []).filter(r => r.fecha_carrera === f && !r.baja);
+      const todos = [...k, ...tns, ...tmz, ...reg];
+      const pagados = todos.filter(r => r.pago_confirmado).length;
+      const recaudado = todos.filter(r => r.pago_confirmado).reduce((s, r) => s + (parseFloat(r.pago_monto) || 0), 0);
+      return { f, k: k.length, tns: tns.length, tmz: tmz.length, reg: reg.length, total: todos.length, pagados, recaudado };
     }).filter(r => !filtroFecha || r.f === filtroFecha);
 
-    const tbF = document.getElementById('tbodyPorFecha');
     const hayDatos = rows.some(r => r.total > 0);
-    if (!hayDatos) {
-      tbF.innerHTML = '<tr><td colspan="6" class="empty">Sin inscripciones</td></tr>';
-    } else {
-      tbF.innerHTML = rows.map(r => `
-        <tr>
+    document.getElementById('tbodyPorFecha').innerHTML = !hayDatos
+      ? '<tr><td colspan="8" class="empty">Sin inscripciones</td></tr>'
+      : rows.map(r => `<tr>
           <td>${FECHAS[r.f]}</td>
-          <td>${r.k || '—'}</td>
-          <td>${r.tns || '—'}</td>
-          <td>${r.tmz || '—'}</td>
-          <td>${r.reg || '—'}</td>
+          <td>${r.k || '—'}</td><td>${r.tns || '—'}</td><td>${r.tmz || '—'}</td><td>${r.reg || '—'}</td>
           <td><strong>${r.total || '—'}</strong></td>
+          <td>${r.pagados || '—'}</td>
+          <td>${r.recaudado ? `$ ${r.recaudado.toLocaleString('es-UY')}` : '—'}</td>
         </tr>`).join('');
-    }
   }
 
-  // Chequear sesión al cargar
   checkSession();
 </script>
 </body>
