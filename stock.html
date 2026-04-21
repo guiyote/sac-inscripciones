@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/jpeg" href="logo.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAC - Stock</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --rojo: #CC0000; --rojo-oscuro: #990000;
+      --gris: #1a1a1a; --gris-medio: #2d2d2d; --gris-campo: #222;
+      --blanco: #ffffff; --texto-muted: #888; --borde: #3a3a3a;
+      --verde: #16a34a; --amarillo: #ca8a04;
+    }
+    body { font-family: 'Barlow', sans-serif; background: var(--gris); color: var(--blanco); min-height: 100vh; }
+
+    header { background: var(--gris); border-bottom: 3px solid var(--rojo); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 70px; position: sticky; top: 0; z-index: 100; }
+    .header-logo { display: flex; align-items: center; gap: 1rem; }
+    .logo-circle { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; flex-shrink: 0; display: block; }
+    .logo-circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .header-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase; line-height: 1.2; }
+    .header-title span { display: block; font-size: 0.7rem; font-weight: 400; letter-spacing: 3px; color: var(--texto-muted); }
+    .header-right { display: flex; align-items: center; gap: 1rem; }
+    .back-link { display: flex; align-items: center; gap: 0.4rem; color: var(--texto-muted); text-decoration: none; font-size: 0.85rem; letter-spacing: 1px; transition: color 0.15s; }
+    .back-link:hover { color: var(--blanco); }
+    .back-link svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+    #btnLogout { display: none; background: transparent; border: 1px solid #444; color: var(--texto-muted); padding: 0.4rem 1rem; border-radius: 3px; cursor: pointer; font-family: 'Barlow', sans-serif; font-size: 0.85rem; transition: border-color 0.15s, color 0.15s; }
+    #btnLogout:hover { border-color: var(--rojo); color: var(--blanco); }
+
+    /* LOGIN */
+    #loginScreen { display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 70px); padding: 2rem; }
+    .login-box { background: var(--gris-medio); border: 1px solid var(--borde); border-top: 4px solid var(--rojo); border-radius: 2px; padding: 2.5rem 2rem; width: 100%; max-width: 380px; }
+    .login-box h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 1.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.4rem; }
+    .login-box p { color: var(--texto-muted); font-size: 0.85rem; margin-bottom: 1.75rem; }
+    .login-box label { display: block; font-size: 0.75rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; margin-bottom: 0.4rem; }
+    .login-box input { width: 100%; background: var(--gris-campo); border: 1px solid var(--borde); border-radius: 3px; padding: 0.75rem 1rem; color: var(--blanco); font-family: 'Barlow', sans-serif; font-size: 1rem; outline: none; transition: border-color 0.15s; margin-bottom: 1rem; }
+    .login-box input:focus { border-color: var(--rojo); }
+    .login-box button { width: 100%; background: var(--rojo); color: var(--blanco); border: none; border-radius: 3px; padding: 0.85rem; font-family: 'Barlow Condensed', sans-serif; font-size: 1.05rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: background 0.15s; margin-top: 0.5rem; }
+    .login-box button:hover { background: var(--rojo-oscuro); }
+    .login-box button:disabled { background: #555; cursor: not-allowed; }
+    .login-error { display: none; color: #f87171; font-size: 0.85rem; margin-top: 0.75rem; }
+
+    /* PANEL */
+    #stockPanel { display: none; padding: 2rem 1.5rem 4rem; max-width: 1100px; margin: 0 auto; }
+    .panel-header { margin-bottom: 2rem; }
+    .panel-header h1 { font-family: 'Barlow Condensed', sans-serif; font-size: 2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
+    .panel-header p { color: var(--texto-muted); font-size: 0.9rem; margin-top: 0.3rem; }
+
+    /* Cards de stock */
+    .stock-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
+    .stock-card { background: var(--gris-medio); border: 1px solid var(--borde); border-top: 3px solid var(--rojo); border-radius: 2px; padding: 1.25rem 1.5rem; }
+    .stock-card.bajo { border-top-color: var(--amarillo); }
+    .stock-card.sin-stock { border-top-color: var(--rojo); opacity: 0.7; }
+    .stock-card .art-nombre { font-family: 'Barlow Condensed', sans-serif; font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.25rem; }
+    .stock-card .art-precio { font-size: 0.8rem; color: var(--texto-muted); margin-bottom: 0.75rem; }
+    .stock-card .art-cantidad { font-family: 'Barlow Condensed', sans-serif; font-size: 2.8rem; font-weight: 800; line-height: 1; }
+    .stock-card .art-cantidad.verde { color: #4ade80; }
+    .stock-card .art-cantidad.amarillo { color: #fde047; }
+    .stock-card .art-cantidad.rojo { color: #f87171; }
+    .stock-card .art-label { font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--texto-muted); margin-top: 0.25rem; }
+    .stock-card .art-btns { display: flex; gap: 0.5rem; margin-top: 1rem; }
+    .btn-entrada { background: rgba(22,163,74,0.2); color: #4ade80; border: 1px solid rgba(22,163,74,0.4); border-radius: 2px; padding: 0.3rem 0.75rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: background 0.15s; }
+    .btn-entrada:hover { background: rgba(22,163,74,0.35); }
+    .btn-salida { background: rgba(204,0,0,0.2); color: #f87171; border: 1px solid rgba(204,0,0,0.4); border-radius: 2px; padding: 0.3rem 0.75rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: background 0.15s; }
+    .btn-salida:hover { background: rgba(204,0,0,0.35); }
+
+    /* Sección historial */
+    .section-block { margin-bottom: 2.5rem; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--borde); }
+    .section-block h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--texto-muted); }
+    .filter-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .filter-row select { background: var(--gris-campo); border: 1px solid var(--borde); border-radius: 3px; padding: 0.45rem 0.75rem; color: var(--blanco); font-family: 'Barlow', sans-serif; font-size: 0.85rem; outline: none; appearance: none; cursor: pointer; }
+
+    .table-wrap { overflow-x: auto; border-radius: 2px; border: 1px solid var(--borde); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    thead th { background: var(--gris-medio); padding: 0.7rem 0.75rem; text-align: left; font-size: 0.68rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; border-bottom: 1px solid var(--borde); white-space: nowrap; }
+    tbody tr { border-bottom: 1px solid #252525; transition: background 0.1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+    tbody td { padding: 0.65rem 0.75rem; color: var(--blanco); vertical-align: middle; }
+
+    .badge { display: inline-block; padding: 0.18rem 0.5rem; border-radius: 2px; font-size: 0.7rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+    .badge-entrada { background: rgba(22,163,74,0.15); color: #4ade80; border: 1px solid rgba(22,163,74,0.3); }
+    .badge-salida { background: rgba(204,0,0,0.15); color: #f87171; border: 1px solid rgba(204,0,0,0.3); }
+    .badge-pagado { background: rgba(22,163,74,0.15); color: #4ade80; border: 1px solid rgba(22,163,74,0.3); }
+    .badge-pendiente { background: rgba(234,179,8,0.12); color: #fde047; border: 1px solid rgba(234,179,8,0.25); }
+
+    .btn-pago-mov { border: none; border-radius: 2px; padding: 0.25rem 0.5rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; background: rgba(22,163,74,0.2); color: #4ade80; border: 1px solid rgba(22,163,74,0.4); }
+    .btn-pago-mov:hover { background: rgba(22,163,74,0.35); }
+
+    .empty { padding: 2rem; text-align: center; color: var(--texto-muted); font-size: 0.9rem; }
+
+    /* Modales */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--gris-medio); border: 1px solid var(--borde); border-radius: 2px; padding: 2rem; width: 100%; max-width: 420px; }
+    .modal.verde-top { border-top: 4px solid var(--verde); }
+    .modal.rojo-top { border-top: 4px solid var(--rojo); }
+    .modal h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 1.3rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.3rem; }
+    .modal .modal-sub { color: var(--texto-muted); font-size: 0.85rem; margin-bottom: 1.25rem; }
+    .modal label { display: block; font-size: 0.75rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; margin-bottom: 0.4rem; margin-top: 0.9rem; }
+    .modal input, .modal select, .modal textarea { width: 100%; background: var(--gris-campo); border: 1px solid var(--borde); border-radius: 3px; padding: 0.65rem 0.9rem; color: var(--blanco); font-family: 'Barlow', sans-serif; font-size: 0.95rem; outline: none; transition: border-color 0.15s; appearance: none; }
+    .modal input:focus, .modal select:focus { border-color: var(--rojo); }
+    .modal textarea { resize: vertical; min-height: 70px; }
+    .modal-btns { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+    .modal-btns button { flex: 1; padding: 0.75rem; border: none; border-radius: 3px; font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: background 0.15s; }
+    .btn-ok-verde { background: var(--verde); color: var(--blanco); }
+    .btn-ok-verde:hover { background: #15803d; }
+    .btn-ok-rojo { background: var(--rojo); color: var(--blanco); }
+    .btn-ok-rojo:hover { background: var(--rojo-oscuro); }
+    .btn-cancelar { background: #333; color: var(--texto-muted); }
+    .btn-cancelar:hover { background: #444; color: var(--blanco); }
+
+    footer { border-top: 1px solid #333; padding: 1.5rem 2rem; text-align: center; color: var(--texto-muted); font-size: 0.8rem; }
+
+    @media (max-width: 600px) {
+      header { padding: 0 1rem; }
+      .header-title span { display: none; }
+      #stockPanel { padding: 1.5rem 1rem 3rem; }
+      .stock-cards { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-logo">
+    <a href="index.html" class="logo-circle"><img src="logo.jpeg" alt="SAC"></a>
+    <div class="header-title">Salto Automóvil Club<span>Stock de repuestos</span></div>
+  </div>
+  <div class="header-right">
+    <a href="admin.html" class="back-link">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Admin
+    </a>
+    <button id="btnLogout">Cerrar sesión</button>
+  </div>
+</header>
+
+<div id="loginScreen">
+  <div class="login-box">
+    <h2>Acceso Admin</h2>
+    <p>Ingresá con tu usuario y contraseña</p>
+    <label for="inputEmail">Email</label>
+    <input type="email" id="inputEmail" placeholder="admin@ejemplo.com" autocomplete="username">
+    <label for="inputPass">Contraseña</label>
+    <input type="password" id="inputPass" placeholder="••••••••" autocomplete="current-password">
+    <button id="btnLogin">Ingresar</button>
+    <div class="login-error" id="loginError">Email o contraseña incorrectos.</div>
+  </div>
+</div>
+
+<!-- MODAL ENTRADA -->
+<div class="modal-overlay" id="modalEntrada">
+  <div class="modal verde-top">
+    <h3>Entrada de stock</h3>
+    <p class="modal-sub" id="modalEntradaNombre"></p>
+    <label>Cantidad</label>
+    <input type="number" id="entradaCantidad" min="1" placeholder="0">
+    <label>Proveedor <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+    <input type="text" id="entradaProveedor" placeholder="Nombre del proveedor">
+    <label>Notas <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+    <textarea id="entradaNotas" placeholder="Observaciones..."></textarea>
+    <div class="modal-btns">
+      <button class="btn-cancelar" onclick="cerrarModal('modalEntrada')">Cancelar</button>
+      <button class="btn-ok-verde" id="btnConfirmarEntrada">Confirmar entrada</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SALIDA -->
+<div class="modal-overlay" id="modalSalida">
+  <div class="modal rojo-top">
+    <h3>Salida de stock</h3>
+    <p class="modal-sub" id="modalSalidaNombre"></p>
+    <label>Cantidad</label>
+    <input type="number" id="salidaCantidad" min="1" placeholder="0">
+    <label>Piloto</label>
+    <input type="text" id="salidaPiloto" placeholder="Nombre del piloto">
+    <label>¿Pagó?</label>
+    <select id="salidaPago">
+      <option value="no">No pagó todavía</option>
+      <option value="si">Sí pagó</option>
+    </select>
+    <div id="salidaPagoDetalle" style="display:none">
+      <label>Monto (U$S)</label>
+      <input type="number" id="salidaMonto" min="0" step="0.01" placeholder="0.00">
+      <label>Medio de pago</label>
+      <select id="salidaMedio">
+        <option value="">Seleccioná...</option>
+        <option value="efectivo">Efectivo</option>
+        <option value="transferencia">Transferencia</option>
+      </select>
+      <label>Fecha de pago</label>
+      <input type="date" id="salidaFechaPago">
+    </div>
+    <label>Notas <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+    <textarea id="salidaNotas" placeholder="Observaciones..."></textarea>
+    <div class="modal-btns">
+      <button class="btn-cancelar" onclick="cerrarModal('modalSalida')">Cancelar</button>
+      <button class="btn-ok-rojo" id="btnConfirmarSalida">Confirmar salida</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PAGO MOVIMIENTO -->
+<div class="modal-overlay" id="modalPagoMov">
+  <div class="modal verde-top">
+    <h3>Registrar pago</h3>
+    <p class="modal-sub" id="modalPagoMovNombre"></p>
+    <label>Monto (U$S)</label>
+    <input type="number" id="pagoMovMonto" min="0" step="0.01" placeholder="0.00">
+    <label>Medio de pago</label>
+    <select id="pagoMovMedio">
+      <option value="">Seleccioná...</option>
+      <option value="efectivo">Efectivo</option>
+      <option value="transferencia">Transferencia</option>
+    </select>
+    <label>Fecha de pago</label>
+    <input type="date" id="pagoMovFecha">
+    <div class="modal-btns">
+      <button class="btn-cancelar" onclick="cerrarModal('modalPagoMov')">Cancelar</button>
+      <button class="btn-ok-verde" id="btnConfirmarPagoMov">Confirmar pago</button>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL -->
+<div id="stockPanel">
+  <div class="panel-header">
+    <h1>Stock de repuestos</h1>
+    <p>TNS / TMZ — Turismo SAC</p>
+  </div>
+
+  <!-- Cards de artículos -->
+  <div class="stock-cards" id="stockCards">
+    <div style="color:var(--texto-muted);font-size:0.9rem">Cargando...</div>
+  </div>
+
+  <!-- Historial -->
+  <div class="section-block">
+    <div class="section-header">
+      <h2>Historial de movimientos</h2>
+      <div class="filter-row">
+        <select id="filtroArticulo">
+          <option value="">Todos los artículos</option>
+        </select>
+        <select id="filtroTipo">
+          <option value="">Entradas y salidas</option>
+          <option value="entrada">Solo entradas</option>
+          <option value="salida">Solo salidas</option>
+        </select>
+        <select id="filtroPagoMov">
+          <option value="">Todos los pagos</option>
+          <option value="pagado">Pagados</option>
+          <option value="pendiente">Pendientes</option>
+        </select>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Fecha</th><th>Artículo</th><th>Tipo</th><th>Cantidad</th>
+          <th>Piloto / Proveedor</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Notas</th><th>Acción</th>
+        </tr></thead>
+        <tbody id="tbodyHistorial"><tr><td colspan="11" class="empty">Cargando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<footer>Salto Automóvil Club &mdash; Stock de Repuestos &mdash; 2026</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = 'https://qpveivsqkudlqjbxcxzh.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_H6Q0geOf0yqMVQ8MfCcr9Q_31LSQMVg';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  function fmtDate(iso) { if (!iso) return '—'; const [y,m,d] = iso.split('T')[0].split('-'); return `${d}/${m}/${y}`; }
+  function fmtDateSimple(iso) { if (!iso) return '—'; const [y,m,d] = iso.split('-'); return `${d}/${m}/${y}`; }
+  function val(v) { return (v != null && v !== '') ? v : '—'; }
+  function capFirst(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : '—'; }
+
+  let articulos = [];
+  let modalCtx = null;
+
+  // AUTH
+  async function checkSession() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) showPanel();
+  }
+
+  document.getElementById('btnLogin').addEventListener('click', async () => {
+    const email = document.getElementById('inputEmail').value.trim();
+    const pass = document.getElementById('inputPass').value;
+    const btn = document.getElementById('btnLogin');
+    const err = document.getElementById('loginError');
+    err.style.display = 'none';
+    btn.disabled = true; btn.textContent = 'Ingresando...';
+    const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+    if (error) { err.style.display = 'block'; btn.disabled = false; btn.textContent = 'Ingresar'; }
+    else showPanel();
+  });
+  document.getElementById('inputPass').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btnLogin').click(); });
+  document.getElementById('btnLogout').addEventListener('click', async () => {
+    await sb.auth.signOut();
+    document.getElementById('stockPanel').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('btnLogout').style.display = 'none';
+  });
+
+  function showPanel() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('stockPanel').style.display = 'block';
+    document.getElementById('btnLogout').style.display = 'inline-block';
+    cargarTodo();
+  }
+
+  // MODALES
+  function cerrarModal(id) { document.getElementById(id).classList.remove('open'); modalCtx = null; }
+  document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); }));
+
+  function abrirEntrada(artId, artNombre) {
+    modalCtx = { artId, artNombre };
+    document.getElementById('modalEntradaNombre').textContent = artNombre;
+    document.getElementById('entradaCantidad').value = '';
+    document.getElementById('entradaProveedor').value = '';
+    document.getElementById('entradaNotas').value = '';
+    document.getElementById('modalEntrada').classList.add('open');
+  }
+
+  function abrirSalida(artId, artNombre, precioUsd) {
+    modalCtx = { artId, artNombre, precioUsd };
+    document.getElementById('modalSalidaNombre').textContent = `${artNombre} — U$S ${precioUsd} c/u`;
+    document.getElementById('salidaCantidad').value = '';
+    document.getElementById('salidaPiloto').value = '';
+    document.getElementById('salidaPago').value = 'no';
+    document.getElementById('salidaPagoDetalle').style.display = 'none';
+    document.getElementById('salidaMonto').value = '';
+    document.getElementById('salidaMedio').value = '';
+    document.getElementById('salidaFechaPago').value = new Date().toISOString().split('T')[0];
+    document.getElementById('salidaNotas').value = '';
+    document.getElementById('modalSalida').classList.add('open');
+  }
+
+  document.getElementById('salidaPago').addEventListener('change', function() {
+    const detalle = document.getElementById('salidaPagoDetalle');
+    detalle.style.display = this.value === 'si' ? 'block' : 'none';
+    if (this.value === 'si' && modalCtx) {
+      const cant = parseInt(document.getElementById('salidaCantidad').value) || 1;
+      document.getElementById('salidaMonto').value = (modalCtx.precioUsd * cant).toFixed(2);
+    }
+  });
+
+  document.getElementById('salidaCantidad').addEventListener('input', function() {
+    if (document.getElementById('salidaPago').value === 'si' && modalCtx) {
+      const cant = parseInt(this.value) || 1;
+      document.getElementById('salidaMonto').value = (modalCtx.precioUsd * cant).toFixed(2);
+    }
+  });
+
+  document.getElementById('btnConfirmarEntrada').addEventListener('click', async () => {
+    if (!modalCtx) return;
+    const cantidad = parseInt(document.getElementById('entradaCantidad').value);
+    if (!cantidad || cantidad < 1) { alert('Ingresá una cantidad válida.'); return; }
+    const btn = document.getElementById('btnConfirmarEntrada');
+    btn.disabled = true; btn.textContent = 'Guardando...';
+
+    const { error: errMov } = await sb.from('stock_movimientos').insert([{
+      articulo_id: modalCtx.artId,
+      tipo: 'entrada',
+      cantidad,
+      proveedor: document.getElementById('entradaProveedor').value.trim() || null,
+      notas: document.getElementById('entradaNotas').value.trim() || null,
+    }]);
+
+    if (!errMov) {
+      // Actualizar stock
+      const art = articulos.find(a => a.id === modalCtx.artId);
+      await sb.from('stock_articulos').update({ stock_actual: art.stock_actual + cantidad }).eq('id', modalCtx.artId);
+      cerrarModal('modalEntrada');
+      cargarTodo();
+    } else {
+      alert('Error al guardar. Intentá nuevamente.');
+    }
+    btn.disabled = false; btn.textContent = 'Confirmar entrada';
+  });
+
+  document.getElementById('btnConfirmarSalida').addEventListener('click', async () => {
+    if (!modalCtx) return;
+    const cantidad = parseInt(document.getElementById('salidaCantidad').value);
+    if (!cantidad || cantidad < 1) { alert('Ingresá una cantidad válida.'); return; }
+    const piloto = document.getElementById('salidaPiloto').value.trim();
+    if (!piloto) { alert('Ingresá el nombre del piloto.'); return; }
+    const art = articulos.find(a => a.id === modalCtx.artId);
+    if (cantidad > art.stock_actual) { alert(`Stock insuficiente. Stock actual: ${art.stock_actual}`); return; }
+
+    const pago = document.getElementById('salidaPago').value === 'si';
+    const btn = document.getElementById('btnConfirmarSalida');
+    btn.disabled = true; btn.textContent = 'Guardando...';
+
+    const monto = parseFloat(document.getElementById('salidaMonto').value);
+    const { error: errMov } = await sb.from('stock_movimientos').insert([{
+      articulo_id: modalCtx.artId,
+      tipo: 'salida',
+      cantidad,
+      piloto,
+      pago_confirmado: pago,
+      pago_monto: pago && !isNaN(monto) ? monto : null,
+      pago_medio: pago ? document.getElementById('salidaMedio').value || null : null,
+      pago_fecha: pago ? document.getElementById('salidaFechaPago').value || null : null,
+      notas: document.getElementById('salidaNotas').value.trim() || null,
+    }]);
+
+    if (!errMov) {
+      await sb.from('stock_articulos').update({ stock_actual: art.stock_actual - cantidad }).eq('id', modalCtx.artId);
+      cerrarModal('modalSalida');
+      cargarTodo();
+    } else {
+      alert('Error al guardar. Intentá nuevamente.');
+    }
+    btn.disabled = false; btn.textContent = 'Confirmar salida';
+  });
+
+  function abrirPagoMov(movId, piloto) {
+    modalCtx = { movId };
+    document.getElementById('modalPagoMovNombre').textContent = piloto;
+    document.getElementById('pagoMovMonto').value = '';
+    document.getElementById('pagoMovMedio').value = '';
+    document.getElementById('pagoMovFecha').value = new Date().toISOString().split('T')[0];
+    document.getElementById('modalPagoMov').classList.add('open');
+  }
+
+  document.getElementById('btnConfirmarPagoMov').addEventListener('click', async () => {
+    if (!modalCtx) return;
+    const medio = document.getElementById('pagoMovMedio').value;
+    if (!medio) { alert('Seleccioná el medio de pago.'); return; }
+    const monto = parseFloat(document.getElementById('pagoMovMonto').value);
+    const fecha = document.getElementById('pagoMovFecha').value;
+    const btn = document.getElementById('btnConfirmarPagoMov');
+    btn.disabled = true; btn.textContent = 'Guardando...';
+    const { error } = await sb.from('stock_movimientos').update({
+      pago_confirmado: true,
+      pago_monto: isNaN(monto) ? null : monto,
+      pago_medio: medio,
+      pago_fecha: fecha || null,
+    }).eq('id', modalCtx.movId);
+    btn.disabled = false; btn.textContent = 'Confirmar pago';
+    if (!error) { cerrarModal('modalPagoMov'); cargarHistorial(); }
+    else alert('Error al guardar.');
+  });
+
+  // DATOS
+  async function cargarTodo() {
+    await cargarArticulos();
+    await cargarHistorial();
+  }
+
+  async function cargarArticulos() {
+    const { data } = await sb.from('stock_articulos').select('*').order('nombre');
+    articulos = data || [];
+
+    // Poblar filtro
+    const filtro = document.getElementById('filtroArticulo');
+    filtro.innerHTML = '<option value="">Todos los artículos</option>';
+    articulos.forEach(a => {
+      const opt = document.createElement('option');
+      opt.value = a.id;
+      opt.textContent = a.nombre;
+      filtro.appendChild(opt);
+    });
+
+    // Renderizar cards
+    const cards = document.getElementById('stockCards');
+    if (articulos.length === 0) { cards.innerHTML = '<div style="color:var(--texto-muted)">Sin artículos</div>'; return; }
+
+    cards.innerHTML = articulos.map(a => {
+      const bajo = a.stock_actual > 0 && a.stock_actual <= 3;
+      const sinStock = a.stock_actual === 0;
+      const colorClass = sinStock ? 'rojo' : bajo ? 'amarillo' : 'verde';
+      const cardClass = sinStock ? 'sin-stock' : bajo ? 'bajo' : '';
+      return `<div class="stock-card ${cardClass}">
+        <div class="art-nombre">${a.nombre}</div>
+        <div class="art-precio">U$S ${a.precio_usd} c/u</div>
+        <div class="art-cantidad ${colorClass}">${a.stock_actual}</div>
+        <div class="art-label">unidades en stock</div>
+        <div class="art-btns">
+          <button class="btn-entrada" onclick="abrirEntrada('${a.id}','${a.nombre}')">+ Entrada</button>
+          <button class="btn-salida" onclick="abrirSalida('${a.id}','${a.nombre}',${a.precio_usd})">− Salida</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  async function cargarHistorial() {
+    const filtroArt = document.getElementById('filtroArticulo').value;
+    const filtroTipo = document.getElementById('filtroTipo').value;
+    const filtroPago = document.getElementById('filtroPagoMov').value;
+
+    let q = sb.from('stock_movimientos')
+      .select('*, stock_articulos(nombre)')
+      .order('created_at', { ascending: false });
+
+    if (filtroArt) q = q.eq('articulo_id', filtroArt);
+    if (filtroTipo) q = q.eq('tipo', filtroTipo);
+    if (filtroPago === 'pagado') q = q.eq('pago_confirmado', true).eq('tipo', 'salida');
+    if (filtroPago === 'pendiente') q = q.eq('pago_confirmado', false).eq('tipo', 'salida');
+
+    const { data } = await q;
+    const movs = data || [];
+
+    const tbody = document.getElementById('tbodyHistorial');
+    if (movs.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="11" class="empty">Sin movimientos</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = movs.map(m => {
+      const esSalida = m.tipo === 'salida';
+      return `<tr>
+        <td>${fmtDate(m.created_at)}</td>
+        <td>${m.stock_articulos?.nombre || '—'}</td>
+        <td><span class="badge ${esSalida ? 'badge-salida' : 'badge-entrada'}">${esSalida ? 'Salida' : 'Entrada'}</span></td>
+        <td>${m.cantidad}</td>
+        <td>${esSalida ? val(m.piloto) : val(m.proveedor)}</td>
+        <td>${esSalida ? `<span class="badge ${m.pago_confirmado ? 'badge-pagado' : 'badge-pendiente'}">${m.pago_confirmado ? 'Pagado' : 'Pendiente'}</span>` : '—'}</td>
+        <td>${m.pago_monto != null ? `U$S ${Number(m.pago_monto).toFixed(2)}` : '—'}</td>
+        <td>${capFirst(m.pago_medio)}</td>
+        <td>${fmtDateSimple(m.pago_fecha)}</td>
+        <td>${val(m.notas)}</td>
+        <td>${esSalida && !m.pago_confirmado ? `<button class="btn-pago-mov" onclick="abrirPagoMov('${m.id}','${m.piloto}')">Pago</button>` : '—'}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Filtros historial
+  ['filtroArticulo','filtroTipo','filtroPagoMov'].forEach(id => {
+    document.getElementById(id).addEventListener('change', cargarHistorial);
+  });
+
+  checkSession();
+</script>
+</body>
+</html>
