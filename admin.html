@@ -82,6 +82,8 @@
     .btn-pago:hover { background: rgba(22,163,74,0.35); }
     .btn-baja { background: rgba(100,100,100,0.2); color: #aaa; border: 1px solid #444; }
     .btn-baja:hover { background: rgba(100,100,100,0.35); }
+    .btn-alta { background: rgba(59,130,246,0.2); color: #93c5fd; border: 1px solid rgba(59,130,246,0.4); }
+    .btn-alta:hover { background: rgba(59,130,246,0.35); }
 
     .empty { padding: 2rem; text-align: center; color: var(--texto-muted); font-size: 0.9rem; }
     .loading { padding: 2rem; text-align: center; color: var(--texto-muted); font-size: 0.9rem; }
@@ -202,6 +204,14 @@
         <option value="">Todos</option>
         <option value="pagado">Pagados</option>
         <option value="pendiente">Pendientes</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Bajas</label>
+      <select id="filtroBaja">
+        <option value="activos">Solo activos</option>
+        <option value="bajas">Solo bajas</option>
+        <option value="todos">Todos</option>
       </select>
     </div>
     <button class="btn-refresh" id="btnCargar">Actualizar</button>
@@ -358,14 +368,23 @@
     else alert('Error al guardar. Intentá nuevamente.');
   });
 
+  async function darAlta(tabla, id, nombre) {
+    if (!confirm(`¿Dar de alta a ${nombre}?`)) return;
+    const { error } = await sb.from(tabla).update({ baja: false, baja_motivo: null }).eq('id', id);
+    if (!error) cargarDatos();
+    else alert('Error al dar de alta. Intentá nuevamente.');
+  }
+
   // DATOS
   document.getElementById('btnCargar').addEventListener('click', cargarDatos);
 
-  async function queryTabla(tabla, filtroFecha, filtroPago) {
+  async function queryTabla(tabla, filtroFecha, filtroPago, filtroBaja) {
     let q = sb.from(tabla).select('*').order('created_at', { ascending: false });
     if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
     if (filtroPago === 'pagado') q = q.eq('pago_confirmado', true);
     if (filtroPago === 'pendiente') q = q.eq('pago_confirmado', false);
+    if (filtroBaja === 'activos') q = q.eq('baja', false);
+    if (filtroBaja === 'bajas') q = q.eq('baja', true);
     const { data } = await q;
     return data || [];
   }
@@ -374,6 +393,7 @@
     const filtroFecha = document.getElementById('filtroFecha').value;
     const filtroCat = document.getElementById('filtroCategoria').value;
     const filtroPago = document.getElementById('filtroPago').value;
+    const filtroBaja = document.getElementById('filtroBaja').value;
 
     const mostrarK = !filtroCat || filtroCat === 'karting';
     const mostrarT = !filtroCat || filtroCat === 'turismo';
@@ -384,13 +404,13 @@
     document.getElementById('secRegularidad').style.display = mostrarR ? '' : 'none';
 
     const [kData, tData, rData] = await Promise.all([
-      mostrarK ? queryTabla('inscripciones_karting', filtroFecha, filtroPago) : Promise.resolve([]),
-      mostrarT ? queryTabla('inscripciones_turismo', filtroFecha, filtroPago) : Promise.resolve([]),
-      mostrarR ? queryTabla('inscripciones_regularidad', filtroFecha, filtroPago) : Promise.resolve([]),
+      mostrarK ? queryTabla('inscripciones_karting', filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
+      mostrarT ? queryTabla('inscripciones_turismo', filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
+      mostrarR ? queryTabla('inscripciones_regularidad', filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
     ]);
 
     const todos = [...kData, ...tData, ...rData];
-    const pagados = todos.filter(r => r.pago_confirmado);
+    const pagados = todos.filter(r => r.pago_confirmado && !r.baja);
     const recaudado = pagados.reduce((s, r) => s + (parseFloat(r.pago_monto) || 0), 0);
 
     document.getElementById('totalKarting').textContent = kData.length;
@@ -415,7 +435,7 @@
           <td>${r.baja ? `<span class="badge badge-baja" title="${r.baja_motivo || ''}">Baja</span>` : '—'}</td>
           <td><div class="acciones">
             ${!r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_karting','${r.id}','${r.nombre}')">Pago</button>` : ''}
-            ${!r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_karting','${r.id}','${r.nombre}')">Baja</button>` : ''}
+            ${!r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_karting','${r.id}','${r.nombre}')">Baja</button>` : `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_karting','${r.id}','${r.nombre}')">Alta</button>`}
           </div></td>
         </tr>`).join('');
 
@@ -436,7 +456,7 @@
           <td>${r.baja ? `<span class="badge badge-baja" title="${r.baja_motivo || ''}">Baja</span>` : '—'}</td>
           <td><div class="acciones">
             ${!r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_turismo','${r.id}','${r.nombre}')">Pago</button>` : ''}
-            ${!r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_turismo','${r.id}','${r.nombre}')">Baja</button>` : ''}
+            ${!r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_turismo','${r.id}','${r.nombre}')">Baja</button>` : `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_turismo','${r.id}','${r.nombre}')">Alta</button>`}
           </div></td>
         </tr>`).join('');
 
@@ -456,7 +476,7 @@
           <td>${r.baja ? `<span class="badge badge-baja" title="${r.baja_motivo || ''}">Baja</span>` : '—'}</td>
           <td><div class="acciones">
             ${!r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Pago</button>` : ''}
-            ${!r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Baja</button>` : ''}
+            ${!r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Baja</button>` : `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Alta</button>`}
           </div></td>
         </tr>`).join('');
 

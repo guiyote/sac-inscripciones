@@ -308,6 +308,15 @@
       color: var(--texto-muted);
       font-size: 0.8rem;
     }
+
+    @media (max-width: 600px) {
+      header { padding: 0 1rem; }
+      .header-title { font-size: 0.9rem; letter-spacing: 1px; }
+      .header-title span { display: none; }
+      .page-header { padding: 1.75rem 1rem; }
+      .form-wrap { padding: 0 1rem 3rem; margin-top: 1.5rem; }
+      .submit-btn { font-size: 1rem; padding: 0.9rem; }
+    }
   </style>
 </head>
 <body>
@@ -341,14 +350,14 @@
           <label for="fecha_carrera">Fecha <span class="req">*</span></label>
           <div class="select-wrap">
             <select id="fecha_carrera" required>
-              <option value="">Seleccioná una fecha...</option>
-              <option value="2026-04-26">1º fecha — 25/26 Abril 2026</option>
-              <option value="2026-06-14">2º fecha — 13/14 Junio 2026</option>
-              <option value="2026-07-12">3º fecha — 11/12 Julio 2026</option>
-              <option value="2026-08-16">4º fecha — 15/16 Agosto 2026</option>
-              <option value="2026-09-13">5º fecha — 12/13 Setiembre 2026</option>
-              <option value="2026-10-18">6º fecha — 17/18 Octubre 2026</option>
-              <option value="2026-11-29">7º fecha — 28/29 Noviembre 2026</option>
+              <option value="" disabled>Seleccioná una fecha...</option>
+              <option value="2026-04-26" data-mes="4">1º fecha — 25/26 Abril 2026</option>
+              <option value="2026-06-14" data-mes="6">2º fecha — 13/14 Junio 2026</option>
+              <option value="2026-07-12" data-mes="7">3º fecha — 11/12 Julio 2026</option>
+              <option value="2026-08-16" data-mes="8">4º fecha — 15/16 Agosto 2026</option>
+              <option value="2026-09-13" data-mes="9">5º fecha — 12/13 Setiembre 2026</option>
+              <option value="2026-10-18" data-mes="10">6º fecha — 17/18 Octubre 2026</option>
+              <option value="2026-11-29" data-mes="11">7º fecha — 28/29 Noviembre 2026</option>
             </select>
           </div>
         </div>
@@ -513,6 +522,34 @@
       btn.disabled = false;
       btn.textContent = 'Enviar inscripción';
     });
+  </script>
+  <script>
+    // Selección dinámica de fecha según mes actual
+    (function() {
+      const mesActual = new Date().getMonth() + 1;
+      const select = document.getElementById('fecha_carrera');
+      let encontrada = false;
+      Array.from(select.options).forEach(opt => {
+        const mes = parseInt(opt.getAttribute('data-mes'));
+        if (mes) {
+          if (mes === mesActual) {
+            opt.selected = true;
+            opt.disabled = false;
+            encontrada = true;
+          } else {
+            opt.disabled = true;
+            opt.style.color = '#555';
+          }
+        }
+      });
+      // Si no hay fecha este mes, mostrar mensaje
+      if (!encontrada) {
+        const placeholder = select.options[0];
+        placeholder.textContent = 'Sin fecha este mes';
+        placeholder.selected = true;
+        select.disabled = true;
+      }
+    })();
   </script>
 </body>
 </html>
