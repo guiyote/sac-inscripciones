@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/jpeg" href="logo.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAC - Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --rojo: #CC0000; --rojo-oscuro: #990000;
+      --gris: #1a1a1a; --gris-medio: #2d2d2d; --gris-campo: #222;
+      --blanco: #ffffff; --texto-muted: #888; --borde: #3a3a3a;
+    }
+    body { font-family: 'Barlow', sans-serif; background: var(--gris); color: var(--blanco); min-height: 100vh; }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--gris); border-bottom: 3px solid var(--rojo);
+      padding: 0 2rem; display: flex; align-items: center; justify-content: space-between;
+      height: 70px; position: sticky; top: 0; z-index: 100;
+    }
+    .header-logo { display: flex; align-items: center; gap: 1rem; }
+    .logo-circle { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; flex-shrink: 0; display: block; }
+    .logo-circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .header-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase; line-height: 1.2; }
+    .header-title span { display: block; font-size: 0.7rem; font-weight: 400; letter-spacing: 3px; color: var(--texto-muted); }
+    #btnLogout { display: none; background: transparent; border: 1px solid #444; color: var(--texto-muted); padding: 0.4rem 1rem; border-radius: 3px; cursor: pointer; font-family: 'Barlow', sans-serif; font-size: 0.85rem; letter-spacing: 1px; transition: border-color 0.15s, color 0.15s; }
+    #btnLogout:hover { border-color: var(--rojo); color: var(--blanco); }
+
+    /* ── LOGIN ── */
+    #loginScreen {
+      display: flex; align-items: center; justify-content: center;
+      min-height: calc(100vh - 70px); padding: 2rem;
+    }
+    .login-box {
+      background: var(--gris-medio); border: 1px solid var(--borde); border-top: 4px solid var(--rojo);
+      border-radius: 2px; padding: 2.5rem 2rem; width: 100%; max-width: 380px;
+    }
+    .login-box h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 1.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.4rem; }
+    .login-box p { color: var(--texto-muted); font-size: 0.85rem; margin-bottom: 1.75rem; }
+    .login-box label { display: block; font-size: 0.75rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; margin-bottom: 0.4rem; }
+    .login-box input {
+      width: 100%; background: var(--gris-campo); border: 1px solid var(--borde); border-radius: 3px;
+      padding: 0.75rem 1rem; color: var(--blanco); font-family: 'Barlow', sans-serif; font-size: 1rem;
+      outline: none; transition: border-color 0.15s; margin-bottom: 1rem;
+    }
+    .login-box input:focus { border-color: var(--rojo); }
+    .login-box button {
+      width: 100%; background: var(--rojo); color: var(--blanco); border: none; border-radius: 3px;
+      padding: 0.85rem; font-family: 'Barlow Condensed', sans-serif; font-size: 1.05rem; font-weight: 700;
+      letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: background 0.15s; margin-top: 0.5rem;
+    }
+    .login-box button:hover { background: var(--rojo-oscuro); }
+    .login-box button:disabled { background: #555; cursor: not-allowed; }
+    .login-error { display: none; color: #f87171; font-size: 0.85rem; margin-top: 0.75rem; }
+
+    /* ── ADMIN PANEL ── */
+    #adminPanel { display: none; padding: 2rem 1.5rem 4rem; max-width: 1100px; margin: 0 auto; }
+
+    .panel-header { margin-bottom: 2rem; }
+    .panel-header h1 { font-family: 'Barlow Condensed', sans-serif; font-size: 2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
+    .panel-header p { color: var(--texto-muted); font-size: 0.9rem; margin-top: 0.3rem; }
+
+    /* Filtros */
+    .filters {
+      background: var(--gris-medio); border: 1px solid var(--borde); border-radius: 2px;
+      padding: 1.25rem 1.5rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;
+      margin-bottom: 2rem;
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 0.4rem; min-width: 180px; flex: 1; }
+    .filter-group label { font-size: 0.72rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; }
+    .filter-group select {
+      background: var(--gris-campo); border: 1px solid var(--borde); border-radius: 3px;
+      padding: 0.6rem 0.9rem; color: var(--blanco); font-family: 'Barlow', sans-serif;
+      font-size: 0.95rem; outline: none; transition: border-color 0.15s; appearance: none; cursor: pointer;
+    }
+    .filter-group select:focus { border-color: var(--rojo); }
+    .btn-refresh {
+      background: var(--rojo); color: var(--blanco); border: none; border-radius: 3px;
+      padding: 0.6rem 1.25rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.95rem;
+      font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+      transition: background 0.15s; white-space: nowrap;
+    }
+    .btn-refresh:hover { background: var(--rojo-oscuro); }
+
+    /* Resumen */
+    .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .summary-card {
+      background: var(--gris-medio); border: 1px solid var(--borde); border-top: 3px solid var(--rojo);
+      border-radius: 2px; padding: 1.25rem 1.5rem;
+    }
+    .summary-card .num { font-family: 'Barlow Condensed', sans-serif; font-size: 2.5rem; font-weight: 800; line-height: 1; }
+    .summary-card .lbl { font-size: 0.75rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--texto-muted); margin-top: 0.3rem; }
+
+    /* Tablas */
+    .section-block { margin-bottom: 2.5rem; }
+    .section-block h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--texto-muted); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--borde); }
+
+    .table-wrap { overflow-x: auto; border-radius: 2px; border: 1px solid var(--borde); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    thead th { background: var(--gris-medio); padding: 0.75rem 1rem; text-align: left; font-size: 0.72rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; border-bottom: 1px solid var(--borde); white-space: nowrap; }
+    tbody tr { border-bottom: 1px solid #2a2a2a; transition: background 0.1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.03); }
+    tbody td { padding: 0.75rem 1rem; color: var(--blanco); vertical-align: middle; }
+    .badge {
+      display: inline-block; padding: 0.2rem 0.6rem; border-radius: 2px; font-size: 0.75rem;
+      font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+    }
+    .badge-karting { background: rgba(204,0,0,0.15); color: #f87171; border: 1px solid rgba(204,0,0,0.3); }
+    .badge-tns { background: rgba(59,130,246,0.12); color: #93c5fd; border: 1px solid rgba(59,130,246,0.25); }
+    .badge-tmz { background: rgba(168,85,247,0.12); color: #d8b4fe; border: 1px solid rgba(168,85,247,0.25); }
+    .badge-reg { background: rgba(34,197,94,0.12); color: #86efac; border: 1px solid rgba(34,197,94,0.25); }
+
+    .empty { padding: 2rem; text-align: center; color: var(--texto-muted); font-size: 0.9rem; }
+
+    .loading { padding: 2rem; text-align: center; color: var(--texto-muted); font-size: 0.9rem; }
+
+    footer { border-top: 1px solid #333; padding: 1.5rem 2rem; text-align: center; color: var(--texto-muted); font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-logo">
+    <a href="index.html" class="logo-circle"><img src="logo.jpeg" alt="SAC"></a>
+    <div class="header-title">Salto Automóvil Club<span>Panel de administración</span></div>
+  </div>
+  <button id="btnLogout">Cerrar sesión</button>
+</header>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <h2>Acceso Admin</h2>
+    <p>Ingresá con tu usuario y contraseña</p>
+    <label for="inputEmail">Email</label>
+    <input type="email" id="inputEmail" placeholder="admin@ejemplo.com" autocomplete="username">
+    <label for="inputPass">Contraseña</label>
+    <input type="password" id="inputPass" placeholder="••••••••" autocomplete="current-password">
+    <button id="btnLogin">Ingresar</button>
+    <div class="login-error" id="loginError">Email o contraseña incorrectos.</div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel">
+  <div class="panel-header">
+    <h1>Inscripciones 2026</h1>
+    <p>Reportes del Campeonato Regional SAC</p>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters">
+    <div class="filter-group">
+      <label>Fecha de carrera</label>
+      <select id="filtroFecha">
+        <option value="">Todas las fechas</option>
+        <option value="2026-04-26">25 / 26 Abril</option>
+        <option value="2026-06-14">13 / 14 Junio</option>
+        <option value="2026-07-12">11 / 12 Julio</option>
+        <option value="2026-08-16">15 / 16 Agosto</option>
+        <option value="2026-09-13">12 / 13 Setiembre</option>
+        <option value="2026-10-18">17 / 18 Octubre</option>
+        <option value="2026-11-29">28 / 29 Noviembre</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Categoría</label>
+      <select id="filtroCategoria">
+        <option value="">Todas las categorías</option>
+        <option value="karting">Karting</option>
+        <option value="turismo">Turismo (TNS/TMZ)</option>
+        <option value="regularidad">Regularidad</option>
+      </select>
+    </div>
+    <button class="btn-refresh" id="btnCargar">Actualizar</button>
+  </div>
+
+  <!-- Resumen -->
+  <div class="summary-cards">
+    <div class="summary-card">
+      <div class="num" id="totalKarting">—</div>
+      <div class="lbl">Karting</div>
+    </div>
+    <div class="summary-card">
+      <div class="num" id="totalTurismo">—</div>
+      <div class="lbl">Turismo</div>
+    </div>
+    <div class="summary-card">
+      <div class="num" id="totalRegularidad">—</div>
+      <div class="lbl">Regularidad</div>
+    </div>
+    <div class="summary-card">
+      <div class="num" id="totalGeneral">—</div>
+      <div class="lbl">Total inscriptos</div>
+    </div>
+  </div>
+
+  <!-- Tabla Karting -->
+  <div class="section-block" id="secKarting">
+    <h2>Karting</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Piloto</th>
+            <th>Fecha carrera</th>
+            <th>Cilindrada</th>
+            <th>Nº Kart</th>
+            <th>Departamento</th>
+            <th>Fecha nac.</th>
+            <th>Inscripto</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyKarting"><tr><td colspan="7" class="loading">Cargando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tabla Turismo -->
+  <div class="section-block" id="secTurismo">
+    <h2>Turismo — TNS / TMZ</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Piloto</th>
+            <th>Fecha carrera</th>
+            <th>Categoría</th>
+            <th>Nº Auto</th>
+            <th>Marca / Modelo</th>
+            <th>Equipo</th>
+            <th>Gomas</th>
+            <th>Pastillas</th>
+            <th>Discos</th>
+            <th>Inscripto</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyTurismo"><tr><td colspan="10" class="loading">Cargando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tabla Regularidad -->
+  <div class="section-block" id="secRegularidad">
+    <h2>Regularidad</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Piloto</th>
+            <th>Navegante</th>
+            <th>Fecha carrera</th>
+            <th>Vehículo</th>
+            <th>Nº Auto</th>
+            <th>Inscripto</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyRegularidad"><tr><td colspan="6" class="loading">Cargando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Resumen por fecha -->
+  <div class="section-block">
+    <h2>Inscripciones por fecha</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Karting</th>
+            <th>TNS</th>
+            <th>TMZ</th>
+            <th>Regularidad</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyPorFecha"><tr><td colspan="6" class="loading">Cargando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<footer>Salto Automóvil Club &mdash; Panel Administrativo &mdash; 2026</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = 'https://qpveivsqkudlqjbxcxzh.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_H6Q0geOf0yqMVQ8MfCcr9Q_31LSQMVg';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const FECHAS = {
+    '2026-04-26': '25/26 Abril',
+    '2026-06-14': '13/14 Junio',
+    '2026-07-12': '11/12 Julio',
+    '2026-08-16': '15/16 Agosto',
+    '2026-09-13': '12/13 Setiembre',
+    '2026-10-18': '17/18 Octubre',
+    '2026-11-29': '28/29 Noviembre',
+  };
+
+  function fmtFecha(iso) {
+    if (!iso) return '—';
+    return FECHAS[iso] || iso;
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return '—';
+    const [y, m, d] = iso.split('-');
+    return `${d}/${m}/${y}`;
+  }
+
+  function fmtTs(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('es-UY') + ' ' + d.toLocaleTimeString('es-UY', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function val(v) { return v ?? '—'; }
+
+  // ── AUTH ──
+  async function checkSession() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) showPanel();
+  }
+
+  document.getElementById('btnLogin').addEventListener('click', async () => {
+    const email = document.getElementById('inputEmail').value.trim();
+    const pass = document.getElementById('inputPass').value;
+    const btn = document.getElementById('btnLogin');
+    const err = document.getElementById('loginError');
+    err.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Ingresando...';
+
+    const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+    if (error) {
+      err.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Ingresar';
+    } else {
+      showPanel();
+    }
+  });
+
+  document.getElementById('inputPass').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('btnLogin').click();
+  });
+
+  document.getElementById('btnLogout').addEventListener('click', async () => {
+    await sb.auth.signOut();
+    document.getElementById('adminPanel').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('btnLogout').style.display = 'none';
+  });
+
+  function showPanel() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    document.getElementById('btnLogout').style.display = 'inline-block';
+    cargarDatos();
+  }
+
+  // ── DATOS ──
+  document.getElementById('btnCargar').addEventListener('click', cargarDatos);
+
+  async function cargarDatos() {
+    const filtroFecha = document.getElementById('filtroFecha').value;
+    const filtroCat = document.getElementById('filtroCategoria').value;
+
+    const mostrarKarting = !filtroCat || filtroCat === 'karting';
+    const mostrarTurismo = !filtroCat || filtroCat === 'turismo';
+    const mostrarRegularidad = !filtroCat || filtroCat === 'regularidad';
+
+    document.getElementById('secKarting').style.display = mostrarKarting ? '' : 'none';
+    document.getElementById('secTurismo').style.display = mostrarTurismo ? '' : 'none';
+    document.getElementById('secRegularidad').style.display = mostrarRegularidad ? '' : 'none';
+
+    let [kData, tData, rData] = [[], [], []];
+
+    if (mostrarKarting) {
+      let q = sb.from('inscripciones_karting').select('*').order('created_at', { ascending: false });
+      if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
+      const { data } = await q;
+      kData = data || [];
+    }
+
+    if (mostrarTurismo) {
+      let q = sb.from('inscripciones_turismo').select('*').order('created_at', { ascending: false });
+      if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
+      const { data } = await q;
+      tData = data || [];
+    }
+
+    if (mostrarRegularidad) {
+      let q = sb.from('inscripciones_regularidad').select('*').order('created_at', { ascending: false });
+      if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
+      const { data } = await q;
+      rData = data || [];
+    }
+
+    // Totales
+    document.getElementById('totalKarting').textContent = kData.length;
+    document.getElementById('totalTurismo').textContent = tData.length;
+    document.getElementById('totalRegularidad').textContent = rData.length;
+    document.getElementById('totalGeneral').textContent = kData.length + tData.length + rData.length;
+
+    // Tabla karting
+    const tbK = document.getElementById('tbodyKarting');
+    if (kData.length === 0) {
+      tbK.innerHTML = '<tr><td colspan="7" class="empty">Sin inscripciones</td></tr>';
+    } else {
+      tbK.innerHTML = kData.map(r => `
+        <tr>
+          <td>${val(r.nombre)}</td>
+          <td>${fmtFecha(r.fecha_carrera)}</td>
+          <td><span class="badge badge-karting">${val(r.cilindrada)}</span></td>
+          <td>${val(r.numero_kart)}</td>
+          <td>${val(r.departamento)}</td>
+          <td>${fmtDate(r.fecha_nacimiento)}</td>
+          <td>${fmtTs(r.created_at)}</td>
+        </tr>`).join('');
+    }
+
+    // Tabla turismo
+    const tbT = document.getElementById('tbodyTurismo');
+    if (tData.length === 0) {
+      tbT.innerHTML = '<tr><td colspan="10" class="empty">Sin inscripciones</td></tr>';
+    } else {
+      tbT.innerHTML = tData.map(r => `
+        <tr>
+          <td>${val(r.nombre)}</td>
+          <td>${fmtFecha(r.fecha_carrera)}</td>
+          <td><span class="badge ${r.categoria === 'TNS' ? 'badge-tns' : 'badge-tmz'}">${val(r.categoria)}</span></td>
+          <td>${val(r.numero_auto)}</td>
+          <td>${val(r.marca_modelo)}</td>
+          <td>${val(r.nombre_equipo)}</td>
+          <td>${val(r.cantidad_gomas)}</td>
+          <td>${val(r.cantidad_pastillas)}</td>
+          <td>${val(r.cantidad_discos)}</td>
+          <td>${fmtTs(r.created_at)}</td>
+        </tr>`).join('');
+    }
+
+    // Tabla regularidad
+    const tbR = document.getElementById('tbodyRegularidad');
+    if (rData.length === 0) {
+      tbR.innerHTML = '<tr><td colspan="6" class="empty">Sin inscripciones</td></tr>';
+    } else {
+      tbR.innerHTML = rData.map(r => `
+        <tr>
+          <td>${val(r.nombre_piloto)}</td>
+          <td>${val(r.nombre_navegante)}</td>
+          <td>${fmtFecha(r.fecha_carrera)}</td>
+          <td>${[r.marca, r.modelo, r.anio].filter(Boolean).join(' ') || '—'}</td>
+          <td>${val(r.numero_auto)}</td>
+          <td>${fmtTs(r.created_at)}</td>
+        </tr>`).join('');
+    }
+
+    // Tabla por fecha — siempre con todos los datos sin filtro de categoría
+    await cargarPorFecha(filtroFecha);
+  }
+
+  async function cargarPorFecha(filtroFecha) {
+    // Traemos todos sin filtro de categoría para el resumen
+    let qK = sb.from('inscripciones_karting').select('fecha_carrera');
+    let qT = sb.from('inscripciones_turismo').select('fecha_carrera, categoria');
+    let qR = sb.from('inscripciones_regularidad').select('fecha_carrera');
+
+    if (filtroFecha) {
+      qK = qK.eq('fecha_carrera', filtroFecha);
+      qT = qT.eq('fecha_carrera', filtroFecha);
+      qR = qR.eq('fecha_carrera', filtroFecha);
+    }
+
+    const [{ data: kAll }, { data: tAll }, { data: rAll }] = await Promise.all([qK, qT, qR]);
+
+    // Agrupar por fecha
+    const fechas = Object.keys(FECHAS);
+    const rows = fechas.map(f => {
+      const k = (kAll || []).filter(r => r.fecha_carrera === f).length;
+      const tns = (tAll || []).filter(r => r.fecha_carrera === f && r.categoria === 'TNS').length;
+      const tmz = (tAll || []).filter(r => r.fecha_carrera === f && r.categoria === 'TMZ').length;
+      const reg = (rAll || []).filter(r => r.fecha_carrera === f).length;
+      const total = k + tns + tmz + reg;
+      return { f, k, tns, tmz, reg, total };
+    }).filter(r => !filtroFecha || r.f === filtroFecha);
+
+    const tbF = document.getElementById('tbodyPorFecha');
+    const hayDatos = rows.some(r => r.total > 0);
+    if (!hayDatos) {
+      tbF.innerHTML = '<tr><td colspan="6" class="empty">Sin inscripciones</td></tr>';
+    } else {
+      tbF.innerHTML = rows.map(r => `
+        <tr>
+          <td>${FECHAS[r.f]}</td>
+          <td>${r.k || '—'}</td>
+          <td>${r.tns || '—'}</td>
+          <td>${r.tmz || '—'}</td>
+          <td>${r.reg || '—'}</td>
+          <td><strong>${r.total || '—'}</strong></td>
+        </tr>`).join('');
+    }
+  }
+
+  // Chequear sesión al cargar
+  checkSession();
+</script>
+</body>
+</html>
