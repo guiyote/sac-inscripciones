@@ -361,8 +361,39 @@
           <input type="text" id="nombre" placeholder="Ej: Juan Pérez" required>
         </div>
         <div class="field">
+          <label for="cedula">Cédula de identidad <span class="req">*</span></label>
+          <input type="text" id="cedula" placeholder="Ej: 1234567-8" required>
+        </div>
+        <div class="field">
+          <label for="celular">Celular <span class="opt">(opcional)</span></label>
+          <input type="text" id="celular" placeholder="Ej: 099 123 456">
+        </div>
+        <div class="field">
           <label for="departamento">Departamento</label>
-          <input type="text" id="departamento" placeholder="Ej: Salto">
+          <div class="select-wrap">
+            <select id="departamento">
+              <option value="">Seleccioná...</option>
+              <option value="Artigas">Artigas</option>
+              <option value="Canelones">Canelones</option>
+              <option value="Cerro Largo">Cerro Largo</option>
+              <option value="Colonia">Colonia</option>
+              <option value="Durazno">Durazno</option>
+              <option value="Flores">Flores</option>
+              <option value="Florida">Florida</option>
+              <option value="Lavalleja">Lavalleja</option>
+              <option value="Maldonado">Maldonado</option>
+              <option value="Montevideo">Montevideo</option>
+              <option value="Paysandú">Paysandú</option>
+              <option value="Río Negro">Río Negro</option>
+              <option value="Rivera">Rivera</option>
+              <option value="Rocha">Rocha</option>
+              <option value="Salto">Salto</option>
+              <option value="San José">San José</option>
+              <option value="Soriano">Soriano</option>
+              <option value="Tacuarembó">Tacuarembó</option>
+              <option value="Treinta y Tres">Treinta y Tres</option>
+            </select>
+          </div>
         </div>
         <div class="field">
           <label for="fecha_nacimiento">Fecha de nacimiento</label>
@@ -424,23 +455,46 @@
       msgBox.textContent = '';
 
       const cilindrada = document.querySelector('input[name="cilindrada"]:checked')?.value;
-
       if (!cilindrada) {
         msgBox.className = 'msg error';
         msgBox.textContent = 'Por favor seleccioná una cilindrada.';
         return;
       }
 
+      const fecha_carrera = document.getElementById('fecha_carrera').value;
+      const nombre = document.getElementById('nombre').value.trim();
+      const numero_kart = document.getElementById('numero_kart').value.trim() || null;
+
       btn.disabled = true;
+      btn.textContent = 'Verificando...';
+
+      // Validación duplicado: mismo nombre + número de kart + fecha
+      const { data: existentes } = await sb
+        .from('inscripciones_karting')
+        .select('id')
+        .eq('fecha_carrera', fecha_carrera)
+        .ilike('nombre', nombre)
+        .eq('numero_kart', numero_kart);
+
+      if (existentes && existentes.length > 0) {
+        msgBox.className = 'msg error';
+        msgBox.textContent = 'Ya existe una inscripción con ese nombre y número de kart para esta fecha.';
+        btn.disabled = false;
+        btn.textContent = 'Enviar inscripción';
+        return;
+      }
+
       btn.textContent = 'Enviando...';
 
       const payload = {
-        fecha_carrera: document.getElementById('fecha_carrera').value,
-        nombre: document.getElementById('nombre').value.trim(),
-        departamento: document.getElementById('departamento').value.trim() || null,
+        fecha_carrera,
+        nombre,
+        cedula: document.getElementById('cedula').value.trim() || null,
+        celular: document.getElementById('celular').value.trim() || null,
+        departamento: document.getElementById('departamento').value || null,
         fecha_nacimiento: document.getElementById('fecha_nacimiento').value || null,
         cilindrada,
-        numero_kart: document.getElementById('numero_kart').value.trim() || null,
+        numero_kart,
       };
 
       const { error } = await sb.from('inscripciones_karting').insert([payload]);

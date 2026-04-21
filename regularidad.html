@@ -120,6 +120,14 @@
           <input type="text" id="nombre_piloto" placeholder="Ej: Juan Pérez" required>
         </div>
         <div class="field">
+          <label for="cedula_piloto">Cédula de identidad <span class="req">*</span></label>
+          <input type="text" id="cedula_piloto" placeholder="Ej: 1234567-8" required>
+        </div>
+        <div class="field">
+          <label for="celular_piloto">Celular <span class="opt">(opcional)</span></label>
+          <input type="text" id="celular_piloto" placeholder="Ej: 099 123 456">
+        </div>
+        <div class="field">
           <label for="fecha_nacimiento_piloto">Fecha de nacimiento</label>
           <input type="date" id="fecha_nacimiento_piloto">
         </div>
@@ -179,21 +187,45 @@
       const msgBox = document.getElementById('msgBox');
       msgBox.className = 'msg';
 
+      const fecha_carrera = document.getElementById('fecha_carrera').value;
+      const nombre_piloto = document.getElementById('nombre_piloto').value.trim();
+      const numero_auto = document.getElementById('numero_auto').value.trim() || null;
+
       btn.disabled = true;
+      btn.textContent = 'Verificando...';
+
+      // Validación duplicado: mismo nombre piloto + número de auto + fecha
+      const { data: existentes } = await sb
+        .from('inscripciones_regularidad')
+        .select('id')
+        .eq('fecha_carrera', fecha_carrera)
+        .ilike('nombre_piloto', nombre_piloto)
+        .eq('numero_auto', numero_auto);
+
+      if (existentes && existentes.length > 0) {
+        msgBox.className = 'msg error';
+        msgBox.textContent = 'Ya existe una inscripción con ese piloto y número de auto para esta fecha.';
+        btn.disabled = false;
+        btn.textContent = 'Enviar inscripción';
+        return;
+      }
+
       btn.textContent = 'Enviando...';
 
       const anioVal = parseInt(document.getElementById('anio').value);
 
       const payload = {
-        fecha_carrera: document.getElementById('fecha_carrera').value,
-        nombre_piloto: document.getElementById('nombre_piloto').value.trim(),
+        fecha_carrera,
+        nombre_piloto,
+        cedula_piloto: document.getElementById('cedula_piloto').value.trim() || null,
+        celular_piloto: document.getElementById('celular_piloto').value.trim() || null,
         fecha_nacimiento_piloto: document.getElementById('fecha_nacimiento_piloto').value || null,
         nombre_navegante: document.getElementById('nombre_navegante').value.trim() || null,
         fecha_nacimiento_navegante: document.getElementById('fecha_nacimiento_navegante').value || null,
         marca: document.getElementById('marca').value.trim() || null,
         modelo: document.getElementById('modelo').value.trim() || null,
         anio: isNaN(anioVal) ? null : anioVal,
-        numero_auto: document.getElementById('numero_auto').value.trim() || null,
+        numero_auto,
       };
 
       const { error } = await sb.from('inscripciones_regularidad').insert([payload]);

@@ -155,6 +155,14 @@
           <input type="text" id="nombre" placeholder="Ej: Juan Pérez" required>
         </div>
         <div class="field">
+          <label for="cedula">Cédula de identidad <span class="req">*</span></label>
+          <input type="text" id="cedula" placeholder="Ej: 1234567-8" required>
+        </div>
+        <div class="field">
+          <label for="celular">Celular <span class="opt">(opcional)</span></label>
+          <input type="text" id="celular" placeholder="Ej: 099 123 456">
+        </div>
+        <div class="field">
           <label for="fecha_nacimiento">Fecha de nacimiento</label>
           <input type="date" id="fecha_nacimiento">
         </div>
@@ -236,7 +244,30 @@
         return;
       }
 
+      const fecha_carrera = document.getElementById('fecha_carrera').value;
+      const nombre = document.getElementById('nombre').value.trim();
+      const numero_auto = document.getElementById('numero_auto').value.trim() || null;
+
       btn.disabled = true;
+      btn.textContent = 'Verificando...';
+
+      // Validación duplicado: mismo nombre + número de auto + categoría + fecha
+      const { data: existentes } = await sb
+        .from('inscripciones_turismo')
+        .select('id')
+        .eq('fecha_carrera', fecha_carrera)
+        .eq('categoria', categoria)
+        .ilike('nombre', nombre)
+        .eq('numero_auto', numero_auto);
+
+      if (existentes && existentes.length > 0) {
+        msgBox.className = 'msg error';
+        msgBox.textContent = 'Ya existe una inscripción con ese nombre y número de auto para esta fecha y categoría.';
+        btn.disabled = false;
+        btn.textContent = 'Enviar inscripción';
+        return;
+      }
+
       btn.textContent = 'Enviando...';
 
       const toInt = (id) => {
@@ -245,11 +276,13 @@
       };
 
       const payload = {
-        fecha_carrera: document.getElementById('fecha_carrera').value,
-        nombre: document.getElementById('nombre').value.trim(),
+        fecha_carrera,
+        nombre,
+        cedula: document.getElementById('cedula').value.trim() || null,
+        celular: document.getElementById('celular').value.trim() || null,
         fecha_nacimiento: document.getElementById('fecha_nacimiento').value || null,
         categoria,
-        numero_auto: document.getElementById('numero_auto').value.trim() || null,
+        numero_auto,
         marca_modelo: document.getElementById('marca_modelo').value.trim() || null,
         nombre_concurrente: document.getElementById('nombre_concurrente').value.trim() || null,
         nombre_equipo: document.getElementById('nombre_equipo').value.trim() || null,
