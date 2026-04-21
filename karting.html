@@ -225,14 +225,13 @@
       pointer-events: none;
     }
 
-    /* Checkboxes */
-    .checkbox-group {
+    /* Radio cilindrada */
+    .radio-group {
       display: flex;
       flex-direction: column;
       gap: 0.6rem;
     }
-
-    .checkbox-item {
+    .radio-item {
       display: flex;
       align-items: center;
       gap: 0.75rem;
@@ -243,29 +242,19 @@
       cursor: pointer;
       transition: border-color 0.15s;
     }
-
-    .checkbox-item:hover {
-      border-color: #555;
-    }
-
-    .checkbox-item input[type="checkbox"] {
+    .radio-item:hover { border-color: #555; }
+    .radio-item input[type="radio"] {
       width: 18px;
       height: 18px;
       accent-color: var(--rojo);
       cursor: pointer;
       flex-shrink: 0;
     }
-
-    .checkbox-item.checked {
+    .radio-item.checked {
       border-color: var(--rojo);
       background: rgba(204,0,0,0.06);
     }
-
-    .checkbox-label {
-      font-size: 0.95rem;
-      color: var(--blanco);
-      cursor: pointer;
-    }
+    .radio-label { font-size: 0.95rem; color: var(--blanco); cursor: pointer; }
 
     /* Submit */
     .submit-btn {
@@ -353,13 +342,13 @@
           <div class="select-wrap">
             <select id="fecha_carrera" required>
               <option value="">Seleccioná una fecha...</option>
-              <option value="2026-04-26">25 / 26 de Abril 2026</option>
-              <option value="2026-06-14">13 / 14 de Junio 2026</option>
-              <option value="2026-07-12">11 / 12 de Julio 2026</option>
-              <option value="2026-08-16">15 / 16 de Agosto 2026</option>
-              <option value="2026-09-13">12 / 13 de Setiembre 2026</option>
-              <option value="2026-10-18">17 / 18 de Octubre 2026</option>
-              <option value="2026-11-29">28 / 29 de Noviembre 2026</option>
+              <option value="2026-04-26">1º fecha — 25/26 Abril 2026</option>
+              <option value="2026-06-14">2º fecha — 13/14 Junio 2026</option>
+              <option value="2026-07-12">3º fecha — 11/12 Julio 2026</option>
+              <option value="2026-08-16">4º fecha — 15/16 Agosto 2026</option>
+              <option value="2026-09-13">5º fecha — 12/13 Setiembre 2026</option>
+              <option value="2026-10-18">6º fecha — 17/18 Octubre 2026</option>
+              <option value="2026-11-29">7º fecha — 28/29 Noviembre 2026</option>
             </select>
           </div>
         </div>
@@ -385,18 +374,18 @@
         <div class="section-title">Kart</div>
         <div class="field">
           <label>Cilindrada motor <span class="req">*</span></label>
-          <div class="checkbox-group" id="cilindrada_group">
-            <label class="checkbox-item" onclick="toggleCheck(this)">
-              <input type="checkbox" value="SHIFTER 200cc standard">
-              <span class="checkbox-label">SHIFTER 200cc standard</span>
+          <div class="radio-group" id="cilindrada_group">
+            <label class="radio-item" onclick="toggleRadio(this)">
+              <input type="radio" name="cilindrada" value="SHIFTER 200cc standard">
+              <span class="radio-label">SHIFTER 200cc standard</span>
             </label>
-            <label class="checkbox-item" onclick="toggleCheck(this)">
-              <input type="checkbox" value="SHIFTER 125cc">
-              <span class="checkbox-label">SHIFTER 125cc</span>
+            <label class="radio-item" onclick="toggleRadio(this)">
+              <input type="radio" name="cilindrada" value="SHIFTER 125cc">
+              <span class="radio-label">SHIFTER 125cc</span>
             </label>
-            <label class="checkbox-item" onclick="toggleCheck(this)">
-              <input type="checkbox" value="LIBRE (2T, Estacionarios, Shifter 200 preparados)">
-              <span class="checkbox-label">LIBRE — 2T, Estacionarios, Shifter 200 preparados</span>
+            <label class="radio-item" onclick="toggleRadio(this)">
+              <input type="radio" name="cilindrada" value="LIBRE (2T, Estacionarios, Shifter 200 preparados)">
+              <span class="radio-label">LIBRE — 2T, Estacionarios, Shifter 200 preparados</span>
             </label>
           </div>
         </div>
@@ -422,9 +411,9 @@
     const SUPABASE_KEY = 'sb_publishable_H6Q0geOf0yqMVQ8MfCcr9Q_31LSQMVg';
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    function toggleCheck(label) {
-      const cb = label.querySelector('input[type="checkbox"]');
-      label.classList.toggle('checked', cb.checked);
+    function toggleRadio(label) {
+      document.querySelectorAll('#cilindrada_group .radio-item').forEach(el => el.classList.remove('checked'));
+      label.classList.add('checked');
     }
 
     document.getElementById('formKarting').addEventListener('submit', async (e) => {
@@ -434,13 +423,11 @@
       msgBox.className = 'msg';
       msgBox.textContent = '';
 
-      // Cilindradas seleccionadas
-      const cilindradas = [...document.querySelectorAll('#cilindrada_group input:checked')]
-        .map(cb => cb.value);
+      const cilindrada = document.querySelector('input[name="cilindrada"]:checked')?.value;
 
-      if (cilindradas.length === 0) {
+      if (!cilindrada) {
         msgBox.className = 'msg error';
-        msgBox.textContent = 'Por favor seleccioná al menos una cilindrada.';
+        msgBox.textContent = 'Por favor seleccioná una cilindrada.';
         return;
       }
 
@@ -452,7 +439,7 @@
         nombre: document.getElementById('nombre').value.trim(),
         departamento: document.getElementById('departamento').value.trim() || null,
         fecha_nacimiento: document.getElementById('fecha_nacimiento').value || null,
-        cilindrada: cilindradas.join(', '),
+        cilindrada,
         numero_kart: document.getElementById('numero_kart').value.trim() || null,
       };
 
@@ -466,7 +453,7 @@
         msgBox.className = 'msg success';
         msgBox.textContent = '¡Inscripción enviada! Éxitos y nos vemos el fin de semana.';
         e.target.reset();
-        document.querySelectorAll('.checkbox-item').forEach(el => el.classList.remove('checked'));
+        document.querySelectorAll('.radio-item').forEach(el => el.classList.remove('checked'));
       }
 
       btn.disabled = false;

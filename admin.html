@@ -159,13 +159,13 @@
       <label>Fecha de carrera</label>
       <select id="filtroFecha">
         <option value="">Todas las fechas</option>
-        <option value="2026-04-26">25 / 26 Abril</option>
-        <option value="2026-06-14">13 / 14 Junio</option>
-        <option value="2026-07-12">11 / 12 Julio</option>
-        <option value="2026-08-16">15 / 16 Agosto</option>
-        <option value="2026-09-13">12 / 13 Setiembre</option>
-        <option value="2026-10-18">17 / 18 Octubre</option>
-        <option value="2026-11-29">28 / 29 Noviembre</option>
+        <option value="2026-04-26">1º fecha — 25/26 Abril</option>
+        <option value="2026-06-14">2º fecha — 13/14 Junio</option>
+        <option value="2026-07-12">3º fecha — 11/12 Julio</option>
+        <option value="2026-08-16">4º fecha — 15/16 Agosto</option>
+        <option value="2026-09-13">5º fecha — 12/13 Setiembre</option>
+        <option value="2026-10-18">6º fecha — 17/18 Octubre</option>
+        <option value="2026-11-29">7º fecha — 28/29 Noviembre</option>
       </select>
     </div>
     <div class="filter-group">
@@ -296,13 +296,13 @@
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   const FECHAS = {
-    '2026-04-26': '25/26 Abril',
-    '2026-06-14': '13/14 Junio',
-    '2026-07-12': '11/12 Julio',
-    '2026-08-16': '15/16 Agosto',
-    '2026-09-13': '12/13 Setiembre',
-    '2026-10-18': '17/18 Octubre',
-    '2026-11-29': '28/29 Noviembre',
+    '2026-04-26': '1º — 25/26 Abril',
+    '2026-06-14': '2º — 13/14 Junio',
+    '2026-07-12': '3º — 11/12 Julio',
+    '2026-08-16': '4º — 15/16 Agosto',
+    '2026-09-13': '5º — 12/13 Setiembre',
+    '2026-10-18': '6º — 17/18 Octubre',
+    '2026-11-29': '7º — 28/29 Noviembre',
   };
 
   function fmtFecha(iso) {
