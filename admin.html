@@ -452,7 +452,7 @@
           <td>${fmtMonto(r.pago_monto)}</td>
           <td>${capFirst(r.pago_medio)}</td>
           <td>${fmtDate(r.pago_fecha)}</td>
-          <td>${r.baja ? `<span class="badge badge-baja" title="${r.baja_motivo || ''}">Baja</span>` : '—'}</td>
+          <td>${r.baja ? `<span class="badge badge-baja">Baja</span>${r.baja_motivo ? `<div style="font-size:0.75rem;color:var(--texto-muted);margin-top:0.25rem">${r.baja_motivo}</div>` : ''}` : '—'}</td>
           <td><div class="acciones">
             ${!r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_karting','${r.id}','${r.nombre}')">Pago</button>` : ''}
             ${!r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_karting','${r.id}','${r.nombre}')">Baja</button>` : `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_karting','${r.id}','${r.nombre}')">Alta</button>`}
@@ -473,7 +473,7 @@
           <td>${fmtMonto(r.pago_monto)}</td>
           <td>${capFirst(r.pago_medio)}</td>
           <td>${fmtDate(r.pago_fecha)}</td>
-          <td>${r.baja ? `<span class="badge badge-baja" title="${r.baja_motivo || ''}">Baja</span>` : '—'}</td>
+          <td>${r.baja ? `<span class="badge badge-baja">Baja</span>${r.baja_motivo ? `<div style="font-size:0.75rem;color:var(--texto-muted);margin-top:0.25rem">${r.baja_motivo}</div>` : ''}` : '—'}</td>
           <td><div class="acciones">
             ${!r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_turismo','${r.id}','${r.nombre}')">Pago</button>` : ''}
             ${!r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_turismo','${r.id}','${r.nombre}')">Baja</button>` : `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_turismo','${r.id}','${r.nombre}')">Alta</button>`}
@@ -493,7 +493,7 @@
           <td>${fmtMonto(r.pago_monto)}</td>
           <td>${capFirst(r.pago_medio)}</td>
           <td>${fmtDate(r.pago_fecha)}</td>
-          <td>${r.baja ? `<span class="badge badge-baja" title="${r.baja_motivo || ''}">Baja</span>` : '—'}</td>
+          <td>${r.baja ? `<span class="badge badge-baja">Baja</span>${r.baja_motivo ? `<div style="font-size:0.75rem;color:var(--texto-muted);margin-top:0.25rem">${r.baja_motivo}</div>` : ''}` : '—'}</td>
           <td><div class="acciones">
             ${!r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Pago</button>` : ''}
             ${!r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Baja</button>` : `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Alta</button>`}

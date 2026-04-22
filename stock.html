@@ -240,6 +240,44 @@
     <div style="color:var(--texto-muted);font-size:0.9rem">Cargando...</div>
   </div>
 
+  <!-- Pedidos de inscripción -->
+  <div class="section-block">
+    <div class="section-header">
+      <h2>Pedidos de pilotos — al inscribirse</h2>
+      <div class="filter-row">
+        <select id="filtroPedidoFecha">
+          <option value="">Todas las fechas</option>
+          <option value="2026-04-26">1º — 25/26 Abril</option>
+          <option value="2026-06-14">2º — 13/14 Junio</option>
+          <option value="2026-07-12">3º — 11/12 Julio</option>
+          <option value="2026-08-16">4º — 15/16 Agosto</option>
+          <option value="2026-09-13">5º — 12/13 Setiembre</option>
+          <option value="2026-10-18">6º — 17/18 Octubre</option>
+          <option value="2026-11-29">7º — 28/29 Noviembre</option>
+        </select>
+        <select id="filtroPedidoCat">
+          <option value="">TNS y TMZ</option>
+          <option value="TNS">Solo TNS</option>
+          <option value="TMZ">Solo TMZ</option>
+        </select>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Piloto</th><th>Categoría</th><th>Fecha carrera</th><th>Inscripto el</th>
+          <th>Gomas (u)</th><th>Pastillas (caja)</th><th>Discos (par)</th>
+        </tr></thead>
+        <tbody id="tbodyPedidos"><tr><td colspan="7" class="empty">Cargando...</td></tr></tbody>
+      </table>
+    </div>
+    <div style="margin-top:1rem;background:var(--gris-medio);border:1px solid var(--borde);border-radius:2px;padding:1rem 1.5rem;display:flex;gap:2.5rem;flex-wrap:wrap">
+      <div><span style="font-size:0.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--texto-muted)">Total gomas</span><div style="font-family:'Barlow Condensed',sans-serif;font-size:1.8rem;font-weight:800" id="pedidoTotalGomas">—</div></div>
+      <div><span style="font-size:0.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--texto-muted)">Total pastillas</span><div style="font-family:'Barlow Condensed',sans-serif;font-size:1.8rem;font-weight:800" id="pedidoTotalPastillas">—</div></div>
+      <div><span style="font-size:0.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--texto-muted)">Total discos</span><div style="font-family:'Barlow Condensed',sans-serif;font-size:1.8rem;font-weight:800" id="pedidoTotalDiscos">—</div></div>
+    </div>
+  </div>
+
   <!-- Historial -->
   <div class="section-block">
     <div class="section-header">
@@ -457,7 +495,54 @@
   // DATOS
   async function cargarTodo() {
     await cargarArticulos();
+    await cargarPedidos();
     await cargarHistorial();
+  }
+
+  async function cargarPedidos() {
+    const filtroFecha = document.getElementById('filtroPedidoFecha').value;
+    const filtroCat = document.getElementById('filtroPedidoCat').value;
+
+    let q = sb.from('inscripciones_turismo')
+      .select('nombre, categoria, fecha_carrera, created_at, cantidad_gomas, cantidad_pastillas, cantidad_discos')
+      .eq('baja', false)
+      .order('fecha_carrera').order('nombre');
+
+    if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
+    if (filtroCat) q = q.eq('categoria', filtroCat);
+
+    const { data } = await q;
+    const rows = (data || []).filter(r => r.cantidad_gomas || r.cantidad_pastillas || r.cantidad_discos);
+
+    const tbody = document.getElementById('tbodyPedidos');
+    const FECHAS = {
+      '2026-04-26': '1º — 25/26 Abril', '2026-06-14': '2º — 13/14 Junio',
+      '2026-07-12': '3º — 11/12 Julio', '2026-08-16': '4º — 15/16 Agosto',
+      '2026-09-13': '5º — 12/13 Setiembre', '2026-10-18': '6º — 17/18 Octubre',
+      '2026-11-29': '7º — 28/29 Noviembre',
+    };
+
+    if (rows.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="empty">Sin pedidos</td></tr>';
+      document.getElementById('pedidoTotalGomas').textContent = '—';
+      document.getElementById('pedidoTotalPastillas').textContent = '—';
+      document.getElementById('pedidoTotalDiscos').textContent = '—';
+      return;
+    }
+
+    tbody.innerHTML = rows.map(r => `<tr>
+      <td>${val(r.nombre)}</td>
+      <td><span class="badge ${r.categoria === 'TNS' ? 'badge-tns' : 'badge-tmz'}">${r.categoria}</span></td>
+      <td>${FECHAS[r.fecha_carrera] || r.fecha_carrera}</td>
+      <td>${fmtDate(r.created_at)}</td>
+      <td>${r.cantidad_gomas || '—'}</td>
+      <td>${r.cantidad_pastillas || '—'}</td>
+      <td>${r.cantidad_discos || '—'}</td>
+    </tr>`).join('');
+
+    document.getElementById('pedidoTotalGomas').textContent = rows.reduce((s,r) => s + (r.cantidad_gomas || 0), 0) || '—';
+    document.getElementById('pedidoTotalPastillas').textContent = rows.reduce((s,r) => s + (r.cantidad_pastillas || 0), 0) || '—';
+    document.getElementById('pedidoTotalDiscos').textContent = rows.reduce((s,r) => s + (r.cantidad_discos || 0), 0) || '—';
   }
 
   async function cargarArticulos() {
@@ -540,6 +625,11 @@
   // Filtros historial
   ['filtroArticulo','filtroTipo','filtroPagoMov'].forEach(id => {
     document.getElementById(id).addEventListener('change', cargarHistorial);
+  });
+
+  // Filtros pedidos
+  ['filtroPedidoFecha','filtroPedidoCat'].forEach(id => {
+    document.getElementById(id).addEventListener('change', cargarPedidos);
   });
 
   checkSession();
