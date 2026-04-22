@@ -158,6 +158,10 @@
   <div class="modal verde-top">
     <h3>Entrada de stock</h3>
     <p class="modal-sub" id="modalEntradaNombre"></p>
+    <label>Ubicación <span style="color:var(--rojo)">*</span></label>
+    <select id="entradaUbicacion">
+      <option value="">Seleccioná...</option>
+    </select>
     <label>Cantidad</label>
     <input type="number" id="entradaCantidad" min="1" placeholder="0">
     <label>Proveedor <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
@@ -176,6 +180,11 @@
   <div class="modal rojo-top">
     <h3>Salida de stock</h3>
     <p class="modal-sub" id="modalSalidaNombre"></p>
+    <label>Ubicación <span style="color:var(--rojo)">*</span></label>
+    <select id="salidaUbicacion" onchange="actualizarStockDisponible()">
+      <option value="">Seleccioná...</option>
+    </select>
+    <div id="stockDisponibleInfo" style="display:none;font-size:0.8rem;color:var(--texto-muted);margin-top:0.35rem"></div>
     <label>Cantidad</label>
     <input type="number" id="salidaCantidad" min="1" placeholder="0">
     <label>Piloto</label>
@@ -301,7 +310,7 @@
     <div class="table-wrap">
       <table>
         <thead><tr>
-          <th>Fecha</th><th>Artículo</th><th>Tipo</th><th>Cantidad</th>
+          <th>Fecha</th><th>Artículo</th><th>Tipo</th><th>Ubicación</th><th>Cantidad</th>
           <th>Piloto / Proveedor</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Notas</th><th>Acción</th>
         </tr></thead>
         <tbody id="tbodyHistorial"><tr><td colspan="11" class="empty">Cargando...</td></tr></tbody>
@@ -324,6 +333,8 @@
   function capFirst(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : '—'; }
 
   let articulos = [];
+  let ubicaciones = [];
+  let stockPorUbicacion = [];
   let modalCtx = null;
 
   // AUTH
@@ -355,7 +366,23 @@
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('stockPanel').style.display = 'block';
     document.getElementById('btnLogout').style.display = 'inline-block';
-    cargarTodo();
+    cargarUbicaciones().then(() => cargarTodo());
+  }
+
+  async function cargarUbicaciones() {
+    const { data } = await sb.from('stock_ubicaciones').select('*').order('nombre');
+    ubicaciones = data || [];
+    // Poblar selects de ubicación en modales
+    ['entradaUbicacion', 'salidaUbicacion'].forEach(id => {
+      const sel = document.getElementById(id);
+      sel.innerHTML = '<option value="">Seleccioná...</option>';
+      ubicaciones.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u.id;
+        opt.textContent = u.nombre;
+        sel.appendChild(opt);
+      });
+    });
   }
 
   // MODALES
@@ -365,15 +392,18 @@
   function abrirEntrada(artId, artNombre) {
     modalCtx = { artId, artNombre };
     document.getElementById('modalEntradaNombre').textContent = artNombre;
+    document.getElementById('entradaUbicacion').value = '';
     document.getElementById('entradaCantidad').value = '';
     document.getElementById('entradaProveedor').value = '';
     document.getElementById('entradaNotas').value = '';
     document.getElementById('modalEntrada').classList.add('open');
   }
 
-  function abrirSalida(artId, artNombre, precioUsd) {
+  async function abrirSalida(artId, artNombre, precioUsd) {
     modalCtx = { artId, artNombre, precioUsd };
     document.getElementById('modalSalidaNombre').textContent = `${artNombre} — U$S ${precioUsd} c/u`;
+    document.getElementById('salidaUbicacion').value = '';
+    document.getElementById('stockDisponibleInfo').style.display = 'none';
     document.getElementById('salidaCantidad').value = '';
     document.getElementById('salidaPiloto').value = '';
     document.getElementById('salidaPago').value = 'no';
@@ -382,7 +412,33 @@
     document.getElementById('salidaMedio').value = '';
     document.getElementById('salidaFechaPago').value = new Date().toISOString().split('T')[0];
     document.getElementById('salidaNotas').value = '';
+    // Cargar stock por ubicación para este artículo
+    const { data } = await sb.from('stock_por_ubicacion')
+      .select('*, stock_ubicaciones(nombre)')
+      .eq('articulo_id', artId);
+    stockPorUbicacion = data || [];
+    // Actualizar opciones con stock disponible
+    const sel = document.getElementById('salidaUbicacion');
+    sel.innerHTML = '<option value="">Seleccioná...</option>';
+    stockPorUbicacion.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.ubicacion_id;
+      opt.textContent = `${s.stock_ubicaciones.nombre} (${s.stock_actual} en stock)`;
+      if (s.stock_actual === 0) opt.disabled = true;
+      sel.appendChild(opt);
+    });
     document.getElementById('modalSalida').classList.add('open');
+  }
+
+  function actualizarStockDisponible() {
+    const ubId = document.getElementById('salidaUbicacion').value;
+    const info = document.getElementById('stockDisponibleInfo');
+    if (!ubId) { info.style.display = 'none'; return; }
+    const s = stockPorUbicacion.find(s => s.ubicacion_id === ubId);
+    if (s) {
+      info.style.display = 'block';
+      info.textContent = `Stock disponible: ${s.stock_actual} unidades`;
+    }
   }
 
   document.getElementById('salidaPago').addEventListener('change', function() {
@@ -403,6 +459,8 @@
 
   document.getElementById('btnConfirmarEntrada').addEventListener('click', async () => {
     if (!modalCtx) return;
+    const ubicacionId = document.getElementById('entradaUbicacion').value;
+    if (!ubicacionId) { alert('Seleccioná una ubicación.'); return; }
     const cantidad = parseInt(document.getElementById('entradaCantidad').value);
     if (!cantidad || cantidad < 1) { alert('Ingresá una cantidad válida.'); return; }
     const btn = document.getElementById('btnConfirmarEntrada');
@@ -410,6 +468,7 @@
 
     const { error: errMov } = await sb.from('stock_movimientos').insert([{
       articulo_id: modalCtx.artId,
+      ubicacion_id: ubicacionId,
       tipo: 'entrada',
       cantidad,
       proveedor: document.getElementById('entradaProveedor').value.trim() || null,
@@ -417,7 +476,17 @@
     }]);
 
     if (!errMov) {
-      // Actualizar stock
+      // Actualizar stock_por_ubicacion
+      const { data: existing } = await sb.from('stock_por_ubicacion')
+        .select('stock_actual')
+        .eq('articulo_id', modalCtx.artId)
+        .eq('ubicacion_id', ubicacionId)
+        .single();
+      const nuevoStock = (existing?.stock_actual || 0) + cantidad;
+      await sb.from('stock_por_ubicacion')
+        .upsert({ articulo_id: modalCtx.artId, ubicacion_id: ubicacionId, stock_actual: nuevoStock },
+          { onConflict: 'articulo_id,ubicacion_id' });
+      // Actualizar stock total del artículo
       const art = articulos.find(a => a.id === modalCtx.artId);
       await sb.from('stock_articulos').update({ stock_actual: art.stock_actual + cantidad }).eq('id', modalCtx.artId);
       cerrarModal('modalEntrada');
@@ -430,12 +499,17 @@
 
   document.getElementById('btnConfirmarSalida').addEventListener('click', async () => {
     if (!modalCtx) return;
+    const ubicacionId = document.getElementById('salidaUbicacion').value;
+    if (!ubicacionId) { alert('Seleccioná una ubicación.'); return; }
     const cantidad = parseInt(document.getElementById('salidaCantidad').value);
     if (!cantidad || cantidad < 1) { alert('Ingresá una cantidad válida.'); return; }
     const piloto = document.getElementById('salidaPiloto').value.trim();
     if (!piloto) { alert('Ingresá el nombre del piloto.'); return; }
-    const art = articulos.find(a => a.id === modalCtx.artId);
-    if (cantidad > art.stock_actual) { alert(`Stock insuficiente. Stock actual: ${art.stock_actual}`); return; }
+    const stockUb = stockPorUbicacion.find(s => s.ubicacion_id === ubicacionId);
+    if (!stockUb || cantidad > stockUb.stock_actual) {
+      alert(`Stock insuficiente en esa ubicación. Disponible: ${stockUb?.stock_actual || 0}`);
+      return;
+    }
 
     const pago = document.getElementById('salidaPago').value === 'si';
     const btn = document.getElementById('btnConfirmarSalida');
@@ -444,6 +518,7 @@
     const monto = parseFloat(document.getElementById('salidaMonto').value);
     const { error: errMov } = await sb.from('stock_movimientos').insert([{
       articulo_id: modalCtx.artId,
+      ubicacion_id: ubicacionId,
       tipo: 'salida',
       cantidad,
       piloto,
@@ -455,6 +530,13 @@
     }]);
 
     if (!errMov) {
+      // Descontar de stock_por_ubicacion
+      await sb.from('stock_por_ubicacion')
+        .update({ stock_actual: stockUb.stock_actual - cantidad })
+        .eq('articulo_id', modalCtx.artId)
+        .eq('ubicacion_id', ubicacionId);
+      // Descontar del stock total
+      const art = articulos.find(a => a.id === modalCtx.artId);
       await sb.from('stock_articulos').update({ stock_actual: art.stock_actual - cantidad }).eq('id', modalCtx.artId);
       cerrarModal('modalSalida');
       cargarTodo();
@@ -563,16 +645,29 @@
     const cards = document.getElementById('stockCards');
     if (articulos.length === 0) { cards.innerHTML = '<div style="color:var(--texto-muted)">Sin artículos</div>'; return; }
 
+    // Cargar stock por ubicación para todas las cards
+    const { data: stockUbData } = await sb.from('stock_por_ubicacion')
+      .select('*, stock_ubicaciones(nombre)')
+      .order('stock_ubicaciones(nombre)');
+
     cards.innerHTML = articulos.map(a => {
       const bajo = a.stock_actual > 0 && a.stock_actual <= 3;
       const sinStock = a.stock_actual === 0;
       const colorClass = sinStock ? 'rojo' : bajo ? 'amarillo' : 'verde';
       const cardClass = sinStock ? 'sin-stock' : bajo ? 'bajo' : '';
+      const stockUbs = (stockUbData || []).filter(s => s.articulo_id === a.id);
+      const desglose = stockUbs.map(s =>
+        `<div style="display:flex;justify-content:space-between;font-size:0.78rem;color:${s.stock_actual === 0 ? 'var(--texto-muted)' : 'var(--blanco)'};margin-top:0.2rem">
+          <span>${s.stock_ubicaciones.nombre}</span>
+          <span style="font-weight:600">${s.stock_actual}</span>
+        </div>`
+      ).join('');
       return `<div class="stock-card ${cardClass}">
         <div class="art-nombre">${a.nombre}</div>
         <div class="art-precio">U$S ${a.precio_usd} c/u</div>
         <div class="art-cantidad ${colorClass}">${a.stock_actual}</div>
-        <div class="art-label">unidades en stock</div>
+        <div class="art-label">total en stock</div>
+        ${desglose ? `<div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--borde)">${desglose}</div>` : ''}
         <div class="art-btns">
           <button class="btn-entrada" onclick="abrirEntrada('${a.id}','${a.nombre}')">+ Entrada</button>
           <button class="btn-salida" onclick="abrirSalida('${a.id}','${a.nombre}',${a.precio_usd})">− Salida</button>
@@ -587,7 +682,7 @@
     const filtroPago = document.getElementById('filtroPagoMov').value;
 
     let q = sb.from('stock_movimientos')
-      .select('*, stock_articulos(nombre)')
+      .select('*, stock_articulos(nombre), stock_ubicaciones(nombre)')
       .order('created_at', { ascending: false });
 
     if (filtroArt) q = q.eq('articulo_id', filtroArt);
@@ -600,7 +695,7 @@
 
     const tbody = document.getElementById('tbodyHistorial');
     if (movs.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="11" class="empty">Sin movimientos</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="12" class="empty">Sin movimientos</td></tr>';
       return;
     }
 
@@ -610,6 +705,7 @@
         <td>${fmtDate(m.created_at)}</td>
         <td>${m.stock_articulos?.nombre || '—'}</td>
         <td><span class="badge ${esSalida ? 'badge-salida' : 'badge-entrada'}">${esSalida ? 'Salida' : 'Entrada'}</span></td>
+        <td>${m.stock_ubicaciones?.nombre || '—'}</td>
         <td>${m.cantidad}</td>
         <td>${esSalida ? val(m.piloto) : val(m.proveedor)}</td>
         <td>${esSalida ? `<span class="badge ${m.pago_confirmado ? 'badge-pagado' : 'badge-pendiente'}">${m.pago_confirmado ? 'Pagado' : 'Pendiente'}</span>` : '—'}</td>
