@@ -66,6 +66,9 @@
     .btn-entrada:hover { background: rgba(22,163,74,0.35); }
     .btn-salida { background: rgba(204,0,0,0.2); color: #f87171; border: 1px solid rgba(204,0,0,0.4); border-radius: 2px; padding: 0.3rem 0.75rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: background 0.15s; }
     .btn-salida:hover { background: rgba(204,0,0,0.35); }
+    .btn-transferir { background: rgba(99,102,241,0.2); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.4); border-radius: 2px; padding: 0.3rem 0.75rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: background 0.15s; }
+    .btn-transferir:hover { background: rgba(99,102,241,0.35); }
+    .badge-transferencia { background: rgba(99,102,241,0.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.3); }
 
     /* Sección historial */
     .section-block { margin-bottom: 2.5rem; }
@@ -215,6 +218,29 @@
   </div>
 </div>
 
+<!-- MODAL TRANSFERENCIA -->
+<div class="modal-overlay" id="modalTransferencia">
+  <div class="modal" style="border-top:4px solid #6366f1">
+    <h3>Mover stock</h3>
+    <p class="modal-sub" id="modalTransferenciaNombre"></p>
+    <label>Ubicación origen <span style="color:var(--rojo)">*</span></label>
+    <select id="transferenciaOrigen" onchange="actualizarStockTransferencia()">
+      <option value="">Seleccioná...</option>
+    </select>
+    <div id="transferenciaStockInfo" style="display:none;font-size:0.8rem;color:var(--texto-muted);margin-top:0.35rem"></div>
+    <label>Ubicación destino <span style="color:var(--rojo)">*</span></label>
+    <select id="transferenciaDestino">
+      <option value="">Seleccioná...</option>
+    </select>
+    <label>Cantidad</label>
+    <input type="number" id="transferenciaCantidad" min="1" placeholder="0">
+    <div class="modal-btns">
+      <button class="btn-cancelar" onclick="cerrarModal('modalTransferencia')">Cancelar</button>
+      <button class="btn-ok-rojo" id="btnConfirmarTransferencia" style="background:#6366f1">Confirmar traslado</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL PAGO MOVIMIENTO -->
 <div class="modal-overlay" id="modalPagoMov">
   <div class="modal verde-top">
@@ -296,9 +322,10 @@
           <option value="">Todos los artículos</option>
         </select>
         <select id="filtroTipo">
-          <option value="">Entradas y salidas</option>
+          <option value="">Todos los tipos</option>
           <option value="entrada">Solo entradas</option>
           <option value="salida">Solo salidas</option>
+          <option value="transferencia">Solo traslados</option>
         </select>
         <select id="filtroPagoMov">
           <option value="">Todos los pagos</option>
@@ -671,6 +698,7 @@
         <div class="art-btns">
           <button class="btn-entrada" onclick="abrirEntrada('${a.id}','${a.nombre}')">+ Entrada</button>
           <button class="btn-salida" onclick="abrirSalida('${a.id}','${a.nombre}',${a.precio_usd})">− Salida</button>
+          <button class="btn-transferir" onclick="abrirTransferencia('${a.id}','${a.nombre}')">⇄ Mover</button>
         </div>
       </div>`;
     }).join('');
@@ -701,22 +729,120 @@
 
     tbody.innerHTML = movs.map(m => {
       const esSalida = m.tipo === 'salida';
+      const esTransferencia = m.tipo === 'transferencia';
       return `<tr>
         <td>${fmtDate(m.created_at)}</td>
         <td>${m.stock_articulos?.nombre || '—'}</td>
-        <td><span class="badge ${esSalida ? 'badge-salida' : 'badge-entrada'}">${esSalida ? 'Salida' : 'Entrada'}</span></td>
+        <td><span class="badge ${m.tipo === 'transferencia' ? 'badge-transferencia' : esSalida ? 'badge-salida' : 'badge-entrada'}">${m.tipo === 'transferencia' ? 'Traslado' : esSalida ? 'Salida' : 'Entrada'}</span></td>
         <td>${m.stock_ubicaciones?.nombre || '—'}</td>
         <td>${m.cantidad}</td>
-        <td>${esSalida ? val(m.piloto) : val(m.proveedor)}</td>
-        <td>${esSalida ? `<span class="badge ${m.pago_confirmado ? 'badge-pagado' : 'badge-pendiente'}">${m.pago_confirmado ? 'Pagado' : 'Pendiente'}</span>` : '—'}</td>
+        <td>${esTransferencia ? '—' : esSalida ? val(m.piloto) : val(m.proveedor)}</td>
+        <td>${esSalida && !esTransferencia ? `<span class="badge ${m.pago_confirmado ? 'badge-pagado' : 'badge-pendiente'}">${m.pago_confirmado ? 'Pagado' : 'Pendiente'}</span>` : '—'}</td>
         <td>${m.pago_monto != null ? `U$S ${Number(m.pago_monto).toFixed(2)}` : '—'}</td>
         <td>${capFirst(m.pago_medio)}</td>
         <td>${fmtDateSimple(m.pago_fecha)}</td>
         <td>${val(m.notas)}</td>
-        <td>${esSalida && !m.pago_confirmado ? `<button class="btn-pago-mov" onclick="abrirPagoMov('${m.id}','${m.piloto}')">Pago</button>` : '—'}</td>
+        <td>${esSalida && !m.pago_confirmado && m.tipo !== 'transferencia' ? `<button class="btn-pago-mov" onclick="abrirPagoMov('${m.id}','${m.piloto}')">Pago</button>` : '—'}</td>
       </tr>`;
     }).join('');
   }
+
+  // TRANSFERENCIA
+  async function abrirTransferencia(artId, artNombre) {
+    modalCtx = { artId, artNombre };
+    document.getElementById('modalTransferenciaNombre').textContent = artNombre;
+    document.getElementById('transferenciaOrigen').value = '';
+    document.getElementById('transferenciaDestino').value = '';
+    document.getElementById('transferenciaCantidad').value = '';
+    document.getElementById('transferenciaStockInfo').style.display = 'none';
+
+    const { data } = await sb.from('stock_por_ubicacion')
+      .select('*, stock_ubicaciones(nombre)')
+      .eq('articulo_id', artId);
+    stockPorUbicacion = data || [];
+
+    const selOrigen = document.getElementById('transferenciaOrigen');
+    const selDestino = document.getElementById('transferenciaDestino');
+    selOrigen.innerHTML = '<option value="">Seleccioná...</option>';
+    selDestino.innerHTML = '<option value="">Seleccioná...</option>';
+
+    stockPorUbicacion.forEach(s => {
+      const optO = document.createElement('option');
+      optO.value = s.ubicacion_id;
+      optO.textContent = `${s.stock_ubicaciones.nombre} (${s.stock_actual} en stock)`;
+      if (s.stock_actual === 0) optO.disabled = true;
+      selOrigen.appendChild(optO);
+
+      const optD = document.createElement('option');
+      optD.value = s.ubicacion_id;
+      optD.textContent = s.stock_ubicaciones.nombre;
+      selDestino.appendChild(optD);
+    });
+
+    document.getElementById('modalTransferencia').classList.add('open');
+  }
+
+  function actualizarStockTransferencia() {
+    const ubId = document.getElementById('transferenciaOrigen').value;
+    const info = document.getElementById('transferenciaStockInfo');
+    if (!ubId) { info.style.display = 'none'; return; }
+    const s = stockPorUbicacion.find(s => s.ubicacion_id === ubId);
+    if (s) {
+      info.style.display = 'block';
+      info.textContent = `Stock disponible en origen: ${s.stock_actual} unidades`;
+    }
+  }
+
+  document.getElementById('btnConfirmarTransferencia').addEventListener('click', async () => {
+    if (!modalCtx) return;
+    const origenId = document.getElementById('transferenciaOrigen').value;
+    const destinoId = document.getElementById('transferenciaDestino').value;
+    const cantidad = parseInt(document.getElementById('transferenciaCantidad').value);
+
+    if (!origenId) { alert('Seleccioná la ubicación de origen.'); return; }
+    if (!destinoId) { alert('Seleccioná la ubicación de destino.'); return; }
+    if (origenId === destinoId) { alert('El origen y el destino deben ser distintos.'); return; }
+    if (!cantidad || cantidad < 1) { alert('Ingresá una cantidad válida.'); return; }
+
+    const stockOrigen = stockPorUbicacion.find(s => s.ubicacion_id === origenId);
+    const stockDestino = stockPorUbicacion.find(s => s.ubicacion_id === destinoId);
+    if (!stockOrigen || cantidad > stockOrigen.stock_actual) {
+      alert(`Stock insuficiente en origen. Disponible: ${stockOrigen?.stock_actual || 0}`);
+      return;
+    }
+
+    const nombreOrigen = stockOrigen.stock_ubicaciones.nombre;
+    const nombreDestino = stockDestino.stock_ubicaciones.nombre;
+    const btn = document.getElementById('btnConfirmarTransferencia');
+    btn.disabled = true; btn.textContent = 'Guardando...';
+
+    // Registrar movimiento de transferencia (salida del origen)
+    const { error: errMov } = await sb.from('stock_movimientos').insert([{
+      articulo_id: modalCtx.artId,
+      ubicacion_id: origenId,
+      tipo: 'transferencia',
+      cantidad,
+      notas: `Traslado a ${nombreDestino}`,
+    }]);
+
+    if (!errMov) {
+      // Descontar del origen
+      await sb.from('stock_por_ubicacion')
+        .update({ stock_actual: stockOrigen.stock_actual - cantidad })
+        .eq('articulo_id', modalCtx.artId)
+        .eq('ubicacion_id', origenId);
+      // Sumar al destino
+      await sb.from('stock_por_ubicacion')
+        .update({ stock_actual: (stockDestino?.stock_actual || 0) + cantidad })
+        .eq('articulo_id', modalCtx.artId)
+        .eq('ubicacion_id', destinoId);
+      cerrarModal('modalTransferencia');
+      cargarTodo();
+    } else {
+      alert('Error al guardar. Intentá nuevamente.');
+    }
+    btn.disabled = false; btn.textContent = 'Confirmar traslado';
+  });
 
   // Filtros historial
   ['filtroArticulo','filtroTipo','filtroPagoMov'].forEach(id => {
