@@ -363,6 +363,7 @@
   let ubicaciones = [];
   let stockPorUbicacion = [];
   let modalCtx = null;
+  let esAdmin = false;
 
   // AUTH
   async function checkSession() {
@@ -389,11 +390,14 @@
     document.getElementById('btnLogout').style.display = 'none';
   });
 
-  function showPanel() {
+  async function showPanel() {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('stockPanel').style.display = 'block';
     document.getElementById('btnLogout').style.display = 'inline-block';
-    cargarUbicaciones().then(() => cargarTodo());
+    const { data: rol } = await sb.rpc('get_my_role');
+    esAdmin = rol === 'admin';
+    await cargarUbicaciones();
+    await cargarTodo();
   }
 
   async function cargarUbicaciones() {
@@ -695,11 +699,11 @@
         <div class="art-cantidad ${colorClass}">${a.stock_actual}</div>
         <div class="art-label">total en stock</div>
         ${desglose ? `<div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--borde)">${desglose}</div>` : ''}
-        <div class="art-btns">
+        ${esAdmin ? `<div class="art-btns">
           <button class="btn-entrada" onclick="abrirEntrada('${a.id}','${a.nombre}')">+ Entrada</button>
           <button class="btn-salida" onclick="abrirSalida('${a.id}','${a.nombre}',${a.precio_usd})">− Salida</button>
           <button class="btn-transferir" onclick="abrirTransferencia('${a.id}','${a.nombre}')">⇄ Mover</button>
-        </div>
+        </div>` : ''}
       </div>`;
     }).join('');
   }
@@ -742,7 +746,7 @@
         <td>${capFirst(m.pago_medio)}</td>
         <td>${fmtDateSimple(m.pago_fecha)}</td>
         <td>${val(m.notas)}</td>
-        <td>${esSalida && !m.pago_confirmado && m.tipo !== 'transferencia' ? `<button class="btn-pago-mov" onclick="abrirPagoMov('${m.id}','${m.piloto}')">Pago</button>` : '—'}</td>
+        <td>${esAdmin && esSalida && !m.pago_confirmado && m.tipo !== 'transferencia' ? `<button class="btn-pago-mov" onclick="abrirPagoMov('${m.id}','${m.piloto}')">Pago</button>` : '—'}</td>
       </tr>`;
     }).join('');
   }
