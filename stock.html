@@ -202,6 +202,17 @@
     <input type="number" id="salidaCantidad" min="1" placeholder="0">
     <label>Piloto</label>
     <input type="text" id="salidaPiloto" placeholder="Nombre del piloto">
+    <label>Fecha de carrera <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+    <select id="salidaFechaCarrera">
+      <option value="">Sin asignar</option>
+      <option value="2026-04-26">1º — 25/26 Abril</option>
+      <option value="2026-06-14">2º — 13/14 Junio</option>
+      <option value="2026-07-12">3º — 11/12 Julio</option>
+      <option value="2026-08-16">4º — 15/16 Agosto</option>
+      <option value="2026-09-13">5º — 12/13 Setiembre</option>
+      <option value="2026-10-18">6º — 17/18 Octubre</option>
+      <option value="2026-11-29">7º — 28/29 Noviembre</option>
+    </select>
     <label>¿Pagó?</label>
     <select id="salidaPago">
       <option value="no">No pagó todavía</option>
@@ -289,6 +300,18 @@
   <div class="section-block">
     <div class="section-header">
       <h2>Resumen de ventas / pagos</h2>
+      <div class="filter-row">
+        <select id="filtroResumenFecha">
+          <option value="">Todas las fechas</option>
+          <option value="2026-04-26">1º — 25/26 Abril</option>
+          <option value="2026-06-14">2º — 13/14 Junio</option>
+          <option value="2026-07-12">3º — 11/12 Julio</option>
+          <option value="2026-08-16">4º — 15/16 Agosto</option>
+          <option value="2026-09-13">5º — 12/13 Setiembre</option>
+          <option value="2026-10-18">6º — 17/18 Octubre</option>
+          <option value="2026-11-29">7º — 28/29 Noviembre</option>
+        </select>
+      </div>
     </div>
     <div class="summary-cards">
       <div class="summary-card"><div class="num" id="sumTotalSalidas">—</div><div class="lbl">Total salidas</div></div>
@@ -364,15 +387,25 @@
           <option value="pagado">Pagados</option>
           <option value="pendiente">Pendientes</option>
         </select>
+        <select id="filtroHistorialFecha">
+          <option value="">Todas las fechas</option>
+          <option value="2026-04-26">1º — 25/26 Abril</option>
+          <option value="2026-06-14">2º — 13/14 Junio</option>
+          <option value="2026-07-12">3º — 11/12 Julio</option>
+          <option value="2026-08-16">4º — 15/16 Agosto</option>
+          <option value="2026-09-13">5º — 12/13 Setiembre</option>
+          <option value="2026-10-18">6º — 17/18 Octubre</option>
+          <option value="2026-11-29">7º — 28/29 Noviembre</option>
+        </select>
       </div>
     </div>
     <div class="table-wrap">
       <table>
         <thead><tr>
           <th>Fecha</th><th>Artículo</th><th>Tipo</th><th>Ubicación</th><th>Cantidad</th>
-          <th>Piloto / Proveedor</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Notas</th><th>Acción</th>
+          <th>Piloto / Proveedor</th><th>Carrera</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Notas</th><th>Acción</th>
         </tr></thead>
-        <tbody id="tbodyHistorial"><tr><td colspan="11" class="empty">Cargando...</td></tr></tbody>
+        <tbody id="tbodyHistorial"><tr><td colspan="13" class="empty">Cargando...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -469,6 +502,7 @@
     document.getElementById('stockDisponibleInfo').style.display = 'none';
     document.getElementById('salidaCantidad').value = '';
     document.getElementById('salidaPiloto').value = '';
+    document.getElementById('salidaFechaCarrera').value = '';
     document.getElementById('salidaPago').value = 'no';
     document.getElementById('salidaPagoDetalle').style.display = 'none';
     document.getElementById('salidaMonto').value = '';
@@ -585,6 +619,7 @@
       tipo: 'salida',
       cantidad,
       piloto,
+      fecha_carrera: document.getElementById('salidaFechaCarrera').value || null,
       pago_confirmado: pago,
       pago_monto: pago && !isNaN(monto) ? monto : null,
       pago_medio: pago ? document.getElementById('salidaMedio').value || null : null,
@@ -645,10 +680,15 @@
     await cargarHistorial();
   }
 
+  document.getElementById('filtroResumenFecha').addEventListener('change', cargarResumenPagos);
+
   async function cargarResumenPagos() {
-    const { data: movs } = await sb.from('stock_movimientos')
+    const filtroFecha = document.getElementById('filtroResumenFecha').value;
+    let q = sb.from('stock_movimientos')
       .select('tipo, pago_confirmado, pago_monto, stock_articulos(nombre)')
       .eq('tipo', 'salida');
+    if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
+    const { data: movs } = await q;
 
     const salidas = movs || [];
     const pagadas = salidas.filter(m => m.pago_confirmado);
@@ -792,6 +832,7 @@
     const filtroArt = document.getElementById('filtroArticulo').value;
     const filtroTipo = document.getElementById('filtroTipo').value;
     const filtroPago = document.getElementById('filtroPagoMov').value;
+    const filtroFecha = document.getElementById('filtroHistorialFecha').value;
 
     let q = sb.from('stock_movimientos')
       .select('*, stock_articulos(nombre), stock_ubicaciones(nombre)')
@@ -801,13 +842,21 @@
     if (filtroTipo) q = q.eq('tipo', filtroTipo);
     if (filtroPago === 'pagado') q = q.eq('pago_confirmado', true).eq('tipo', 'salida');
     if (filtroPago === 'pendiente') q = q.eq('pago_confirmado', false).eq('tipo', 'salida');
+    if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
 
     const { data } = await q;
     const movs = data || [];
 
+    const FECHAS_HIST = {
+      '2026-04-26': '1º Abril', '2026-06-14': '2º Junio',
+      '2026-07-12': '3º Julio', '2026-08-16': '4º Agosto',
+      '2026-09-13': '5º Set.', '2026-10-18': '6º Oct.',
+      '2026-11-29': '7º Nov.',
+    };
+
     const tbody = document.getElementById('tbodyHistorial');
     if (movs.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="12" class="empty">Sin movimientos</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="13" class="empty">Sin movimientos</td></tr>';
       return;
     }
 
@@ -821,6 +870,7 @@
         <td>${m.stock_ubicaciones?.nombre || '—'}</td>
         <td>${m.cantidad}</td>
         <td>${esTransferencia ? '—' : esSalida ? val(m.piloto) : val(m.proveedor)}</td>
+        <td>${m.fecha_carrera ? FECHAS_HIST[m.fecha_carrera] || m.fecha_carrera : '—'}</td>
         <td>${esSalida && !esTransferencia ? `<span class="badge ${m.pago_confirmado ? 'badge-pagado' : 'badge-pendiente'}">${m.pago_confirmado ? 'Pagado' : 'Pendiente'}</span>` : '—'}</td>
         <td>${m.pago_monto != null ? `U$S ${Number(m.pago_monto).toFixed(2)}` : '—'}</td>
         <td>${capFirst(m.pago_medio)}</td>
@@ -929,7 +979,7 @@
   });
 
   // Filtros historial
-  ['filtroArticulo','filtroTipo','filtroPagoMov'].forEach(id => {
+  ['filtroArticulo','filtroTipo','filtroPagoMov','filtroHistorialFecha'].forEach(id => {
     document.getElementById(id).addEventListener('change', cargarHistorial);
   });
 
