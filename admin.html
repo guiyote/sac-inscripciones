@@ -84,6 +84,10 @@
     .btn-baja:hover { background: rgba(100,100,100,0.35); }
     .btn-alta { background: rgba(59,130,246,0.2); color: #93c5fd; border: 1px solid rgba(59,130,246,0.4); }
     .btn-alta:hover { background: rgba(59,130,246,0.35); }
+    .btn-transponder { background: rgba(139,92,246,0.2); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.4); }
+    .btn-transponder:hover { background: rgba(139,92,246,0.35); }
+    .badge-confirmado { background: rgba(22,163,74,0.15); color: #4ade80; border: 1px solid rgba(22,163,74,0.3); }
+    .badge-en-espera { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
 
     .empty { padding: 2rem; text-align: center; color: var(--texto-muted); font-size: 0.9rem; }
     .loading { padding: 2rem; text-align: center; color: var(--texto-muted); font-size: 0.9rem; }
@@ -175,6 +179,20 @@
   </div>
 </div>
 
+<!-- MODAL TRANSPONDER -->
+<div class="modal-overlay" id="modalTransponder">
+  <div class="modal" style="border-top-color:#7c3aed">
+    <h3>Transponder</h3>
+    <p class="modal-sub" id="modalTransponderNombre"></p>
+    <label>Número de transponder</label>
+    <input type="text" id="transponderNumero" placeholder="Ej: 12345">
+    <div class="modal-btns">
+      <button class="btn-cancelar" onclick="cerrarModal('modalTransponder')">Cancelar</button>
+      <button class="btn-confirmar-verde" id="btnConfirmarTransponder">Confirmar</button>
+    </div>
+  </div>
+</div>
+
 <div id="adminPanel">
   <div class="panel-header">
     <h1>Inscripciones 2026</h1>
@@ -235,24 +253,24 @@
   <div class="section-block" id="secKarting">
     <h2>Karting</h2>
     <div class="table-wrap"><table>
-      <thead><tr><th>Piloto</th><th>Fecha</th><th>Cilindrada</th><th>Nº Kart</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Estado</th><th>Acciones</th></tr></thead>
-      <tbody id="tbodyKarting"><tr><td colspan="10" class="loading">Cargando...</td></tr></tbody>
+      <thead><tr><th>Piloto</th><th>CI</th><th>Fecha</th><th>Cilindrada</th><th>Nº Kart</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody id="tbodyKarting"><tr><td colspan="11" class="loading">Cargando...</td></tr></tbody>
     </table></div>
   </div>
 
   <div class="section-block" id="secTurismo">
     <h2>Turismo — TNS / TMZ</h2>
     <div class="table-wrap"><table>
-      <thead><tr><th>Piloto</th><th>Fecha</th><th>Cat.</th><th>Nº Auto</th><th>Marca/Modelo</th><th>Equipo</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Estado</th><th>Acciones</th></tr></thead>
-      <tbody id="tbodyTurismo"><tr><td colspan="12" class="loading">Cargando...</td></tr></tbody>
+      <thead><tr><th>Piloto</th><th>CI</th><th>Fecha</th><th>Cat.</th><th>Nº Auto</th><th>Marca/Modelo</th><th>Equipo</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody id="tbodyTurismo"><tr><td colspan="13" class="loading">Cargando...</td></tr></tbody>
     </table></div>
   </div>
 
   <div class="section-block" id="secRegularidad">
     <h2>Regularidad</h2>
     <div class="table-wrap"><table>
-      <thead><tr><th>Piloto</th><th>Navegante</th><th>Fecha</th><th>Vehículo</th><th>Nº Auto</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Estado</th><th>Acciones</th></tr></thead>
-      <tbody id="tbodyRegularidad"><tr><td colspan="11" class="loading">Cargando...</td></tr></tbody>
+      <thead><tr><th>Piloto</th><th>CI</th><th>Navegante</th><th>Fecha</th><th>Vehículo</th><th>Nº Auto</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody id="tbodyRegularidad"><tr><td colspan="12" class="loading">Cargando...</td></tr></tbody>
     </table></div>
   </div>
 
@@ -398,6 +416,31 @@
     else alert('Error al dar de alta. Intentá nuevamente.');
   }
 
+  function estadoCell(r) {
+    if (r.baja) return `<span class="badge badge-baja">Baja</span>${r.baja_motivo ? `<div style="font-size:0.75rem;color:var(--texto-muted);margin-top:0.25rem">${r.baja_motivo}</div>` : ''}`;
+    if (r.pago_confirmado && r.transponder) return `<span class="badge badge-confirmado">Confirmado</span><div style="font-size:0.75rem;color:#a78bfa;margin-top:0.2rem">T: ${r.transponder}</div>`;
+    if (r.pago_confirmado) return `<span class="badge badge-en-espera">En espera</span>`;
+    return '—';
+  }
+
+  function abrirModalTransponder(tabla, id, nombre, transponderActual) {
+    modalCtx = { tabla, id };
+    document.getElementById('modalTransponderNombre').textContent = nombre;
+    document.getElementById('transponderNumero').value = transponderActual || '';
+    document.getElementById('modalTransponder').classList.add('open');
+  }
+
+  document.getElementById('btnConfirmarTransponder').addEventListener('click', async () => {
+    if (!modalCtx) return;
+    const num = document.getElementById('transponderNumero').value.trim();
+    const btn = document.getElementById('btnConfirmarTransponder');
+    btn.disabled = true; btn.textContent = 'Guardando...';
+    const { error } = await sb.from(modalCtx.tabla).update({ transponder: num || null }).eq('id', modalCtx.id);
+    btn.disabled = false; btn.textContent = 'Confirmar';
+    if (!error) { cerrarModal('modalTransponder'); cargarDatos(); }
+    else alert('Error al guardar. Intentá nuevamente.');
+  });
+
   // DATOS
   document.getElementById('btnCargar').addEventListener('click', cargarDatos);
 
@@ -446,9 +489,10 @@
 
     // Karting
     document.getElementById('tbodyKarting').innerHTML = kData.length === 0
-      ? '<tr><td colspan="10" class="empty">Sin inscripciones</td></tr>'
+      ? '<tr><td colspan="11" class="empty">Sin inscripciones</td></tr>'
       : kData.map(r => `<tr class="${r.baja ? 'baja-row' : ''}">
           <td>${val(r.nombre)}</td>
+          <td style="font-size:0.8rem;color:var(--texto-muted)">${val(r.cedula)}</td>
           <td>${fmtFecha(r.fecha_carrera)}</td>
           <td><span class="badge badge-karting">${val(r.cilindrada)}</span></td>
           <td>${val(r.numero_kart)}</td>
@@ -456,18 +500,20 @@
           <td>${fmtMonto(r.pago_monto)}</td>
           <td>${capFirst(r.pago_medio)}</td>
           <td>${fmtDate(r.pago_fecha)}</td>
-          <td>${r.baja ? `<span class="badge badge-baja">Baja</span>${r.baja_motivo ? `<div style="font-size:0.75rem;color:var(--texto-muted);margin-top:0.25rem">${r.baja_motivo}</div>` : ''}` : '—'}</td>
+          <td>${estadoCell(r)}</td>
           <td><div class="acciones">
             ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_karting','${r.id}','${r.nombre}')">Pago</button>` : ''}
+            ${esAdmin && r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-transponder" onclick="abrirModalTransponder('inscripciones_karting','${r.id}','${r.nombre}','${r.transponder||''}')">${r.transponder ? 'T: '+r.transponder : 'Transponder'}</button>` : ''}
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_karting','${r.id}','${r.nombre}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_karting','${r.id}','${r.nombre}')">Alta</button>` : '—'}
           </div></td>
         </tr>`).join('');
 
     // Turismo
     document.getElementById('tbodyTurismo').innerHTML = tData.length === 0
-      ? '<tr><td colspan="12" class="empty">Sin inscripciones</td></tr>'
+      ? '<tr><td colspan="13" class="empty">Sin inscripciones</td></tr>'
       : tData.map(r => `<tr class="${r.baja ? 'baja-row' : ''}">
           <td>${val(r.nombre)}</td>
+          <td style="font-size:0.8rem;color:var(--texto-muted)">${val(r.cedula)}</td>
           <td>${fmtFecha(r.fecha_carrera)}</td>
           <td><span class="badge ${r.categoria === 'TNS' ? 'badge-tns' : 'badge-tmz'}">${val(r.categoria)}</span></td>
           <td>${val(r.numero_auto)}</td>
@@ -477,18 +523,20 @@
           <td>${fmtMonto(r.pago_monto)}</td>
           <td>${capFirst(r.pago_medio)}</td>
           <td>${fmtDate(r.pago_fecha)}</td>
-          <td>${r.baja ? `<span class="badge badge-baja">Baja</span>${r.baja_motivo ? `<div style="font-size:0.75rem;color:var(--texto-muted);margin-top:0.25rem">${r.baja_motivo}</div>` : ''}` : '—'}</td>
+          <td>${estadoCell(r)}</td>
           <td><div class="acciones">
             ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_turismo','${r.id}','${r.nombre}')">Pago</button>` : ''}
+            ${esAdmin && r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-transponder" onclick="abrirModalTransponder('inscripciones_turismo','${r.id}','${r.nombre}','${r.transponder||''}')">${r.transponder ? 'T: '+r.transponder : 'Transponder'}</button>` : ''}
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_turismo','${r.id}','${r.nombre}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_turismo','${r.id}','${r.nombre}')">Alta</button>` : '—'}
           </div></td>
         </tr>`).join('');
 
     // Regularidad
     document.getElementById('tbodyRegularidad').innerHTML = rData.length === 0
-      ? '<tr><td colspan="11" class="empty">Sin inscripciones</td></tr>'
+      ? '<tr><td colspan="12" class="empty">Sin inscripciones</td></tr>'
       : rData.map(r => `<tr class="${r.baja ? 'baja-row' : ''}">
           <td>${val(r.nombre_piloto)}</td>
+          <td style="font-size:0.8rem;color:var(--texto-muted)">${val(r.cedula_piloto)}</td>
           <td>${val(r.nombre_navegante)}</td>
           <td>${fmtFecha(r.fecha_carrera)}</td>
           <td>${[r.marca, r.modelo, r.anio].filter(Boolean).join(' ') || '—'}</td>
@@ -497,9 +545,10 @@
           <td>${fmtMonto(r.pago_monto)}</td>
           <td>${capFirst(r.pago_medio)}</td>
           <td>${fmtDate(r.pago_fecha)}</td>
-          <td>${r.baja ? `<span class="badge badge-baja">Baja</span>${r.baja_motivo ? `<div style="font-size:0.75rem;color:var(--texto-muted);margin-top:0.25rem">${r.baja_motivo}</div>` : ''}` : '—'}</td>
+          <td>${estadoCell(r)}</td>
           <td><div class="acciones">
             ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Pago</button>` : ''}
+            ${esAdmin && r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-transponder" onclick="abrirModalTransponder('inscripciones_regularidad','${r.id}','${r.nombre_piloto}','${r.transponder||''}')">${r.transponder ? 'T: '+r.transponder : 'Transponder'}</button>` : ''}
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Alta</button>` : '—'}
           </div></td>
         </tr>`).join('');
