@@ -253,7 +253,7 @@
   <div class="section-block" id="secKarting">
     <h2>Karting</h2>
     <div class="table-wrap"><table>
-      <thead><tr><th>Piloto</th><th>CI</th><th>Fecha</th><th>Cilindrada</th><th>Nº Kart</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <thead><tr><th>Piloto</th><th>CI</th><th>Fecha</th><th>Cilindrada</th><th>Nº Kart</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Transponder</th><th>Acciones</th></tr></thead>
       <tbody id="tbodyKarting"><tr><td colspan="11" class="loading">Cargando...</td></tr></tbody>
     </table></div>
   </div>
@@ -261,7 +261,7 @@
   <div class="section-block" id="secTurismo">
     <h2>Turismo — TNS / TMZ</h2>
     <div class="table-wrap"><table>
-      <thead><tr><th>Piloto</th><th>CI</th><th>Fecha</th><th>Cat.</th><th>Nº Auto</th><th>Marca/Modelo</th><th>Equipo</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <thead><tr><th>Piloto</th><th>CI</th><th>Fecha</th><th>Cat.</th><th>Nº Auto</th><th>Marca/Modelo</th><th>Equipo</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Transponder</th><th>Acciones</th></tr></thead>
       <tbody id="tbodyTurismo"><tr><td colspan="13" class="loading">Cargando...</td></tr></tbody>
     </table></div>
   </div>
@@ -269,7 +269,7 @@
   <div class="section-block" id="secRegularidad">
     <h2>Regularidad</h2>
     <div class="table-wrap"><table>
-      <thead><tr><th>Piloto</th><th>CI</th><th>Navegante</th><th>Fecha</th><th>Vehículo</th><th>Nº Auto</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <thead><tr><th>Piloto</th><th>CI</th><th>Navegante</th><th>Fecha</th><th>Vehículo</th><th>Nº Auto</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Transponder</th><th>Acciones</th></tr></thead>
       <tbody id="tbodyRegularidad"><tr><td colspan="12" class="loading">Cargando...</td></tr></tbody>
     </table></div>
   </div>
@@ -315,6 +315,14 @@
   };
 
   function fmtFecha(iso) { return FECHAS[iso] || iso || '—'; }
+  function fmtCI(v) {
+    if (!v) return '—';
+    const d = v.replace(/\D/g, '');
+    if (d.length < 2) return v;
+    const check = d.slice(-1);
+    const body = d.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return `${body}-${check}`;
+  }
   function fmtDate(iso) { if (!iso) return '—'; const [y,m,d] = iso.split('-'); return `${d}/${m}/${y}`; }
   function val(v) { return (v != null && v !== '') ? v : '—'; }
   function fmtMonto(v) { return v != null ? `$ ${Number(v).toLocaleString('es-UY')}` : '—'; }
@@ -416,11 +424,9 @@
     else alert('Error al dar de alta. Intentá nuevamente.');
   }
 
-  function estadoCell(r) {
-    if (r.baja) return `<span class="badge badge-baja">Baja</span>${r.baja_motivo ? `<div style="font-size:0.75rem;color:var(--texto-muted);margin-top:0.25rem">${r.baja_motivo}</div>` : ''}`;
-    if (r.pago_confirmado && r.transponder) return `<span class="badge badge-confirmado">Confirmado</span><div style="font-size:0.75rem;color:#a78bfa;margin-top:0.2rem">T: ${r.transponder}</div>`;
-    if (r.pago_confirmado) return `<span class="badge badge-en-espera">En espera</span>`;
-    return '—';
+  function transponderCell(r) {
+    if (r.transponder) return `<span style="color:#4ade80;font-weight:600">Sí</span>`;
+    return `<span style="color:var(--texto-muted)">No</span>`;
   }
 
   function abrirModalTransponder(tabla, id, nombre, transponderActual) {
@@ -492,7 +498,7 @@
       ? '<tr><td colspan="11" class="empty">Sin inscripciones</td></tr>'
       : kData.map(r => `<tr class="${r.baja ? 'baja-row' : ''}">
           <td>${val(r.nombre)}</td>
-          <td style="font-size:0.8rem;color:var(--texto-muted)">${val(r.cedula)}</td>
+          <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtCI(r.cedula)}</td>
           <td>${fmtFecha(r.fecha_carrera)}</td>
           <td><span class="badge badge-karting">${val(r.cilindrada)}</span></td>
           <td>${val(r.numero_kart)}</td>
@@ -500,7 +506,7 @@
           <td>${fmtMonto(r.pago_monto)}</td>
           <td>${capFirst(r.pago_medio)}</td>
           <td>${fmtDate(r.pago_fecha)}</td>
-          <td>${estadoCell(r)}</td>
+          <td>${transponderCell(r)}</td>
           <td><div class="acciones">
             ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_karting','${r.id}','${r.nombre}')">Pago</button>` : ''}
             ${esAdmin && r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-transponder" onclick="abrirModalTransponder('inscripciones_karting','${r.id}','${r.nombre}','${r.transponder||''}')">${r.transponder ? 'T: '+r.transponder : 'Transponder'}</button>` : ''}
@@ -513,7 +519,7 @@
       ? '<tr><td colspan="13" class="empty">Sin inscripciones</td></tr>'
       : tData.map(r => `<tr class="${r.baja ? 'baja-row' : ''}">
           <td>${val(r.nombre)}</td>
-          <td style="font-size:0.8rem;color:var(--texto-muted)">${val(r.cedula)}</td>
+          <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtCI(r.cedula)}</td>
           <td>${fmtFecha(r.fecha_carrera)}</td>
           <td><span class="badge ${r.categoria === 'TNS' ? 'badge-tns' : 'badge-tmz'}">${val(r.categoria)}</span></td>
           <td>${val(r.numero_auto)}</td>
@@ -523,7 +529,7 @@
           <td>${fmtMonto(r.pago_monto)}</td>
           <td>${capFirst(r.pago_medio)}</td>
           <td>${fmtDate(r.pago_fecha)}</td>
-          <td>${estadoCell(r)}</td>
+          <td>${transponderCell(r)}</td>
           <td><div class="acciones">
             ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_turismo','${r.id}','${r.nombre}')">Pago</button>` : ''}
             ${esAdmin && r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-transponder" onclick="abrirModalTransponder('inscripciones_turismo','${r.id}','${r.nombre}','${r.transponder||''}')">${r.transponder ? 'T: '+r.transponder : 'Transponder'}</button>` : ''}
@@ -536,7 +542,7 @@
       ? '<tr><td colspan="12" class="empty">Sin inscripciones</td></tr>'
       : rData.map(r => `<tr class="${r.baja ? 'baja-row' : ''}">
           <td>${val(r.nombre_piloto)}</td>
-          <td style="font-size:0.8rem;color:var(--texto-muted)">${val(r.cedula_piloto)}</td>
+          <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtCI(r.cedula_piloto)}</td>
           <td>${val(r.nombre_navegante)}</td>
           <td>${fmtFecha(r.fecha_carrera)}</td>
           <td>${[r.marca, r.modelo, r.anio].filter(Boolean).join(' ') || '—'}</td>
@@ -545,7 +551,7 @@
           <td>${fmtMonto(r.pago_monto)}</td>
           <td>${capFirst(r.pago_medio)}</td>
           <td>${fmtDate(r.pago_fecha)}</td>
-          <td>${estadoCell(r)}</td>
+          <td>${transponderCell(r)}</td>
           <td><div class="acciones">
             ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Pago</button>` : ''}
             ${esAdmin && r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-transponder" onclick="abrirModalTransponder('inscripciones_regularidad','${r.id}','${r.nombre_piloto}','${r.transponder||''}')">${r.transponder ? 'T: '+r.transponder : 'Transponder'}</button>` : ''}
