@@ -341,7 +341,14 @@
     <p>Completá los datos para inscribirte. GRACIAS</p>
   </div>
 
-  <div class="form-wrap">
+  <div id="avisoInscripcionesCerradas" style="display:none;max-width:600px;margin:4rem auto;padding:0 1.5rem;text-align:center">
+    <div style="background:#2d2d2d;border:1px solid #3a3a3a;border-top:4px solid #CC0000;border-radius:2px;padding:2.5rem 2rem">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:800;text-transform:uppercase;letter-spacing:2px;margin-bottom:0.75rem">Inscripciones cerradas</div>
+      <p style="color:#888;font-size:0.95rem">Las inscripciones están temporalmente suspendidas.<br>Contactate con la organización para más información.</p>
+    </div>
+  </div>
+
+  <div id="formWrap" class="form-wrap">
     <form id="formKarting">
 
       <div class="form-section">
@@ -450,6 +457,14 @@
     const SUPABASE_URL = 'https://qpveivsqkudlqjbxcxzh.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_H6Q0geOf0yqMVQ8MfCcr9Q_31LSQMVg';
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    (async () => {
+      const { data } = await sb.from('configuracion').select('valor').eq('clave', 'inscripciones_habilitadas').single();
+      if (data?.valor === 'false') {
+        document.getElementById('formWrap').style.display = 'none';
+        document.getElementById('avisoInscripcionesCerradas').style.display = '';
+      }
+    })();
 
     function toggleRadio(label) {
       document.querySelectorAll('#cilindrada_group .radio-item').forEach(el => el.classList.remove('checked'));

@@ -86,6 +86,9 @@
     .btn-alta:hover { background: rgba(59,130,246,0.35); }
     .btn-transponder { background: rgba(139,92,246,0.2); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.4); }
     .btn-transponder:hover { background: rgba(139,92,246,0.35); }
+    .btn-editar { background: rgba(234,179,8,0.18); color: #fde047; border: 1px solid rgba(234,179,8,0.4); }
+    .btn-editar:hover { background: rgba(234,179,8,0.32); }
+    .modal-xl { max-width: 560px !important; max-height: 88vh; overflow-y: auto; }
     .badge-confirmado { background: rgba(22,163,74,0.15); color: #4ade80; border: 1px solid rgba(22,163,74,0.3); }
     .badge-en-espera { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
 
@@ -193,10 +196,154 @@
   </div>
 </div>
 
+<!-- MODAL EDITAR -->
+<div class="modal-overlay" id="modalEditar">
+  <div class="modal modal-xl" style="border-top-color:#d97706">
+    <h3>Modificar inscripción</h3>
+    <p class="modal-sub" id="modalEditarNombre"></p>
+
+    <label>Fecha de carrera</label>
+    <select id="editFechaCarrera">
+      <option value="2026-04-26">1º fecha — 25/26 Abril</option>
+      <option value="2026-06-14">2º fecha — 13/14 Junio</option>
+      <option value="2026-07-12">3º fecha — 11/12 Julio</option>
+      <option value="2026-08-16">4º fecha — 15/16 Agosto</option>
+      <option value="2026-09-13">5º fecha — 12/13 Setiembre</option>
+      <option value="2026-10-18">6º fecha — 17/18 Octubre</option>
+      <option value="2026-11-29">7º fecha — 28/29 Noviembre</option>
+    </select>
+
+    <!-- Karting -->
+    <div id="editSectionKarting" style="display:none">
+      <label>Nombre y apellido</label>
+      <input type="text" id="eK_nombre">
+      <label>Cédula</label>
+      <input type="text" id="eK_cedula">
+      <label>Celular</label>
+      <input type="text" id="eK_celular">
+      <label>Departamento</label>
+      <select id="eK_departamento">
+        <option value="">Seleccioná...</option>
+        <option>Artigas</option><option>Canelones</option><option>Cerro Largo</option><option>Colonia</option>
+        <option>Durazno</option><option>Flores</option><option>Florida</option><option>Lavalleja</option>
+        <option>Maldonado</option><option>Montevideo</option><option>Paysandú</option><option>Río Negro</option>
+        <option>Rivera</option><option>Rocha</option><option>Salto</option><option>San José</option>
+        <option>Soriano</option><option>Tacuarembó</option><option>Treinta y Tres</option>
+      </select>
+      <label>Fecha de nacimiento</label>
+      <input type="date" id="eK_fecha_nacimiento">
+      <label>Cilindrada</label>
+      <select id="eK_cilindrada">
+        <option value="">Seleccioná...</option>
+        <option value="SHIFTER 200cc standard">SHIFTER 200cc standard</option>
+        <option value="SHIFTER 125cc">SHIFTER 125cc</option>
+        <option value="LIBRE (2T, Estacionarios, Shifter 200 preparados)">LIBRE (2T, Estacionarios, Shifter 200 preparados)</option>
+      </select>
+      <label>Número de kart</label>
+      <input type="text" id="eK_numero_kart">
+    </div>
+
+    <!-- Turismo -->
+    <div id="editSectionTurismo" style="display:none">
+      <label>Nombre y apellido</label>
+      <input type="text" id="eT_nombre">
+      <label>Cédula</label>
+      <input type="text" id="eT_cedula">
+      <label>Celular</label>
+      <input type="text" id="eT_celular">
+      <label>Departamento</label>
+      <select id="eT_departamento">
+        <option value="">Seleccioná...</option>
+        <option>Artigas</option><option>Canelones</option><option>Cerro Largo</option><option>Colonia</option>
+        <option>Durazno</option><option>Flores</option><option>Florida</option><option>Lavalleja</option>
+        <option>Maldonado</option><option>Montevideo</option><option>Paysandú</option><option>Río Negro</option>
+        <option>Rivera</option><option>Rocha</option><option>Salto</option><option>San José</option>
+        <option>Soriano</option><option>Tacuarembó</option><option>Treinta y Tres</option>
+      </select>
+      <label>Fecha de nacimiento</label>
+      <input type="date" id="eT_fecha_nacimiento">
+      <label>Categoría</label>
+      <select id="eT_categoria">
+        <option value="TNS">TNS</option>
+        <option value="TMZ">TMZ</option>
+      </select>
+      <label>Número de auto</label>
+      <input type="text" id="eT_numero_auto">
+      <label>Marca / Modelo</label>
+      <input type="text" id="eT_marca_modelo">
+      <label>Nombre del concurrente</label>
+      <input type="text" id="eT_nombre_concurrente">
+      <label>Nombre del equipo</label>
+      <input type="text" id="eT_nombre_equipo">
+      <label>Cant. gomas</label>
+      <input type="number" id="eT_cantidad_gomas" min="0" step="1">
+      <label>Cant. pastillas (cajas)</label>
+      <input type="number" id="eT_cantidad_pastillas" min="0" step="1">
+      <label>Cant. discos (pares)</label>
+      <input type="number" id="eT_cantidad_discos" min="0" step="1">
+    </div>
+
+    <!-- Regularidad -->
+    <div id="editSectionRegularidad" style="display:none">
+      <label>Nombre del piloto</label>
+      <input type="text" id="eR_nombre_piloto">
+      <label>Cédula del piloto</label>
+      <input type="text" id="eR_cedula_piloto">
+      <label>Fecha de nacimiento (piloto)</label>
+      <input type="date" id="eR_fecha_nacimiento_piloto">
+      <label>Nombre del navegante</label>
+      <input type="text" id="eR_nombre_navegante">
+      <label>Fecha de nacimiento (navegante)</label>
+      <input type="date" id="eR_fecha_nacimiento_navegante">
+      <label>Marca</label>
+      <input type="text" id="eR_marca">
+      <label>Modelo</label>
+      <input type="text" id="eR_modelo">
+      <label>Año</label>
+      <input type="text" id="eR_anio">
+      <label>Número de auto</label>
+      <input type="text" id="eR_numero_auto">
+    </div>
+
+    <!-- Pago (común a todas las categorías) -->
+    <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--borde)">
+      <label>Estado de pago</label>
+      <select id="edit_pago_confirmado">
+        <option value="false">Pendiente</option>
+        <option value="true">Pagado</option>
+      </select>
+      <label>Monto (UYU)</label>
+      <input type="number" id="edit_pago_monto" placeholder="0" min="0" step="1">
+      <label>Fecha de pago</label>
+      <input type="date" id="edit_pago_fecha">
+      <label>Medio de pago</label>
+      <select id="edit_pago_medio">
+        <option value="">Sin especificar</option>
+        <option value="efectivo">Efectivo</option>
+        <option value="transferencia">Transferencia</option>
+      </select>
+    </div>
+
+    <div class="modal-btns">
+      <button class="btn-cancelar" onclick="cerrarModal('modalEditar')">Cancelar</button>
+      <button class="btn-confirmar-verde" id="btnConfirmarEditar" style="background:#d97706">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
 <div id="adminPanel">
-  <div class="panel-header">
-    <h1>Inscripciones 2026</h1>
-    <p>Campeonato Regional SAC</p>
+  <div class="panel-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+    <div>
+      <h1>Inscripciones 2026</h1>
+      <p>Campeonato Regional SAC</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.75rem;background:var(--gris-medio);border:1px solid var(--borde);border-radius:3px;padding:0.65rem 1rem">
+      <div>
+        <div style="font-size:0.68rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--texto-muted);margin-bottom:0.3rem">Inscripciones públicas</div>
+        <span id="inscStatusBadge" class="badge badge-pendiente" style="font-size:0.72rem">Cargando...</span>
+      </div>
+      <button id="btnToggleInsc" class="btn-accion btn-baja" style="padding:0.35rem 0.75rem;font-size:0.78rem">—</button>
+    </div>
   </div>
 
   <div class="filters">
@@ -353,6 +500,34 @@
     document.getElementById('btnLogout').style.display = 'none';
   });
   let esAdmin = false;
+  let inscripcionesHabilitadas = null;
+
+  async function cargarEstadoInscripciones() {
+    const { data } = await sb.from('configuracion').select('valor').eq('clave', 'inscripciones_habilitadas').single();
+    inscripcionesHabilitadas = data?.valor !== 'false';
+    const badge = document.getElementById('inscStatusBadge');
+    const btn = document.getElementById('btnToggleInsc');
+    if (inscripcionesHabilitadas) {
+      badge.textContent = 'Habilitadas'; badge.className = 'badge badge-pagado';
+      btn.textContent = 'Deshabilitar'; btn.className = 'btn-accion btn-baja';
+    } else {
+      badge.textContent = 'Deshabilitadas'; badge.className = 'badge badge-baja';
+      btn.textContent = 'Habilitar'; btn.className = 'btn-accion btn-alta';
+    }
+  }
+
+  document.getElementById('btnToggleInsc').addEventListener('click', async () => {
+    if (!esAdmin) return;
+    const nuevo = !inscripcionesHabilitadas;
+    const accion = nuevo ? 'habilitar' : 'deshabilitar';
+    if (!confirm(`¿Confirmar: ${accion} las inscripciones públicas?`)) return;
+    const btn = document.getElementById('btnToggleInsc');
+    btn.disabled = true;
+    const { error } = await sb.from('configuracion').update({ valor: nuevo ? 'true' : 'false' }).eq('clave', 'inscripciones_habilitadas');
+    btn.disabled = false;
+    if (!error) { inscripcionesHabilitadas = nuevo; cargarEstadoInscripciones(); }
+    else alert('Error al actualizar. Intentá nuevamente.');
+  });
 
   async function showPanel() {
     document.getElementById('loginScreen').style.display = 'none';
@@ -360,6 +535,7 @@
     document.getElementById('btnLogout').style.display = 'inline-block';
     const { data: rol } = await sb.rpc('get_my_role');
     esAdmin = rol === 'admin';
+    cargarEstadoInscripciones();
     cargarDatos();
   }
 
@@ -447,6 +623,126 @@
     else alert('Error al guardar. Intentá nuevamente.');
   });
 
+  async function abrirModalEditar(tabla, id) {
+    const { data: r, error } = await sb.from(tabla).select('*').eq('id', id).single();
+    if (error || !r) { alert('Error al cargar los datos.'); return; }
+    modalCtx = { tabla, id };
+
+    document.getElementById('editSectionKarting').style.display = 'none';
+    document.getElementById('editSectionTurismo').style.display = 'none';
+    document.getElementById('editSectionRegularidad').style.display = 'none';
+
+    document.getElementById('editFechaCarrera').value = r.fecha_carrera || '';
+
+    if (tabla === 'inscripciones_karting') {
+      document.getElementById('modalEditarNombre').textContent = r.nombre || '';
+      document.getElementById('editSectionKarting').style.display = '';
+      document.getElementById('eK_nombre').value = r.nombre || '';
+      document.getElementById('eK_cedula').value = r.cedula || '';
+      document.getElementById('eK_celular').value = r.celular || '';
+      document.getElementById('eK_departamento').value = r.departamento || '';
+      document.getElementById('eK_fecha_nacimiento').value = r.fecha_nacimiento || '';
+      document.getElementById('eK_cilindrada').value = r.cilindrada || '';
+      document.getElementById('eK_numero_kart').value = r.numero_kart || '';
+    } else if (tabla === 'inscripciones_turismo') {
+      document.getElementById('modalEditarNombre').textContent = r.nombre || '';
+      document.getElementById('editSectionTurismo').style.display = '';
+      document.getElementById('eT_nombre').value = r.nombre || '';
+      document.getElementById('eT_cedula').value = r.cedula || '';
+      document.getElementById('eT_celular').value = r.celular || '';
+      document.getElementById('eT_departamento').value = r.departamento || '';
+      document.getElementById('eT_fecha_nacimiento').value = r.fecha_nacimiento || '';
+      document.getElementById('eT_categoria').value = r.categoria || '';
+      document.getElementById('eT_numero_auto').value = r.numero_auto || '';
+      document.getElementById('eT_marca_modelo').value = r.marca_modelo || '';
+      document.getElementById('eT_nombre_concurrente').value = r.nombre_concurrente || '';
+      document.getElementById('eT_nombre_equipo').value = r.nombre_equipo || '';
+      document.getElementById('eT_cantidad_gomas').value = r.cantidad_gomas ?? '';
+      document.getElementById('eT_cantidad_pastillas').value = r.cantidad_pastillas ?? '';
+      document.getElementById('eT_cantidad_discos').value = r.cantidad_discos ?? '';
+    } else if (tabla === 'inscripciones_regularidad') {
+      document.getElementById('modalEditarNombre').textContent = r.nombre_piloto || '';
+      document.getElementById('editSectionRegularidad').style.display = '';
+      document.getElementById('eR_nombre_piloto').value = r.nombre_piloto || '';
+      document.getElementById('eR_cedula_piloto').value = r.cedula_piloto || '';
+      document.getElementById('eR_fecha_nacimiento_piloto').value = r.fecha_nacimiento_piloto || '';
+      document.getElementById('eR_nombre_navegante').value = r.nombre_navegante || '';
+      document.getElementById('eR_fecha_nacimiento_navegante').value = r.fecha_nacimiento_navegante || '';
+      document.getElementById('eR_marca').value = r.marca || '';
+      document.getElementById('eR_modelo').value = r.modelo || '';
+      document.getElementById('eR_anio').value = r.anio || '';
+      document.getElementById('eR_numero_auto').value = r.numero_auto || '';
+    }
+
+    document.getElementById('edit_pago_confirmado').value = r.pago_confirmado ? 'true' : 'false';
+    document.getElementById('edit_pago_monto').value = r.pago_monto ?? '';
+    document.getElementById('edit_pago_fecha').value = r.pago_fecha || '';
+    document.getElementById('edit_pago_medio').value = r.pago_medio || '';
+
+    document.getElementById('modalEditar').classList.add('open');
+  }
+
+  document.getElementById('btnConfirmarEditar').addEventListener('click', async () => {
+    if (!modalCtx) return;
+    const { tabla, id } = modalCtx;
+    const btn = document.getElementById('btnConfirmarEditar');
+    btn.disabled = true; btn.textContent = 'Guardando...';
+
+    const pagoMonto = parseFloat(document.getElementById('edit_pago_monto').value);
+    const updates = {
+      fecha_carrera: document.getElementById('editFechaCarrera').value || null,
+      pago_confirmado: document.getElementById('edit_pago_confirmado').value === 'true',
+      pago_monto: isNaN(pagoMonto) ? null : pagoMonto,
+      pago_fecha: document.getElementById('edit_pago_fecha').value || null,
+      pago_medio: document.getElementById('edit_pago_medio').value || null,
+    };
+
+    if (tabla === 'inscripciones_karting') {
+      Object.assign(updates, {
+        nombre: document.getElementById('eK_nombre').value.trim() || null,
+        cedula: document.getElementById('eK_cedula').value.trim() || null,
+        celular: document.getElementById('eK_celular').value.trim() || null,
+        departamento: document.getElementById('eK_departamento').value || null,
+        fecha_nacimiento: document.getElementById('eK_fecha_nacimiento').value || null,
+        cilindrada: document.getElementById('eK_cilindrada').value || null,
+        numero_kart: document.getElementById('eK_numero_kart').value.trim() || null,
+      });
+    } else if (tabla === 'inscripciones_turismo') {
+      Object.assign(updates, {
+        nombre: document.getElementById('eT_nombre').value.trim() || null,
+        cedula: document.getElementById('eT_cedula').value.trim() || null,
+        celular: document.getElementById('eT_celular').value.trim() || null,
+        departamento: document.getElementById('eT_departamento').value || null,
+        fecha_nacimiento: document.getElementById('eT_fecha_nacimiento').value || null,
+        categoria: document.getElementById('eT_categoria').value || null,
+        numero_auto: document.getElementById('eT_numero_auto').value.trim() || null,
+        marca_modelo: document.getElementById('eT_marca_modelo').value.trim() || null,
+        nombre_concurrente: document.getElementById('eT_nombre_concurrente').value.trim() || null,
+        nombre_equipo: document.getElementById('eT_nombre_equipo').value.trim() || null,
+        cantidad_gomas: parseInt(document.getElementById('eT_cantidad_gomas').value) || null,
+        cantidad_pastillas: parseInt(document.getElementById('eT_cantidad_pastillas').value) || null,
+        cantidad_discos: parseInt(document.getElementById('eT_cantidad_discos').value) || null,
+      });
+    } else if (tabla === 'inscripciones_regularidad') {
+      Object.assign(updates, {
+        nombre_piloto: document.getElementById('eR_nombre_piloto').value.trim() || null,
+        cedula_piloto: document.getElementById('eR_cedula_piloto').value.trim() || null,
+        fecha_nacimiento_piloto: document.getElementById('eR_fecha_nacimiento_piloto').value || null,
+        nombre_navegante: document.getElementById('eR_nombre_navegante').value.trim() || null,
+        fecha_nacimiento_navegante: document.getElementById('eR_fecha_nacimiento_navegante').value || null,
+        marca: document.getElementById('eR_marca').value.trim() || null,
+        modelo: document.getElementById('eR_modelo').value.trim() || null,
+        anio: document.getElementById('eR_anio').value.trim() || null,
+        numero_auto: document.getElementById('eR_numero_auto').value.trim() || null,
+      });
+    }
+
+    const { error } = await sb.from(tabla).update(updates).eq('id', id);
+    btn.disabled = false; btn.textContent = 'Guardar cambios';
+    if (!error) { cerrarModal('modalEditar'); cargarDatos(); }
+    else alert('Error al guardar. Intentá nuevamente.');
+  });
+
   // DATOS
   document.getElementById('btnCargar').addEventListener('click', cargarDatos);
 
@@ -508,6 +804,7 @@
           <td>${fmtDate(r.pago_fecha)}</td>
           <td>${transponderCell(r)}</td>
           <td><div class="acciones">
+            ${esAdmin ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_karting','${r.id}')">Modificar</button>` : ''}
             ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_karting','${r.id}','${r.nombre}')">Pago</button>` : ''}
             ${esAdmin && r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-transponder" onclick="abrirModalTransponder('inscripciones_karting','${r.id}','${r.nombre}','${r.transponder||''}')">${r.transponder ? 'T: '+r.transponder : 'Transponder'}</button>` : ''}
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_karting','${r.id}','${r.nombre}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_karting','${r.id}','${r.nombre}')">Alta</button>` : '—'}
@@ -531,6 +828,7 @@
           <td>${fmtDate(r.pago_fecha)}</td>
           <td>${transponderCell(r)}</td>
           <td><div class="acciones">
+            ${esAdmin ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_turismo','${r.id}')">Modificar</button>` : ''}
             ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_turismo','${r.id}','${r.nombre}')">Pago</button>` : ''}
             ${esAdmin && r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-transponder" onclick="abrirModalTransponder('inscripciones_turismo','${r.id}','${r.nombre}','${r.transponder||''}')">${r.transponder ? 'T: '+r.transponder : 'Transponder'}</button>` : ''}
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_turismo','${r.id}','${r.nombre}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_turismo','${r.id}','${r.nombre}')">Alta</button>` : '—'}
@@ -553,6 +851,7 @@
           <td>${fmtDate(r.pago_fecha)}</td>
           <td>${transponderCell(r)}</td>
           <td><div class="acciones">
+            ${esAdmin ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_regularidad','${r.id}')">Modificar</button>` : ''}
             ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Pago</button>` : ''}
             ${esAdmin && r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-transponder" onclick="abrirModalTransponder('inscripciones_regularidad','${r.id}','${r.nombre_piloto}','${r.transponder||''}')">${r.transponder ? 'T: '+r.transponder : 'Transponder'}</button>` : ''}
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Alta</button>` : '—'}
