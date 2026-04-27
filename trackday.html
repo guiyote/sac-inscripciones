@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <link rel="icon" type="image/jpeg" href="logo.jpeg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SAC - Inscripción Regularidad</title>
+  <title>SAC - Inscripción Track Day</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
@@ -95,9 +95,9 @@
   </header>
 
   <div class="page-header">
-    <div class="page-cat">Navegación</div>
-    <h1>Inscripción Regularidad</h1>
-    <p>Completá los datos del piloto, navegante y vehículo</p>
+    <div class="page-cat">Pista libre</div>
+    <h1>Inscripción Track Day</h1>
+    <p>Completá los datos del conductor y el vehículo</p>
   </div>
 
   <div id="avisoInscripcionesCerradas" style="display:none;max-width:600px;margin:4rem auto;padding:0 1.5rem;text-align:center">
@@ -108,7 +108,7 @@
   </div>
 
   <div id="formWrap" class="form-wrap">
-    <form id="formRegularidad">
+    <form id="formTrackDay">
 
       <div class="form-section">
         <div class="section-title">Fecha de la carrera</div>
@@ -130,34 +130,34 @@
       </div>
 
       <div class="form-section">
-        <div class="section-title">Piloto</div>
+        <div class="section-title">Conductor</div>
         <div class="field">
-          <label for="nombre_piloto">Nombre y apellido <span class="req">*</span></label>
-          <input type="text" id="nombre_piloto" placeholder="Ej: Juan Pérez" required>
+          <label for="nombre_conductor">Nombre y apellido <span class="req">*</span></label>
+          <input type="text" id="nombre_conductor" placeholder="Ej: Juan Pérez" required>
         </div>
         <div class="field">
-          <label for="cedula_piloto">Cédula de identidad <span class="req">*</span></label>
-          <input type="text" id="cedula_piloto" placeholder="Ej: 1234567-8" required>
+          <label for="cedula_conductor">Cédula de identidad <span class="req">*</span></label>
+          <input type="text" id="cedula_conductor" placeholder="Ej: 1234567-8" required>
         </div>
         <div class="field">
-          <label for="celular_piloto">Celular <span class="opt">(opcional)</span></label>
-          <input type="text" id="celular_piloto" placeholder="Ej: 099 123 456">
+          <label for="celular_conductor">Celular <span class="opt">(opcional)</span></label>
+          <input type="text" id="celular_conductor" placeholder="Ej: 099 123 456">
         </div>
         <div class="field">
-          <label for="fecha_nacimiento_piloto">Fecha de nacimiento</label>
-          <input type="date" id="fecha_nacimiento_piloto">
+          <label for="fecha_nacimiento_conductor">Fecha de nacimiento <span class="opt">(opcional)</span></label>
+          <input type="date" id="fecha_nacimiento_conductor">
         </div>
       </div>
 
       <div class="form-section">
-        <div class="section-title">Navegante</div>
+        <div class="section-title">Acompañante <span style="font-size:0.65rem;font-weight:400;letter-spacing:1px;text-transform:none;color:var(--texto-muted);margin-left:4px">(opcional)</span></div>
         <div class="field">
-          <label for="nombre_navegante">Nombre y apellido</label>
-          <input type="text" id="nombre_navegante" placeholder="Ej: María García">
+          <label for="nombre_acompanante">Nombre y apellido <span class="opt">(opcional)</span></label>
+          <input type="text" id="nombre_acompanante" placeholder="Ej: María García">
         </div>
         <div class="field">
-          <label for="fecha_nacimiento_navegante">Fecha de nacimiento</label>
-          <input type="date" id="fecha_nacimiento_navegante">
+          <label for="fecha_nacimiento_acompanante">Fecha de nacimiento <span class="opt">(opcional)</span></label>
+          <input type="date" id="fecha_nacimiento_acompanante">
         </div>
       </div>
 
@@ -185,7 +185,7 @@
 
       <div style="display:flex;align-items:flex-start;gap:0.75rem;background:#2d2d2d;border:1px solid #3a3a3a;border-left:4px solid #CC0000;border-radius:2px;padding:0.9rem 1.1rem;margin-top:1.5rem;margin-bottom:0.5rem">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CC0000" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <p style="font-size:0.9rem;line-height:1.5;color:#ccc"><strong style="color:#fff">Importante:</strong> Tanto el piloto como el navegante deben llevar casco.</p>
+        <p style="font-size:0.9rem;line-height:1.5;color:#ccc"><strong style="color:#fff">Importante:</strong> Tanto el conductor como el acompañante deben llevar casco.</p>
       </div>
 
       <button type="submit" class="submit-btn" id="submitBtn">Enviar inscripción</button>
@@ -210,30 +210,29 @@
       }
     })();
 
-    document.getElementById('formRegularidad').addEventListener('submit', async (e) => {
+    document.getElementById('formTrackDay').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('submitBtn');
       const msgBox = document.getElementById('msgBox');
       msgBox.className = 'msg';
 
       const fecha_carrera = document.getElementById('fecha_carrera').value;
-      const nombre_piloto = document.getElementById('nombre_piloto').value.trim();
+      const nombre_conductor = document.getElementById('nombre_conductor').value.trim();
       const numero_auto = document.getElementById('numero_auto').value.trim() || null;
 
       btn.disabled = true;
       btn.textContent = 'Verificando...';
 
-      // Validación duplicado: mismo nombre piloto + número de auto + fecha
       const { data: existentes } = await sb
-        .from('inscripciones_regularidad')
+        .from('inscripciones_trackday')
         .select('id')
         .eq('fecha_carrera', fecha_carrera)
-        .ilike('nombre_piloto', nombre_piloto)
+        .ilike('nombre_conductor', nombre_conductor)
         .eq('numero_auto', numero_auto);
 
       if (existentes && existentes.length > 0) {
         msgBox.className = 'msg error';
-        msgBox.textContent = 'Ya existe una inscripción con ese piloto y número de auto para esta fecha.';
+        msgBox.textContent = 'Ya existe una inscripción con ese conductor y número de auto para esta fecha.';
         btn.disabled = false;
         btn.textContent = 'Enviar inscripción';
         return;
@@ -245,19 +244,19 @@
 
       const payload = {
         fecha_carrera,
-        nombre_piloto,
-        cedula_piloto: document.getElementById('cedula_piloto').value.trim() || null,
-        celular_piloto: document.getElementById('celular_piloto').value.trim() || null,
-        fecha_nacimiento_piloto: document.getElementById('fecha_nacimiento_piloto').value || null,
-        nombre_navegante: document.getElementById('nombre_navegante').value.trim() || null,
-        fecha_nacimiento_navegante: document.getElementById('fecha_nacimiento_navegante').value || null,
+        nombre_conductor,
+        cedula_conductor: document.getElementById('cedula_conductor').value.trim() || null,
+        celular_conductor: document.getElementById('celular_conductor').value.trim() || null,
+        fecha_nacimiento_conductor: document.getElementById('fecha_nacimiento_conductor').value || null,
+        nombre_acompanante: document.getElementById('nombre_acompanante').value.trim() || null,
+        fecha_nacimiento_acompanante: document.getElementById('fecha_nacimiento_acompanante').value || null,
         marca: document.getElementById('marca').value.trim() || null,
         modelo: document.getElementById('modelo').value.trim() || null,
         anio: isNaN(anioVal) ? null : anioVal,
         numero_auto,
       };
 
-      const { error } = await sb.from('inscripciones_regularidad').insert([payload]);
+      const { error } = await sb.from('inscripciones_trackday').insert([payload]);
 
       if (error) {
         msgBox.className = 'msg error';
@@ -274,7 +273,6 @@
     });
   </script>
   <script>
-    // Selección dinámica de fecha según mes actual
     (function() {
       const mesActual = new Date().getMonth() + 1;
       const select = document.getElementById('fecha_carrera');
@@ -292,7 +290,6 @@
           }
         }
       });
-      // Si no hay fecha este mes, mostrar mensaje
       if (!encontrada) {
         const placeholder = select.options[0];
         placeholder.textContent = 'Sin fecha este mes';

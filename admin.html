@@ -75,6 +75,7 @@
     .badge-pagado { background: rgba(22,163,74,0.15); color: #4ade80; border: 1px solid rgba(22,163,74,0.3); }
     .badge-pendiente { background: rgba(234,179,8,0.12); color: #fde047; border: 1px solid rgba(234,179,8,0.25); }
     .badge-baja { background: rgba(100,100,100,0.15); color: #999; border: 1px solid #444; }
+    .badge-trackday { background: rgba(234,179,8,0.12); color: #fde047; border: 1px solid rgba(234,179,8,0.25); }
 
     .acciones { display: flex; gap: 0.35rem; }
     .btn-accion { border: none; border-radius: 2px; padding: 0.28rem 0.55rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
@@ -305,6 +306,28 @@
       <input type="text" id="eR_numero_auto">
     </div>
 
+    <!-- Track Day -->
+    <div id="editSectionTrackDay" style="display:none">
+      <label>Nombre del conductor</label>
+      <input type="text" id="eTD_nombre_conductor">
+      <label>Cédula del conductor</label>
+      <input type="text" id="eTD_cedula_conductor">
+      <label>Fecha de nacimiento (conductor)</label>
+      <input type="date" id="eTD_fecha_nacimiento_conductor">
+      <label>Nombre del acompañante</label>
+      <input type="text" id="eTD_nombre_acompanante">
+      <label>Fecha de nacimiento (acompañante)</label>
+      <input type="date" id="eTD_fecha_nacimiento_acompanante">
+      <label>Marca</label>
+      <input type="text" id="eTD_marca">
+      <label>Modelo</label>
+      <input type="text" id="eTD_modelo">
+      <label>Año</label>
+      <input type="text" id="eTD_anio">
+      <label>Número de auto</label>
+      <input type="text" id="eTD_numero_auto">
+    </div>
+
     <!-- Pago (común a todas las categorías) -->
     <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--borde)">
       <label>Estado de pago</label>
@@ -367,6 +390,7 @@
         <option value="karting">Karting</option>
         <option value="turismo">Turismo (TNS/TMZ)</option>
         <option value="regularidad">Regularidad</option>
+        <option value="trackday">Track Day</option>
       </select>
     </div>
     <div class="filter-group">
@@ -392,6 +416,7 @@
     <div class="summary-card"><div class="num" id="totalKarting">—</div><div class="lbl">Karting</div></div>
     <div class="summary-card"><div class="num" id="totalTurismo">—</div><div class="lbl">Turismo</div></div>
     <div class="summary-card"><div class="num" id="totalRegularidad">—</div><div class="lbl">Regularidad</div></div>
+    <div class="summary-card"><div class="num" id="totalTrackDay">—</div><div class="lbl">Track Day</div></div>
     <div class="summary-card"><div class="num" id="totalGeneral">—</div><div class="lbl">Total</div></div>
     <div class="summary-card s-verde"><div class="num verde" id="totalPagados">—</div><div class="lbl">Pagados</div></div>
     <div class="summary-card s-verde"><div class="num verde" id="totalRecaudado">—</div><div class="lbl">Recaudado UYU</div></div>
@@ -421,6 +446,14 @@
     </table></div>
   </div>
 
+  <div class="section-block" id="secTrackDay">
+    <h2>Track Day</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Conductor</th><th>CI</th><th>Acompañante</th><th>Fecha</th><th>Vehículo</th><th>Nº Auto</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Acciones</th></tr></thead>
+      <tbody id="tbodyTrackDay"><tr><td colspan="11" class="loading">Cargando...</td></tr></tbody>
+    </table></div>
+  </div>
+
   <div class="section-block" id="secLogistica">
     <h2>Logística Turismo — materiales solicitados</h2>
     <div class="table-wrap"><table>
@@ -437,8 +470,8 @@
   <div class="section-block">
     <h2>Resumen por fecha</h2>
     <div class="table-wrap"><table>
-      <thead><tr><th>Fecha</th><th>Karting</th><th>TNS</th><th>TMZ</th><th>Regularidad</th><th>Total</th><th>Pagados</th><th>Recaudado (UYU)</th></tr></thead>
-      <tbody id="tbodyPorFecha"><tr><td colspan="8" class="loading">Cargando...</td></tr></tbody>
+      <thead><tr><th>Fecha</th><th>Karting</th><th>TNS</th><th>TMZ</th><th>Regularidad</th><th>Track Day</th><th>Total</th><th>Pagados</th><th>Recaudado (UYU)</th></tr></thead>
+      <tbody id="tbodyPorFecha"><tr><td colspan="9" class="loading">Cargando...</td></tr></tbody>
     </table></div>
   </div>
 </div>
@@ -631,6 +664,7 @@
     document.getElementById('editSectionKarting').style.display = 'none';
     document.getElementById('editSectionTurismo').style.display = 'none';
     document.getElementById('editSectionRegularidad').style.display = 'none';
+    document.getElementById('editSectionTrackDay').style.display = 'none';
 
     document.getElementById('editFechaCarrera').value = r.fecha_carrera || '';
 
@@ -672,6 +706,18 @@
       document.getElementById('eR_modelo').value = r.modelo || '';
       document.getElementById('eR_anio').value = r.anio || '';
       document.getElementById('eR_numero_auto').value = r.numero_auto || '';
+    } else if (tabla === 'inscripciones_trackday') {
+      document.getElementById('modalEditarNombre').textContent = r.nombre_conductor || '';
+      document.getElementById('editSectionTrackDay').style.display = '';
+      document.getElementById('eTD_nombre_conductor').value = r.nombre_conductor || '';
+      document.getElementById('eTD_cedula_conductor').value = r.cedula_conductor || '';
+      document.getElementById('eTD_fecha_nacimiento_conductor').value = r.fecha_nacimiento_conductor || '';
+      document.getElementById('eTD_nombre_acompanante').value = r.nombre_acompanante || '';
+      document.getElementById('eTD_fecha_nacimiento_acompanante').value = r.fecha_nacimiento_acompanante || '';
+      document.getElementById('eTD_marca').value = r.marca || '';
+      document.getElementById('eTD_modelo').value = r.modelo || '';
+      document.getElementById('eTD_anio').value = r.anio || '';
+      document.getElementById('eTD_numero_auto').value = r.numero_auto || '';
     }
 
     document.getElementById('edit_pago_confirmado').value = r.pago_confirmado ? 'true' : 'false';
@@ -735,6 +781,18 @@
         anio: document.getElementById('eR_anio').value.trim() || null,
         numero_auto: document.getElementById('eR_numero_auto').value.trim() || null,
       });
+    } else if (tabla === 'inscripciones_trackday') {
+      Object.assign(updates, {
+        nombre_conductor: document.getElementById('eTD_nombre_conductor').value.trim() || null,
+        cedula_conductor: document.getElementById('eTD_cedula_conductor').value.trim() || null,
+        fecha_nacimiento_conductor: document.getElementById('eTD_fecha_nacimiento_conductor').value || null,
+        nombre_acompanante: document.getElementById('eTD_nombre_acompanante').value.trim() || null,
+        fecha_nacimiento_acompanante: document.getElementById('eTD_fecha_nacimiento_acompanante').value || null,
+        marca: document.getElementById('eTD_marca').value.trim() || null,
+        modelo: document.getElementById('eTD_modelo').value.trim() || null,
+        anio: document.getElementById('eTD_anio').value.trim() || null,
+        numero_auto: document.getElementById('eTD_numero_auto').value.trim() || null,
+      });
     }
 
     const { error } = await sb.from(tabla).update(updates).eq('id', id);
@@ -763,30 +821,34 @@
     const filtroPago = document.getElementById('filtroPago').value;
     const filtroBaja = document.getElementById('filtroBaja').value;
 
-    const mostrarK = !filtroCat || filtroCat === 'karting';
-    const mostrarT = !filtroCat || filtroCat === 'turismo';
-    const mostrarR = !filtroCat || filtroCat === 'regularidad';
+    const mostrarK  = !filtroCat || filtroCat === 'karting';
+    const mostrarT  = !filtroCat || filtroCat === 'turismo';
+    const mostrarR  = !filtroCat || filtroCat === 'regularidad';
+    const mostrarTD = !filtroCat || filtroCat === 'trackday';
 
-    document.getElementById('secKarting').style.display = mostrarK ? '' : 'none';
-    document.getElementById('secTurismo').style.display = mostrarT ? '' : 'none';
+    document.getElementById('secKarting').style.display   = mostrarK  ? '' : 'none';
+    document.getElementById('secTurismo').style.display   = mostrarT  ? '' : 'none';
     document.getElementById('secRegularidad').style.display = mostrarR ? '' : 'none';
-    document.getElementById('secLogistica').style.display = mostrarT ? '' : 'none';
+    document.getElementById('secTrackDay').style.display  = mostrarTD ? '' : 'none';
+    document.getElementById('secLogistica').style.display = mostrarT  ? '' : 'none';
 
-    const [kData, tData, rData] = await Promise.all([
-      mostrarK ? queryTabla('inscripciones_karting', filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
-      mostrarT ? queryTabla('inscripciones_turismo', filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
-      mostrarR ? queryTabla('inscripciones_regularidad', filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
+    const [kData, tData, rData, tdData] = await Promise.all([
+      mostrarK  ? queryTabla('inscripciones_karting',    filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
+      mostrarT  ? queryTabla('inscripciones_turismo',    filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
+      mostrarR  ? queryTabla('inscripciones_regularidad',filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
+      mostrarTD ? queryTabla('inscripciones_trackday',   filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
     ]);
 
-    const todos = [...kData, ...tData, ...rData];
+    const todos = [...kData, ...tData, ...rData, ...tdData];
     const pagados = todos.filter(r => r.pago_confirmado && !r.baja);
     const recaudado = pagados.reduce((s, r) => s + (parseFloat(r.pago_monto) || 0), 0);
 
-    document.getElementById('totalKarting').textContent = kData.length;
-    document.getElementById('totalTurismo').textContent = tData.length;
+    document.getElementById('totalKarting').textContent   = kData.length;
+    document.getElementById('totalTurismo').textContent   = tData.length;
     document.getElementById('totalRegularidad').textContent = rData.length;
-    document.getElementById('totalGeneral').textContent = todos.length;
-    document.getElementById('totalPagados').textContent = pagados.length;
+    document.getElementById('totalTrackDay').textContent  = tdData.length;
+    document.getElementById('totalGeneral').textContent   = todos.length;
+    document.getElementById('totalPagados').textContent   = pagados.length;
     document.getElementById('totalRecaudado').textContent = `$ ${recaudado.toLocaleString('es-UY')}`;
 
     // Karting
@@ -858,34 +920,57 @@
           </div></td>
         </tr>`).join('');
 
+    // Track Day
+    document.getElementById('tbodyTrackDay').innerHTML = tdData.length === 0
+      ? '<tr><td colspan="11" class="empty">Sin inscripciones</td></tr>'
+      : tdData.map(r => `<tr class="${r.baja ? 'baja-row' : ''}">
+          <td>${val(r.nombre_conductor)}</td>
+          <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtCI(r.cedula_conductor)}</td>
+          <td>${val(r.nombre_acompanante)}</td>
+          <td>${fmtFecha(r.fecha_carrera)}</td>
+          <td>${[r.marca, r.modelo, r.anio].filter(Boolean).join(' ') || '—'}</td>
+          <td>${val(r.numero_auto)}</td>
+          <td><span class="badge ${r.pago_confirmado ? 'badge-pagado' : 'badge-pendiente'}">${r.pago_confirmado ? 'Pagado' : 'Pendiente'}</span></td>
+          <td>${fmtMonto(r.pago_monto)}</td>
+          <td>${capFirst(r.pago_medio)}</td>
+          <td>${fmtDate(r.pago_fecha)}</td>
+          <td><div class="acciones">
+            ${esAdmin ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_trackday','${r.id}')">Modificar</button>` : ''}
+            ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_trackday','${r.id}','${r.nombre_conductor}')">Pago</button>` : ''}
+            ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_trackday','${r.id}','${r.nombre_conductor}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_trackday','${r.id}','${r.nombre_conductor}')">Alta</button>` : '—'}
+          </div></td>
+        </tr>`).join('');
+
     await cargarPorFecha(filtroFecha);
     await cargarLogistica(filtroFecha, filtroBaja);
   }
 
   async function cargarPorFecha(filtroFecha) {
-    const [{ data: kAll }, { data: tAll }, { data: rAll }] = await Promise.all([
+    const [{ data: kAll }, { data: tAll }, { data: rAll }, { data: tdAll }] = await Promise.all([
       sb.from('inscripciones_karting').select('fecha_carrera, pago_confirmado, pago_monto, baja'),
       sb.from('inscripciones_turismo').select('fecha_carrera, categoria, pago_confirmado, pago_monto, baja'),
       sb.from('inscripciones_regularidad').select('fecha_carrera, pago_confirmado, pago_monto, baja'),
+      sb.from('inscripciones_trackday').select('fecha_carrera, pago_confirmado, pago_monto, baja'),
     ]);
 
     const rows = Object.keys(FECHAS).map(f => {
-      const k = (kAll || []).filter(r => r.fecha_carrera === f && !r.baja);
-      const tns = (tAll || []).filter(r => r.fecha_carrera === f && r.categoria === 'TNS' && !r.baja);
-      const tmz = (tAll || []).filter(r => r.fecha_carrera === f && r.categoria === 'TMZ' && !r.baja);
-      const reg = (rAll || []).filter(r => r.fecha_carrera === f && !r.baja);
-      const todos = [...k, ...tns, ...tmz, ...reg];
+      const k   = (kAll  || []).filter(r => r.fecha_carrera === f && !r.baja);
+      const tns = (tAll  || []).filter(r => r.fecha_carrera === f && r.categoria === 'TNS' && !r.baja);
+      const tmz = (tAll  || []).filter(r => r.fecha_carrera === f && r.categoria === 'TMZ' && !r.baja);
+      const reg = (rAll  || []).filter(r => r.fecha_carrera === f && !r.baja);
+      const td  = (tdAll || []).filter(r => r.fecha_carrera === f && !r.baja);
+      const todos = [...k, ...tns, ...tmz, ...reg, ...td];
       const pagados = todos.filter(r => r.pago_confirmado).length;
       const recaudado = todos.filter(r => r.pago_confirmado).reduce((s, r) => s + (parseFloat(r.pago_monto) || 0), 0);
-      return { f, k: k.length, tns: tns.length, tmz: tmz.length, reg: reg.length, total: todos.length, pagados, recaudado };
+      return { f, k: k.length, tns: tns.length, tmz: tmz.length, reg: reg.length, td: td.length, total: todos.length, pagados, recaudado };
     }).filter(r => !filtroFecha || r.f === filtroFecha);
 
     const hayDatos = rows.some(r => r.total > 0);
     document.getElementById('tbodyPorFecha').innerHTML = !hayDatos
-      ? '<tr><td colspan="8" class="empty">Sin inscripciones</td></tr>'
+      ? '<tr><td colspan="9" class="empty">Sin inscripciones</td></tr>'
       : rows.map(r => `<tr>
           <td>${FECHAS[r.f]}</td>
-          <td>${r.k || '—'}</td><td>${r.tns || '—'}</td><td>${r.tmz || '—'}</td><td>${r.reg || '—'}</td>
+          <td>${r.k || '—'}</td><td>${r.tns || '—'}</td><td>${r.tmz || '—'}</td><td>${r.reg || '—'}</td><td>${r.td || '—'}</td>
           <td><strong>${r.total || '—'}</strong></td>
           <td>${r.pagados || '—'}</td>
           <td>${r.recaudado ? `$ ${r.recaudado.toLocaleString('es-UY')}` : '—'}</td>
