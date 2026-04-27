@@ -74,8 +74,11 @@
     .section-block { margin-bottom: 2.5rem; }
     .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--borde); }
     .section-block h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--texto-muted); }
-    .filter-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
-    .filter-row select { background: var(--gris-campo); border: 1px solid var(--borde); border-radius: 3px; padding: 0.45rem 0.75rem; color: var(--blanco); font-family: 'Barlow', sans-serif; font-size: 0.85rem; outline: none; appearance: none; cursor: pointer; }
+    .filter-row { background: var(--gris-medio); border: 1px solid var(--borde); border-radius: 2px; padding: 0.9rem 1.25rem; display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: flex-end; margin-bottom: 1rem; }
+    .filter-group { display: flex; flex-direction: column; gap: 0.35rem; }
+    .filter-group label { font-size: 0.68rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; }
+    .filter-row select { background: var(--gris-campo); border: 1px solid var(--borde); border-radius: 3px; padding: 0.55rem 0.85rem; color: var(--blanco); font-family: 'Barlow', sans-serif; font-size: 0.88rem; outline: none; appearance: none; cursor: pointer; transition: border-color 0.15s; }
+    .filter-row select:focus { border-color: var(--rojo); }
 
     .table-wrap { overflow-x: auto; border-radius: 2px; border: 1px solid var(--borde); }
     table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
@@ -300,7 +303,10 @@
   <div class="section-block">
     <div class="section-header">
       <h2>Resumen de ventas / pagos</h2>
-      <div class="filter-row">
+    </div>
+    <div class="filter-row">
+      <div class="filter-group">
+        <label>Fecha de carrera</label>
         <select id="filtroResumenFecha">
           <option value="">Todas las fechas</option>
           <option value="2026-04-26">1º — 25/26 Abril</option>
@@ -332,7 +338,10 @@
   <div class="section-block">
     <div class="section-header">
       <h2>Pedidos de pilotos — al inscribirse</h2>
-      <div class="filter-row">
+    </div>
+    <div class="filter-row">
+      <div class="filter-group">
+        <label>Fecha de carrera</label>
         <select id="filtroPedidoFecha">
           <option value="">Todas las fechas</option>
           <option value="2026-04-26">1º — 25/26 Abril</option>
@@ -343,6 +352,9 @@
           <option value="2026-10-18">6º — 17/18 Octubre</option>
           <option value="2026-11-29">7º — 28/29 Noviembre</option>
         </select>
+      </div>
+      <div class="filter-group">
+        <label>Categoría</label>
         <select id="filtroPedidoCat">
           <option value="">TNS y TMZ</option>
           <option value="TNS">Solo TNS</option>
@@ -370,21 +382,33 @@
   <div class="section-block">
     <div class="section-header">
       <h2>Historial de movimientos</h2>
-      <div class="filter-row">
+    </div>
+    <div class="filter-row">
+      <div class="filter-group">
+        <label>Artículo</label>
         <select id="filtroArticulo">
           <option value="">Todos los artículos</option>
         </select>
+      </div>
+      <div class="filter-group">
+        <label>Tipo</label>
         <select id="filtroTipo">
           <option value="">Todos los tipos</option>
           <option value="entrada">Solo entradas</option>
           <option value="salida">Solo salidas</option>
           <option value="transferencia">Solo traslados</option>
         </select>
+      </div>
+      <div class="filter-group">
+        <label>Pago</label>
         <select id="filtroPagoMov">
           <option value="">Todos los pagos</option>
           <option value="pagado">Pagados</option>
           <option value="pendiente">Pendientes</option>
         </select>
+      </div>
+      <div class="filter-group">
+        <label>Fecha de carrera</label>
         <select id="filtroHistorialFecha">
           <option value="">Todas las fechas</option>
           <option value="2026-04-26">1º — 25/26 Abril</option>
