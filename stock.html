@@ -316,16 +316,14 @@
     <div class="summary-cards">
       <div class="summary-card"><div class="num" id="sumTotalSalidas">—</div><div class="lbl">Total salidas</div></div>
       <div class="summary-card s-verde"><div class="num verde" id="sumPagadas">—</div><div class="lbl">Pagadas</div></div>
-      <div class="summary-card s-amarillo"><div class="num amarillo" id="sumPendientes">—</div><div class="lbl">Pendientes</div></div>
       <div class="summary-card s-verde"><div class="num verde" id="sumRecaudado">—</div><div class="lbl">Recaudado U$S</div></div>
-      <div class="summary-card s-amarillo"><div class="num amarillo" id="sumPendienteMonto">—</div><div class="lbl">Pendiente cobro U$S</div></div>
     </div>
     <div class="table-wrap">
       <table>
         <thead><tr>
-          <th>Artículo</th><th>Salidas</th><th>Pagadas</th><th>Pendientes</th><th>Recaudado (U$S)</th><th>Pendiente (U$S)</th>
+          <th>Artículo</th><th>Salidas</th><th>Pagadas</th><th>Recaudado (U$S)</th>
         </tr></thead>
-        <tbody id="tbodyResumenArt"><tr><td colspan="6" class="empty">Cargando...</td></tr></tbody>
+        <tbody id="tbodyResumenArt"><tr><td colspan="4" class="empty">Cargando...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -692,43 +690,34 @@
 
     const salidas = movs || [];
     const pagadas = salidas.filter(m => m.pago_confirmado);
-    const pendientes = salidas.filter(m => !m.pago_confirmado);
     const recaudado = pagadas.reduce((s, m) => s + (parseFloat(m.pago_monto) || 0), 0);
-    const pendienteMonto = pendientes.reduce((s, m) => s + (parseFloat(m.pago_monto) || 0), 0);
 
     document.getElementById('sumTotalSalidas').textContent = salidas.length || '—';
     document.getElementById('sumPagadas').textContent = pagadas.length || '—';
-    document.getElementById('sumPendientes').textContent = pendientes.length || '—';
     document.getElementById('sumRecaudado').textContent = recaudado ? `U$S ${recaudado.toFixed(2)}` : '—';
-    document.getElementById('sumPendienteMonto').textContent = pendienteMonto ? `U$S ${pendienteMonto.toFixed(2)}` : '—';
 
     const porArt = {};
     salidas.forEach(m => {
       const nombre = m.stock_articulos?.nombre || 'Desconocido';
-      if (!porArt[nombre]) porArt[nombre] = { salidas: 0, pagadas: 0, pendientes: 0, recaudado: 0, pendienteMonto: 0 };
+      if (!porArt[nombre]) porArt[nombre] = { salidas: 0, pagadas: 0, recaudado: 0 };
       porArt[nombre].salidas++;
       if (m.pago_confirmado) {
         porArt[nombre].pagadas++;
         porArt[nombre].recaudado += parseFloat(m.pago_monto) || 0;
-      } else {
-        porArt[nombre].pendientes++;
-        porArt[nombre].pendienteMonto += parseFloat(m.pago_monto) || 0;
       }
     });
 
     const tbody = document.getElementById('tbodyResumenArt');
     const rows = Object.entries(porArt).sort((a, b) => a[0].localeCompare(b[0]));
     if (rows.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="empty">Sin ventas registradas</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" class="empty">Sin ventas registradas</td></tr>';
       return;
     }
     tbody.innerHTML = rows.map(([nombre, d]) => `<tr>
       <td>${nombre}</td>
       <td>${d.salidas}</td>
       <td>${d.pagadas || '—'}</td>
-      <td>${d.pendientes ? `<span style="color:#fde047;font-weight:600">${d.pendientes}</span>` : '—'}</td>
       <td>${d.recaudado ? `U$S ${d.recaudado.toFixed(2)}` : '—'}</td>
-      <td>${d.pendienteMonto ? `<span style="color:#fde047">U$S ${d.pendienteMonto.toFixed(2)}</span>` : '—'}</td>
     </tr>`).join('');
   }
 
