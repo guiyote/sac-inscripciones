@@ -76,6 +76,12 @@
     .submit-btn { width: 100%; background: var(--rojo); color: var(--blanco); border: none; border-radius: 3px; padding: 1rem; font-family: 'Barlow Condensed', sans-serif; font-size: 1.1rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; margin-top: 2rem; transition: background 0.15s; }
     .submit-btn:hover { background: var(--rojo-oscuro); }
     .submit-btn:disabled { background: #555; cursor: not-allowed; }
+    .costo-info { background: #232323; border-left: 3px solid var(--rojo); border-radius: 3px; padding: 1.25rem 1.5rem; margin-bottom: 2rem; }
+    .costo-info-title { font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; color: var(--texto-muted); margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--borde); }
+    .costo-row { display: flex; justify-content: space-between; align-items: baseline; font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 600; letter-spacing: 1px; margin-bottom: 0.35rem; color: #ccc; }
+    .costo-row strong { color: var(--blanco); font-size: 1.05rem; }
+    .costo-divider { border: none; border-top: 1px solid var(--borde); margin: 0.75rem 0; }
+    .costo-note { font-size: 0.72rem; color: var(--texto-muted); margin-top: 0.6rem; line-height: 1.5; }
 
     .msg { display: none; padding: 1rem 1.25rem; border-radius: 3px; margin-top: 1rem; font-size: 0.9rem; line-height: 1.5; }
     .msg.success { display: block; background: rgba(0,180,80,0.1); border: 1px solid rgba(0,180,80,0.4); color: #4ade80; }
@@ -120,6 +126,19 @@
   </div>
 
   <div id="formWrap" class="form-wrap">
+    <div class="costo-info">
+      <div class="costo-info-title">Inscripción</div>
+      <div class="costo-row"><span>TNS</span><strong>$8.000</strong></div>
+      <div class="costo-row"><span>TMZ</span><strong>$6.000</strong></div>
+      <div class="costo-note">Incluye transponder</div>
+      <hr class="costo-divider">
+      <div class="costo-info-title" style="margin-top:0.25rem">Materiales del club</div>
+      <div class="costo-row"><span>Pastillas</span><strong>U$S 120</strong></div>
+      <div class="costo-row"><span>Cubiertas</span><strong>U$S 60</strong></div>
+      <div class="costo-row"><span>Discos de freno</span><strong>U$S 70</strong></div>
+      <div class="costo-row"><span>Difusores <span style="font-size:0.72rem;font-weight:400;color:var(--texto-muted)">(solo TNS)</span></span><strong>U$S 120</strong></div>
+      <div class="costo-note">Pago en pesos al tipo de cambio del día · Pedidos: Alejandra Turino +598 99737942 (Salto)</div>
+    </div>
     <form id="formTurismo">
 
       <div class="form-section">
