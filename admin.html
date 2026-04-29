@@ -128,7 +128,7 @@
   <div style="display:flex;align-items:center;gap:1rem">
     <a href="inscripciones-config.html" style="display:flex;align-items:center;gap:0.4rem;color:var(--texto-muted);text-decoration:none;font-size:0.85rem;letter-spacing:1px;transition:color 0.15s" onmouseover="this.style.color='white'" onmouseout="this.style.color='var(--texto-muted)'">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      Inscripciones
+      Habilitar/Deshabilitar
     </a>
     <a href="stock.html" style="display:flex;align-items:center;gap:0.4rem;color:var(--texto-muted);text-decoration:none;font-size:0.85rem;letter-spacing:1px;transition:color 0.15s" onmouseover="this.style.color='white'" onmouseout="this.style.color='var(--texto-muted)'">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
@@ -359,18 +359,9 @@
 </div>
 
 <div id="adminPanel">
-  <div class="panel-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem">
-    <div>
-      <h1>Inscripciones 2026</h1>
-      <p>Campeonato Regional SAC</p>
-    </div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.4rem;background:var(--gris-medio);border:1px solid var(--borde);border-radius:3px;padding:0.65rem 1rem">
-      <div style="font-size:0.68rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--texto-muted)">Inscripciones</div>
-      <div style="display:flex;align-items:center;gap:0.5rem">
-        <span id="inscStatusBadge" class="badge badge-pendiente" style="font-size:0.72rem">Cargando...</span>
-        <button id="btnToggleInsc" class="btn-accion btn-baja" style="padding:0.3rem 0.7rem;font-size:0.78rem">—</button>
-      </div>
-    </div>
+  <div class="panel-header">
+    <h1>Inscripciones 2026</h1>
+    <p>Campeonato Regional SAC</p>
   </div>
 
   <div class="filters">
@@ -537,34 +528,6 @@
     document.getElementById('btnLogout').style.display = 'none';
   });
   let esAdmin = false;
-  let inscripcionesHabilitadas = null;
-
-  async function cargarEstadoInscripciones() {
-    const { data } = await sb.from('configuracion').select('valor').eq('clave', 'inscripciones_habilitadas').single();
-    inscripcionesHabilitadas = data?.valor !== 'false';
-    const badge = document.getElementById('inscStatusBadge');
-    const btn = document.getElementById('btnToggleInsc');
-    if (inscripcionesHabilitadas) {
-      badge.textContent = 'Habilitadas'; badge.className = 'badge badge-pagado';
-      btn.textContent = 'Deshabilitar'; btn.className = 'btn-accion btn-baja';
-    } else {
-      badge.textContent = 'Deshabilitadas'; badge.className = 'badge badge-baja';
-      btn.textContent = 'Habilitar'; btn.className = 'btn-accion btn-alta';
-    }
-  }
-
-  document.getElementById('btnToggleInsc').addEventListener('click', async () => {
-    if (!esAdmin) return;
-    const nuevo = !inscripcionesHabilitadas;
-    const accion = nuevo ? 'habilitar' : 'deshabilitar';
-    if (!confirm(`¿Confirmar: ${accion} las inscripciones públicas?`)) return;
-    const btn = document.getElementById('btnToggleInsc');
-    btn.disabled = true;
-    const { error } = await sb.from('configuracion').update({ valor: nuevo ? 'true' : 'false' }).eq('clave', 'inscripciones_habilitadas');
-    btn.disabled = false;
-    if (!error) { inscripcionesHabilitadas = nuevo; cargarEstadoInscripciones(); }
-    else alert('Error al actualizar. Intentá nuevamente.');
-  });
 
   async function showPanel() {
     document.getElementById('loginScreen').style.display = 'none';
@@ -572,7 +535,6 @@
     document.getElementById('btnLogout').style.display = 'inline-block';
     const { data: rol } = await sb.rpc('get_my_role');
     esAdmin = rol === 'admin';
-    cargarEstadoInscripciones();
     cargarDatos();
   }
 

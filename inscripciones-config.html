@@ -223,12 +223,16 @@
       renderToggles(valores);
 
       document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('configPanel').style.display = '';
+      document.getElementById('configPanel').style.display = 'block';
       document.getElementById('btnLogout').style.display = '';
     }
 
-    sb.auth.onAuthStateChange((event, session) => {
+    sb.auth.getSession().then(({ data: { session } }) => {
       if (session) initPanel();
+    });
+
+    sb.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') initPanel();
     });
 
     document.getElementById('btnLogin').addEventListener('click', async () => {
