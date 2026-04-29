@@ -212,7 +212,7 @@
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     (async () => {
-      const { data } = await sb.from('configuracion').select('valor').eq('clave', 'inscripciones_habilitadas').single();
+      const { data } = await sb.from('configuracion').select('valor').eq('clave', 'inscripciones_trackday').single();
       if (data?.valor === 'false') {
         document.getElementById('formWrap').style.display = 'none';
         document.getElementById('avisoInscripcionesCerradas').style.display = '';
