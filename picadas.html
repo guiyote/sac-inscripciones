@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/jpeg" href="logo.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAC - Inscripción Picadas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --rojo: #CC0000;
+      --rojo-oscuro: #990000;
+      --gris: #1a1a1a;
+      --gris-medio: #2d2d2d;
+      --gris-campo: #222;
+      --gris-claro: #f2f2f2;
+      --blanco: #ffffff;
+      --texto-muted: #888;
+      --borde: #3a3a3a;
+    }
+
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: var(--gris);
+      color: var(--blanco);
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--gris);
+      border-bottom: 3px solid var(--rojo);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 70px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .header-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
+    .header-title span {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 400;
+      letter-spacing: 3px;
+      color: var(--texto-muted);
+    }
+
+    .back-link {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--texto-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      transition: color 0.15s;
+    }
+
+    .back-link:hover { color: var(--blanco); }
+    .back-link svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+    .page-header {
+      background: var(--gris-medio);
+      border-bottom: 1px solid var(--borde);
+      padding: 2.5rem 2rem;
+      text-align: center;
+    }
+
+    .page-cat {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--rojo);
+      margin-bottom: 0.5rem;
+    }
+
+    .page-header h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      line-height: 1;
+    }
+
+    .page-header p {
+      margin-top: 0.75rem;
+      color: var(--texto-muted);
+      font-size: 0.9rem;
+    }
+
+    .form-wrap {
+      max-width: 620px;
+      margin: 2.5rem auto;
+      padding: 0 1.5rem 4rem;
+    }
+
+    .form-section {
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--texto-muted);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--borde);
+    }
+
+    .field {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #bbb;
+      margin-bottom: 0.5rem;
+    }
+
+    label .req { color: var(--rojo); margin-left: 2px; }
+    label .opt { color: var(--texto-muted); font-size: 0.7rem; font-weight: 400; letter-spacing: 0; text-transform: none; }
+
+    input[type="text"],
+    input[type="date"],
+    select {
+      width: 100%;
+      background: var(--gris-campo);
+      border: 1px solid var(--borde);
+      border-radius: 3px;
+      padding: 0.75rem 1rem;
+      color: var(--blanco);
+      font-family: 'Barlow', sans-serif;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.15s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    input[type="text"]:focus,
+    input[type="date"]:focus,
+    select:focus {
+      border-color: var(--rojo);
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.6);
+      cursor: pointer;
+    }
+
+    .select-wrap {
+      position: relative;
+    }
+
+    .select-wrap::after {
+      content: '';
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid var(--texto-muted);
+      pointer-events: none;
+    }
+
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .radio-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: var(--gris-campo);
+      border: 1px solid var(--borde);
+      border-radius: 3px;
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .radio-item:hover { border-color: #555; }
+    .radio-item input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--rojo);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .radio-item.checked {
+      border-color: var(--rojo);
+      background: rgba(204,0,0,0.06);
+    }
+    .radio-label { font-size: 0.95rem; color: var(--blanco); cursor: pointer; }
+
+    .submit-btn {
+      width: 100%;
+      background: var(--rojo);
+      color: var(--blanco);
+      border: none;
+      border-radius: 3px;
+      padding: 1rem;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 2rem;
+      transition: background 0.15s;
+    }
+
+    .submit-btn:hover { background: var(--rojo-oscuro); }
+    .submit-btn:disabled { background: #555; cursor: not-allowed; }
+
+    .costo-info { background: #232323; border-left: 3px solid var(--rojo); border-radius: 3px; padding: 1.25rem 1.5rem; margin-bottom: 2rem; }
+    .costo-info-title { font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; color: var(--texto-muted); margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--borde); }
+    .costo-row { display: flex; justify-content: space-between; align-items: baseline; font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 600; letter-spacing: 1px; margin-bottom: 0.35rem; color: #ccc; }
+    .costo-row strong { color: var(--blanco); font-size: 1.05rem; }
+    .costo-note { font-size: 0.72rem; color: var(--texto-muted); margin-top: 0.6rem; line-height: 1.5; }
+
+    .msg {
+      display: none;
+      padding: 1rem 1.25rem;
+      border-radius: 3px;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .msg.success {
+      display: block;
+      background: rgba(0, 180, 80, 0.1);
+      border: 1px solid rgba(0, 180, 80, 0.4);
+      color: #4ade80;
+    }
+
+    .msg.error {
+      display: block;
+      background: rgba(204,0,0,0.1);
+      border: 1px solid rgba(204,0,0,0.4);
+      color: #f87171;
+    }
+
+    footer {
+      border-top: 1px solid #333;
+      padding: 1.5rem 2rem;
+      text-align: center;
+      color: var(--texto-muted);
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 600px) {
+      header { padding: 0 1rem; }
+      .header-title { font-size: 0.9rem; letter-spacing: 1px; }
+      .header-title span { display: none; }
+      .page-header { padding: 1.75rem 1rem; }
+      .form-wrap { padding: 0 1rem 3rem; margin-top: 1.5rem; }
+      .submit-btn { font-size: 1rem; padding: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-logo">
+      <a href="index.html" class="logo-circle"><img src="logo.jpeg" alt="SAC"></a>
+      <div class="header-title">
+        Salto Automóvil Club
+        <span>Autódromo de Salto</span>
+      </div>
+    </div>
+    <a href="index.html" class="back-link">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Volver
+    </a>
+  </header>
+
+  <div class="page-header">
+    <div class="page-cat">Picadas 201mts</div>
+    <h1>Formulario de Inscripción</h1>
+    <p>Completá los datos para inscribirte. GRACIAS</p>
+  </div>
+
+  <div id="avisoInscripcionesCerradas" style="display:none;max-width:600px;margin:4rem auto;padding:0 1.5rem;text-align:center">
+    <div style="background:#2d2d2d;border:1px solid #3a3a3a;border-top:4px solid #CC0000;border-radius:2px;padding:2.5rem 2rem">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:800;text-transform:uppercase;letter-spacing:2px;margin-bottom:0.75rem">Inscripciones cerradas</div>
+      <p style="color:#888;font-size:0.95rem">Las inscripciones están temporalmente suspendidas.<br>Contactate con la organización para más información.</p>
+    </div>
+  </div>
+
+  <div id="formWrap" class="form-wrap">
+    <div class="costo-info">
+      <div class="costo-info-title">Inscripción</div>
+      <div class="costo-row"><span>Anticipada</span><strong>$1.000</strong></div>
+      <div class="costo-row"><span>En puerta</span><strong>$1.500</strong></div>
+      <div class="costo-row"><span>Reinscripción</span><strong>$500</strong></div>
+    </div>
+
+    <form id="formPicadas">
+
+      <div class="form-section">
+        <div class="section-title">Fecha del evento</div>
+        <div class="field">
+          <label for="fecha_carrera">Fecha <span class="req">*</span></label>
+          <div class="select-wrap">
+            <select id="fecha_carrera" required>
+              <option value="" disabled>Seleccioná una fecha...</option>
+              <option value="2026-05-17" selected>1º picada — 16/17 Mayo 2026</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">Datos del vehículo</div>
+        <div class="field">
+          <label for="nombre_dueno">Nombre del dueño del vehículo</label>
+          <input type="text" id="nombre_dueno" placeholder="Ej: Juan Pérez">
+        </div>
+        <div class="field">
+          <label for="numero_vehiculo">Número del vehículo</label>
+          <input type="text" id="numero_vehiculo" placeholder="Ej: 7">
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">Datos del piloto</div>
+        <div class="field">
+          <label for="nombre_piloto">Nombre del piloto <span class="req">*</span></label>
+          <input type="text" id="nombre_piloto" placeholder="Ej: Juan Pérez" required>
+        </div>
+        <div class="field">
+          <label for="cedula">Cédula del piloto</label>
+          <input type="text" id="cedula" placeholder="Ej: 1234567-8">
+        </div>
+        <div class="field">
+          <label for="celular">Celular <span class="opt">(opcional)</span></label>
+          <input type="text" id="celular" placeholder="Ej: 099 123 456">
+        </div>
+        <div class="field">
+          <label for="fecha_nacimiento">Fecha de nacimiento</label>
+          <input type="date" id="fecha_nacimiento">
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">Categoría</div>
+        <div class="field">
+          <label for="categoria">Categoría <span class="req">*</span></label>
+          <div class="select-wrap">
+            <select id="categoria" required>
+              <option value="" disabled selected>Seleccioná una categoría...</option>
+              <option value="110 ARMADA">110 ARMADA</option>
+              <option value="POLLERITA 2mm">POLLERITA 2mm</option>
+              <option value="POLLERITA LIBRE">POLLERITA LIBRE</option>
+              <option value="150 ARMADA">150 ARMADA</option>
+              <option value="200 LIMITADA">200 LIMITADA</option>
+              <option value="210 ARMADA">210 ARMADA</option>
+              <option value="4T ARMADA">4T ARMADA</option>
+              <option value="4T DRAGSTER">4T DRAGSTER</option>
+              <option value="VALE TODO">VALE TODO</option>
+              <option value="135 2T">135 2T</option>
+              <option value="2T LIBRE">2T LIBRE</option>
+              <option value="FEMENINO">FEMENINO</option>
+              <option value="AUTOS">AUTOS</option>
+              <option value="OTROS">OTROS</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">Reinscripción</div>
+        <div class="field">
+          <label>¿Reinscripción? <span class="req">*</span></label>
+          <div class="radio-group" id="reinscripcion_group">
+            <label class="radio-item checked" onclick="toggleReinscripcion(this)">
+              <input type="radio" name="reinscripcion" value="false" checked>
+              <span class="radio-label">No</span>
+            </label>
+            <label class="radio-item" onclick="toggleReinscripcion(this)">
+              <input type="radio" name="reinscripcion" value="true">
+              <span class="radio-label">Sí — Reinscripción ($500)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">Enviar inscripción</button>
+      <div class="msg" id="msgBox"></div>
+
+    </form>
+  </div>
+
+  <footer>
+    Salto Automóvil Club &mdash; Autódromo de Salto, Uruguay &mdash; 2026
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    const SUPABASE_URL = 'https://qpveivsqkudlqjbxcxzh.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_H6Q0geOf0yqMVQ8MfCcr9Q_31LSQMVg';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    (async () => {
+      const { data } = await sb.from('configuracion').select('valor').eq('clave', 'inscripciones_picadas').single();
+      if (data?.valor === 'false') {
+        document.getElementById('formWrap').style.display = 'none';
+        document.getElementById('avisoInscripcionesCerradas').style.display = '';
+      }
+    })();
+
+    function toggleReinscripcion(label) {
+      document.querySelectorAll('#reinscripcion_group .radio-item').forEach(el => el.classList.remove('checked'));
+      label.classList.add('checked');
+    }
+
+    document.getElementById('formPicadas').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const msgBox = document.getElementById('msgBox');
+      msgBox.className = 'msg';
+      msgBox.textContent = '';
+
+      const categoria = document.getElementById('categoria').value;
+      if (!categoria) {
+        msgBox.className = 'msg error';
+        msgBox.textContent = 'Por favor seleccioná una categoría.';
+        return;
+      }
+
+      const reinscripcionVal = document.querySelector('input[name="reinscripcion"]:checked')?.value;
+      const reinscripcion = reinscripcionVal === 'true';
+
+      const fecha_carrera = document.getElementById('fecha_carrera').value;
+      const nombre_piloto = document.getElementById('nombre_piloto').value.trim();
+      const numero_vehiculo = document.getElementById('numero_vehiculo').value.trim() || null;
+
+      btn.disabled = true;
+      btn.textContent = 'Verificando...';
+
+      const { data: existentes } = await sb
+        .from('inscripciones_picadas')
+        .select('id')
+        .eq('fecha_carrera', fecha_carrera)
+        .ilike('nombre_piloto', nombre_piloto)
+        .eq('numero_vehiculo', numero_vehiculo);
+
+      if (existentes && existentes.length > 0) {
+        msgBox.className = 'msg error';
+        msgBox.textContent = 'Ya existe una inscripción con ese piloto y número de vehículo para esta fecha.';
+        btn.disabled = false;
+        btn.textContent = 'Enviar inscripción';
+        return;
+      }
+
+      btn.textContent = 'Enviando...';
+
+      const payload = {
+        fecha_carrera,
+        nombre_dueno: document.getElementById('nombre_dueno').value.trim() || null,
+        nombre_piloto,
+        cedula: document.getElementById('cedula').value.trim() || null,
+        celular: document.getElementById('celular').value.trim() || null,
+        fecha_nacimiento: document.getElementById('fecha_nacimiento').value || null,
+        categoria,
+        numero_vehiculo,
+        reinscripcion,
+      };
+
+      const { error } = await sb.from('inscripciones_picadas').insert([payload]);
+
+      if (error) {
+        msgBox.className = 'msg error';
+        msgBox.textContent = 'Hubo un error al enviar. Por favor intentá nuevamente.';
+        console.error(error);
+      } else {
+        msgBox.className = 'msg success';
+        msgBox.textContent = '¡Inscripción enviada! Éxitos y nos vemos el fin de semana.';
+        e.target.reset();
+        document.getElementById('categoria').value = '';
+        document.querySelectorAll('#reinscripcion_group .radio-item').forEach(el => el.classList.remove('checked'));
+        document.querySelector('#reinscripcion_group .radio-item').classList.add('checked');
+        document.querySelector('#reinscripcion_group input[value="false"]').checked = true;
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Enviar inscripción';
+    });
+  </script>
+
+</body>
+</html>

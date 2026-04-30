@@ -209,13 +209,18 @@
 
     <label>Fecha de carrera</label>
     <select id="editFechaCarrera">
-      <option value="2026-04-26">1º fecha — 25/26 Abril</option>
-      <option value="2026-06-14">2º fecha — 13/14 Junio</option>
-      <option value="2026-07-12">3º fecha — 11/12 Julio</option>
-      <option value="2026-08-16">4º fecha — 15/16 Agosto</option>
-      <option value="2026-09-13">5º fecha — 12/13 Setiembre</option>
-      <option value="2026-10-18">6º fecha — 17/18 Octubre</option>
-      <option value="2026-11-29">7º fecha — 28/29 Noviembre</option>
+      <optgroup label="Campeonato">
+        <option value="2026-04-26">1º fecha — 25/26 Abril</option>
+        <option value="2026-06-14">2º fecha — 13/14 Junio</option>
+        <option value="2026-07-12">3º fecha — 11/12 Julio</option>
+        <option value="2026-08-16">4º fecha — 15/16 Agosto</option>
+        <option value="2026-09-13">5º fecha — 12/13 Setiembre</option>
+        <option value="2026-10-18">6º fecha — 17/18 Octubre</option>
+        <option value="2026-11-29">7º fecha — 28/29 Noviembre</option>
+      </optgroup>
+      <optgroup label="Picadas">
+        <option value="2026-05-17">1º picada — 16/17 Mayo</option>
+      </optgroup>
     </select>
 
     <!-- Karting -->
@@ -332,6 +337,45 @@
       <input type="text" id="eTD_numero_auto">
     </div>
 
+    <!-- Picadas -->
+    <div id="editSectionPicadas" style="display:none">
+      <label>Nombre del dueño del vehículo</label>
+      <input type="text" id="ePic_nombre_dueno">
+      <label>Nombre del piloto</label>
+      <input type="text" id="ePic_nombre_piloto">
+      <label>Cédula</label>
+      <input type="text" id="ePic_cedula">
+      <label>Celular</label>
+      <input type="text" id="ePic_celular">
+      <label>Fecha de nacimiento</label>
+      <input type="date" id="ePic_fecha_nacimiento">
+      <label>Categoría</label>
+      <select id="ePic_categoria">
+        <option value="">Seleccioná...</option>
+        <option value="110 ARMADA">110 ARMADA</option>
+        <option value="POLLERITA 2mm">POLLERITA 2mm</option>
+        <option value="POLLERITA LIBRE">POLLERITA LIBRE</option>
+        <option value="150 ARMADA">150 ARMADA</option>
+        <option value="200 LIMITADA">200 LIMITADA</option>
+        <option value="210 ARMADA">210 ARMADA</option>
+        <option value="4T ARMADA">4T ARMADA</option>
+        <option value="4T DRAGSTER">4T DRAGSTER</option>
+        <option value="VALE TODO">VALE TODO</option>
+        <option value="135 2T">135 2T</option>
+        <option value="2T LIBRE">2T LIBRE</option>
+        <option value="FEMENINO">FEMENINO</option>
+        <option value="AUTOS">AUTOS</option>
+        <option value="OTROS">OTROS</option>
+      </select>
+      <label>Número del vehículo</label>
+      <input type="text" id="ePic_numero_vehiculo">
+      <label>Reinscripción</label>
+      <select id="ePic_reinscripcion">
+        <option value="false">No</option>
+        <option value="true">Sí</option>
+      </select>
+    </div>
+
     <!-- Pago (común a todas las categorías) -->
     <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--borde)">
       <label>Estado de pago</label>
@@ -369,13 +413,18 @@
       <label>Fecha de carrera</label>
       <select id="filtroFecha">
         <option value="">Todas las fechas</option>
-        <option value="2026-04-26">1º fecha — 25/26 Abril</option>
-        <option value="2026-06-14">2º fecha — 13/14 Junio</option>
-        <option value="2026-07-12">3º fecha — 11/12 Julio</option>
-        <option value="2026-08-16">4º fecha — 15/16 Agosto</option>
-        <option value="2026-09-13">5º fecha — 12/13 Setiembre</option>
-        <option value="2026-10-18">6º fecha — 17/18 Octubre</option>
-        <option value="2026-11-29">7º fecha — 28/29 Noviembre</option>
+        <optgroup label="Campeonato">
+          <option value="2026-04-26">1º fecha — 25/26 Abril</option>
+          <option value="2026-06-14">2º fecha — 13/14 Junio</option>
+          <option value="2026-07-12">3º fecha — 11/12 Julio</option>
+          <option value="2026-08-16">4º fecha — 15/16 Agosto</option>
+          <option value="2026-09-13">5º fecha — 12/13 Setiembre</option>
+          <option value="2026-10-18">6º fecha — 17/18 Octubre</option>
+          <option value="2026-11-29">7º fecha — 28/29 Noviembre</option>
+        </optgroup>
+        <optgroup label="Picadas">
+          <option value="2026-05-17">1º picada — 16/17 Mayo</option>
+        </optgroup>
       </select>
     </div>
     <div class="filter-group">
@@ -386,6 +435,7 @@
         <option value="turismo">Turismo (TNS/TMZ)</option>
         <option value="regularidad">Regularidad</option>
         <option value="trackday">Track Day</option>
+        <option value="picadas">Picadas</option>
       </select>
     </div>
     <div class="filter-group">
@@ -412,6 +462,7 @@
     <div class="summary-card"><div class="num" id="totalTurismo">—</div><div class="lbl">Turismo</div></div>
     <div class="summary-card"><div class="num" id="totalRegularidad">—</div><div class="lbl">Regularidad</div></div>
     <div class="summary-card"><div class="num" id="totalTrackDay">—</div><div class="lbl">Track Day</div></div>
+    <div class="summary-card"><div class="num" id="totalPicadas">—</div><div class="lbl">Picadas</div></div>
     <div class="summary-card"><div class="num" id="totalGeneral">—</div><div class="lbl">Total</div></div>
     <div class="summary-card s-verde"><div class="num verde" id="totalPagados">—</div><div class="lbl">Pagados</div></div>
     <div class="summary-card s-verde"><div class="num verde" id="totalRecaudado">—</div><div class="lbl">Recaudado UYU</div></div>
@@ -462,11 +513,27 @@
     </div>
   </div>
 
+  <div class="section-block" id="secPicadas">
+    <h2>Picadas 201mts</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Dueño vehículo</th><th>Piloto</th><th>CI</th><th>Fecha</th><th>Categoría</th><th>Nº Vehículo</th><th>Reinsc.</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Acciones</th></tr></thead>
+      <tbody id="tbodyPicadas"><tr><td colspan="12" class="loading">Cargando...</td></tr></tbody>
+    </table></div>
+  </div>
+
   <div class="section-block">
-    <h2>Resumen por fecha</h2>
+    <h2>Resumen por fecha — Campeonato</h2>
     <div class="table-wrap"><table>
       <thead><tr><th>Fecha</th><th>Karting</th><th>TNS</th><th>TMZ</th><th>Regularidad</th><th>Track Day</th><th>Total</th><th>Pagados</th><th>Recaudado (UYU)</th></tr></thead>
       <tbody id="tbodyPorFecha"><tr><td colspan="9" class="loading">Cargando...</td></tr></tbody>
+    </table></div>
+  </div>
+
+  <div class="section-block" id="secResumenPicadas">
+    <h2>Resumen por fecha — Picadas</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Fecha</th><th>Inscriptos</th><th>Pagados</th><th>Recaudado (UYU)</th></tr></thead>
+      <tbody id="tbodyResumenPicadas"><tr><td colspan="4" class="loading">Cargando...</td></tr></tbody>
     </table></div>
   </div>
 </div>
@@ -489,7 +556,13 @@
     '2026-11-29': '7º — 28/29 Noviembre',
   };
 
-  function fmtFecha(iso) { return FECHAS[iso] || iso || '—'; }
+  const FECHAS_PICADAS = {
+    '2026-05-17': '1º picada — 16/17 Mayo',
+  };
+
+  const TODAS_FECHAS = { ...FECHAS, ...FECHAS_PICADAS };
+
+  function fmtFecha(iso) { return TODAS_FECHAS[iso] || iso || '—'; }
   function fmtCI(v) {
     if (!v) return '—';
     const d = v.replace(/\D/g, '');
@@ -631,6 +704,7 @@
     document.getElementById('editSectionTurismo').style.display = 'none';
     document.getElementById('editSectionRegularidad').style.display = 'none';
     document.getElementById('editSectionTrackDay').style.display = 'none';
+    document.getElementById('editSectionPicadas').style.display = 'none';
 
     document.getElementById('editFechaCarrera').value = r.fecha_carrera || '';
 
@@ -684,6 +758,17 @@
       document.getElementById('eTD_modelo').value = r.modelo || '';
       document.getElementById('eTD_anio').value = r.anio || '';
       document.getElementById('eTD_numero_auto').value = r.numero_auto || '';
+    } else if (tabla === 'inscripciones_picadas') {
+      document.getElementById('modalEditarNombre').textContent = r.nombre_piloto || '';
+      document.getElementById('editSectionPicadas').style.display = '';
+      document.getElementById('ePic_nombre_dueno').value = r.nombre_dueno || '';
+      document.getElementById('ePic_nombre_piloto').value = r.nombre_piloto || '';
+      document.getElementById('ePic_cedula').value = r.cedula || '';
+      document.getElementById('ePic_celular').value = r.celular || '';
+      document.getElementById('ePic_fecha_nacimiento').value = r.fecha_nacimiento || '';
+      document.getElementById('ePic_categoria').value = r.categoria || '';
+      document.getElementById('ePic_numero_vehiculo').value = r.numero_vehiculo || '';
+      document.getElementById('ePic_reinscripcion').value = r.reinscripcion ? 'true' : 'false';
     }
 
     document.getElementById('edit_pago_confirmado').value = r.pago_confirmado ? 'true' : 'false';
@@ -759,6 +844,17 @@
         anio: document.getElementById('eTD_anio').value.trim() || null,
         numero_auto: document.getElementById('eTD_numero_auto').value.trim() || null,
       });
+    } else if (tabla === 'inscripciones_picadas') {
+      Object.assign(updates, {
+        nombre_dueno: document.getElementById('ePic_nombre_dueno').value.trim() || null,
+        nombre_piloto: document.getElementById('ePic_nombre_piloto').value.trim() || null,
+        cedula: document.getElementById('ePic_cedula').value.trim() || null,
+        celular: document.getElementById('ePic_celular').value.trim() || null,
+        fecha_nacimiento: document.getElementById('ePic_fecha_nacimiento').value || null,
+        categoria: document.getElementById('ePic_categoria').value || null,
+        numero_vehiculo: document.getElementById('ePic_numero_vehiculo').value.trim() || null,
+        reinscripcion: document.getElementById('ePic_reinscripcion').value === 'true',
+      });
     }
 
     const { error } = await sb.from(tabla).update(updates).eq('id', id);
@@ -787,35 +883,40 @@
     const filtroPago = document.getElementById('filtroPago').value;
     const filtroBaja = document.getElementById('filtroBaja').value;
 
-    const mostrarK  = !filtroCat || filtroCat === 'karting';
-    const mostrarT  = !filtroCat || filtroCat === 'turismo';
-    const mostrarR  = !filtroCat || filtroCat === 'regularidad';
-    const mostrarTD = !filtroCat || filtroCat === 'trackday';
+    const mostrarK   = !filtroCat || filtroCat === 'karting';
+    const mostrarT   = !filtroCat || filtroCat === 'turismo';
+    const mostrarR   = !filtroCat || filtroCat === 'regularidad';
+    const mostrarTD  = !filtroCat || filtroCat === 'trackday';
+    const mostrarPic = !filtroCat || filtroCat === 'picadas';
 
-    document.getElementById('secKarting').style.display   = mostrarK  ? '' : 'none';
-    document.getElementById('secTurismo').style.display   = mostrarT  ? '' : 'none';
-    document.getElementById('secRegularidad').style.display = mostrarR ? '' : 'none';
-    document.getElementById('secTrackDay').style.display  = mostrarTD ? '' : 'none';
-    document.getElementById('secLogistica').style.display = mostrarT  ? '' : 'none';
+    document.getElementById('secKarting').style.display      = mostrarK   ? '' : 'none';
+    document.getElementById('secTurismo').style.display      = mostrarT   ? '' : 'none';
+    document.getElementById('secRegularidad').style.display  = mostrarR   ? '' : 'none';
+    document.getElementById('secTrackDay').style.display     = mostrarTD  ? '' : 'none';
+    document.getElementById('secLogistica').style.display    = mostrarT   ? '' : 'none';
+    document.getElementById('secPicadas').style.display      = mostrarPic ? '' : 'none';
+    document.getElementById('secResumenPicadas').style.display = mostrarPic ? '' : 'none';
 
-    const [kData, tData, rData, tdData] = await Promise.all([
-      mostrarK  ? queryTabla('inscripciones_karting',    filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
-      mostrarT  ? queryTabla('inscripciones_turismo',    filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
-      mostrarR  ? queryTabla('inscripciones_regularidad',filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
-      mostrarTD ? queryTabla('inscripciones_trackday',   filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
+    const [kData, tData, rData, tdData, picData] = await Promise.all([
+      mostrarK   ? queryTabla('inscripciones_karting',    filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
+      mostrarT   ? queryTabla('inscripciones_turismo',    filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
+      mostrarR   ? queryTabla('inscripciones_regularidad',filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
+      mostrarTD  ? queryTabla('inscripciones_trackday',   filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
+      mostrarPic ? queryTabla('inscripciones_picadas',    filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
     ]);
 
-    const todos = [...kData, ...tData, ...rData, ...tdData];
+    const todos = [...kData, ...tData, ...rData, ...tdData, ...picData];
     const pagados = todos.filter(r => r.pago_confirmado && !r.baja);
     const recaudado = pagados.reduce((s, r) => s + (parseFloat(r.pago_monto) || 0), 0);
 
-    document.getElementById('totalKarting').textContent   = kData.length;
-    document.getElementById('totalTurismo').textContent   = tData.length;
-    document.getElementById('totalRegularidad').textContent = rData.length;
-    document.getElementById('totalTrackDay').textContent  = tdData.length;
-    document.getElementById('totalGeneral').textContent   = todos.length;
-    document.getElementById('totalPagados').textContent   = pagados.length;
-    document.getElementById('totalRecaudado').textContent = `$ ${recaudado.toLocaleString('es-UY')}`;
+    document.getElementById('totalKarting').textContent      = kData.length;
+    document.getElementById('totalTurismo').textContent      = tData.length;
+    document.getElementById('totalRegularidad').textContent  = rData.length;
+    document.getElementById('totalTrackDay').textContent     = tdData.length;
+    document.getElementById('totalPicadas').textContent      = picData.length;
+    document.getElementById('totalGeneral').textContent      = todos.length;
+    document.getElementById('totalPagados').textContent      = pagados.length;
+    document.getElementById('totalRecaudado').textContent    = `$ ${recaudado.toLocaleString('es-UY')}`;
 
     // Karting
     document.getElementById('tbodyKarting').innerHTML = kData.length === 0
@@ -907,7 +1008,30 @@
           </div></td>
         </tr>`).join('');
 
+    // Picadas
+    document.getElementById('tbodyPicadas').innerHTML = picData.length === 0
+      ? '<tr><td colspan="12" class="empty">Sin inscripciones</td></tr>'
+      : picData.map(r => `<tr class="${r.baja ? 'baja-row' : ''}">
+          <td>${val(r.nombre_dueno)}</td>
+          <td>${val(r.nombre_piloto)}</td>
+          <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtCI(r.cedula)}</td>
+          <td>${fmtFecha(r.fecha_carrera)}</td>
+          <td><span class="badge badge-karting" style="background:rgba(234,179,8,0.12);color:#fde047;border-color:rgba(234,179,8,0.3)">${val(r.categoria)}</span></td>
+          <td>${val(r.numero_vehiculo)}</td>
+          <td>${r.reinscripcion ? '<span style="color:#fde047;font-weight:600">Sí</span>' : '<span style="color:var(--texto-muted)">No</span>'}</td>
+          <td><span class="badge ${r.pago_confirmado ? 'badge-pagado' : 'badge-pendiente'}">${r.pago_confirmado ? 'Pagado' : 'Pendiente'}</span></td>
+          <td>${fmtMonto(r.pago_monto)}</td>
+          <td>${capFirst(r.pago_medio)}</td>
+          <td>${fmtDate(r.pago_fecha)}</td>
+          <td><div class="acciones">
+            ${esAdmin ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_picadas','${r.id}')">Modificar</button>` : ''}
+            ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_picadas','${r.id}','${r.nombre_piloto}')">Pago</button>` : ''}
+            ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_picadas','${r.id}','${r.nombre_piloto}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_picadas','${r.id}','${r.nombre_piloto}')">Alta</button>` : '—'}
+          </div></td>
+        </tr>`).join('');
+
     await cargarPorFecha(filtroFecha);
+    await cargarResumenPicadas();
     await cargarLogistica(filtroFecha, filtroBaja);
   }
 
@@ -938,6 +1062,28 @@
           <td>${FECHAS[r.f]}</td>
           <td>${r.k || '—'}</td><td>${r.tns || '—'}</td><td>${r.tmz || '—'}</td><td>${r.reg || '—'}</td><td>${r.td || '—'}</td>
           <td><strong>${r.total || '—'}</strong></td>
+          <td>${r.pagados || '—'}</td>
+          <td>${r.recaudado ? `$ ${r.recaudado.toLocaleString('es-UY')}` : '—'}</td>
+        </tr>`).join('');
+  }
+
+  async function cargarResumenPicadas() {
+    const { data } = await sb.from('inscripciones_picadas')
+      .select('fecha_carrera, pago_confirmado, pago_monto, baja');
+
+    const rows = Object.keys(FECHAS_PICADAS).map(f => {
+      const items = (data || []).filter(r => r.fecha_carrera === f && !r.baja);
+      const pagados = items.filter(r => r.pago_confirmado).length;
+      const recaudado = items.filter(r => r.pago_confirmado).reduce((s, r) => s + (parseFloat(r.pago_monto) || 0), 0);
+      return { f, total: items.length, pagados, recaudado };
+    });
+
+    const hayDatos = rows.some(r => r.total > 0);
+    document.getElementById('tbodyResumenPicadas').innerHTML = !hayDatos
+      ? '<tr><td colspan="4" class="empty">Sin inscripciones</td></tr>'
+      : rows.map(r => `<tr>
+          <td>${FECHAS_PICADAS[r.f]}</td>
+          <td>${r.total || '—'}</td>
           <td>${r.pagados || '—'}</td>
           <td>${r.recaudado ? `$ ${r.recaudado.toLocaleString('es-UY')}` : '—'}</td>
         </tr>`).join('');
