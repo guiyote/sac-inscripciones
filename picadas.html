@@ -490,36 +490,55 @@
       btn.disabled = true;
       btn.textContent = 'Verificando...';
 
-      // Validación: número de vehículo ya tomado en esta fecha
-      if (numero_vehiculo) {
-        const { data: vehiculoTomado } = await sb
+      if (reinscripcion) {
+        // Reinscripción: validar que no esté ya inscripto en esa categoría para esa fecha
+        const { data: yaEnCategoria } = await sb
           .from('inscripciones_picadas')
           .select('id')
           .eq('fecha_carrera', fecha_carrera)
-          .eq('numero_vehiculo', numero_vehiculo);
+          .ilike('nombre_piloto', nombre_piloto)
+          .eq('numero_vehiculo', numero_vehiculo)
+          .eq('categoria', categoria);
 
-        if (vehiculoTomado && vehiculoTomado.length > 0) {
+        if (yaEnCategoria && yaEnCategoria.length > 0) {
           msgBox.className = 'msg error';
-          msgBox.textContent = `El número de vehículo ${numero_vehiculo} ya está registrado para esta fecha.`;
+          msgBox.textContent = `Ya estás inscripto en la categoría "${categoria}" para esta fecha. Elegí una categoría diferente.`;
           btn.disabled = false;
           btn.textContent = 'Enviar inscripción';
           return;
         }
-      }
+      } else {
+        // Inscripción nueva: el número debe ser único en todas las categorías
+        if (numero_vehiculo) {
+          const { data: vehiculoTomado } = await sb
+            .from('inscripciones_picadas')
+            .select('id')
+            .eq('fecha_carrera', fecha_carrera)
+            .eq('numero_vehiculo', numero_vehiculo);
 
-      const { data: existentes } = await sb
-        .from('inscripciones_picadas')
-        .select('id')
-        .eq('fecha_carrera', fecha_carrera)
-        .ilike('nombre_piloto', nombre_piloto)
-        .eq('numero_vehiculo', numero_vehiculo);
+          if (vehiculoTomado && vehiculoTomado.length > 0) {
+            msgBox.className = 'msg error';
+            msgBox.textContent = `El número de vehículo ${numero_vehiculo} ya está registrado para esta fecha en alguna categoría. Cada número debe ser único sin importar la categoría.`;
+            btn.disabled = false;
+            btn.textContent = 'Enviar inscripción';
+            return;
+          }
+        }
 
-      if (existentes && existentes.length > 0) {
-        msgBox.className = 'msg error';
-        msgBox.textContent = 'Ya existe una inscripción con ese piloto y número de vehículo para esta fecha.';
-        btn.disabled = false;
-        btn.textContent = 'Enviar inscripción';
-        return;
+        const { data: existentes } = await sb
+          .from('inscripciones_picadas')
+          .select('id')
+          .eq('fecha_carrera', fecha_carrera)
+          .ilike('nombre_piloto', nombre_piloto)
+          .eq('numero_vehiculo', numero_vehiculo);
+
+        if (existentes && existentes.length > 0) {
+          msgBox.className = 'msg error';
+          msgBox.textContent = 'Ya existe una inscripción con ese piloto y número de vehículo para esta fecha.';
+          btn.disabled = false;
+          btn.textContent = 'Enviar inscripción';
+          return;
+        }
       }
 
       btn.textContent = 'Enviando...';

@@ -616,10 +616,10 @@
   function cerrarModal(id) { document.getElementById(id).classList.remove('open'); modalCtx = null; }
   document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); }));
 
-  function abrirModalPago(tabla, id, nombre) {
+  function abrirModalPago(tabla, id, nombre, montoDefault) {
     modalCtx = { tabla, id };
     document.getElementById('modalPagoNombre').textContent = nombre;
-    document.getElementById('pagoMonto').value = '';
+    document.getElementById('pagoMonto').value = montoDefault != null ? montoDefault : '';
     document.getElementById('pagoFecha').value = new Date().toISOString().split('T')[0];
     document.getElementById('pagoMedio').value = '';
     document.getElementById('modalPago').classList.add('open');
@@ -1031,7 +1031,7 @@
           <td>${fmtDate(r.pago_fecha)}</td>
           <td><div class="acciones">
             ${esAdmin ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_picadas','${r.id}')">Modificar</button>` : ''}
-            ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_picadas','${r.id}','${r.nombre_piloto}')">Pago</button>` : ''}
+            ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_picadas','${r.id}','${r.nombre_piloto}',${r.reinscripcion ? 500 : null})">Pago</button>` : ''}
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_picadas','${r.id}','${r.nombre_piloto}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_picadas','${r.id}','${r.nombre_piloto}')">Alta</button>` : '—'}
           </div></td>
         </tr>`).join('');
