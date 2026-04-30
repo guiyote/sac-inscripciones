@@ -356,7 +356,7 @@
           <div class="select-wrap">
             <select id="fecha_carrera" required>
               <option value="" disabled>Seleccioná una fecha...</option>
-              <option value="2026-05-17" selected>1º picada — 16/17 Mayo 2026</option>
+              <option value="2026-05-17" data-mes="5">1º picada — 16/17 Mayo 2026</option>
             </select>
           </div>
         </div>
@@ -538,6 +538,32 @@
       btn.disabled = false;
       btn.textContent = 'Enviar inscripción';
     });
+  </script>
+  <script>
+    (function() {
+      const mesActual = new Date().getMonth() + 1;
+      const select = document.getElementById('fecha_carrera');
+      let encontrada = false;
+      Array.from(select.options).forEach(opt => {
+        const mes = parseInt(opt.getAttribute('data-mes'));
+        if (mes) {
+          if (mes === mesActual) {
+            opt.selected = true;
+            opt.disabled = false;
+            encontrada = true;
+          } else {
+            opt.disabled = true;
+            opt.style.color = '#555';
+          }
+        }
+      });
+      if (!encontrada) {
+        const placeholder = select.options[0];
+        placeholder.textContent = 'Sin fecha este mes';
+        placeholder.selected = true;
+        select.disabled = true;
+      }
+    })();
   </script>
 
 </body>
