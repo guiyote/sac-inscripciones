@@ -395,9 +395,9 @@
       </div>
 
       <div class="form-section">
-        <div class="section-title">Categoría</div>
+        <div class="section-title" id="categoriaTitle">Categoría</div>
         <div class="field">
-          <label for="categoria">Categoría <span class="req">*</span></label>
+          <label for="categoria" id="categoriaLabel">Categoría <span class="req">*</span></label>
           <div class="select-wrap">
             <select id="categoria" required>
               <option value="" disabled selected>Seleccioná una categoría...</option>
@@ -464,6 +464,13 @@
     function toggleReinscripcion(label) {
       document.querySelectorAll('#reinscripcion_group .radio-item').forEach(el => el.classList.remove('checked'));
       label.classList.add('checked');
+      const esReinscripcion = label.querySelector('input').value === 'true';
+      document.getElementById('categoriaTitle').textContent = esReinscripcion ? 'Nueva categoría' : 'Categoría';
+      document.getElementById('categoriaLabel').innerHTML = esReinscripcion
+        ? 'Nueva categoría <span class="req">*</span>'
+        : 'Categoría <span class="req">*</span>';
+      document.getElementById('categoria').querySelector('option[disabled]').textContent =
+        esReinscripcion ? 'Seleccioná la nueva categoría...' : 'Seleccioná una categoría...';
     }
 
     document.getElementById('formPicadas').addEventListener('submit', async (e) => {
