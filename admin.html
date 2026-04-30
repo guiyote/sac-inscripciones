@@ -473,7 +473,7 @@
   </div>
 
   <div class="section-block" id="secKarting">
-    <div class="section-header"><h2>Karting</h2><button class="btn-export" onclick="exportarKarting()">↓ Exportar CSV</button></div>
+    <div class="section-header"><h2>Karting</h2><button class="btn-export" onclick="exportarKarting()">↓ Exportar TXT</button></div>
     <div class="table-wrap"><table>
       <thead><tr><th>Piloto</th><th>CI</th><th>Fecha</th><th>Cilindrada</th><th>Nº Kart</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Transponder</th><th>Acciones</th></tr></thead>
       <tbody id="tbodyKarting"><tr><td colspan="11" class="loading">Cargando...</td></tr></tbody>
@@ -481,7 +481,7 @@
   </div>
 
   <div class="section-block" id="secTurismo">
-    <div class="section-header"><h2>Turismo — TNS / TMZ</h2><button class="btn-export" onclick="exportarTurismo()">↓ Exportar CSV</button></div>
+    <div class="section-header"><h2>Turismo — TNS / TMZ</h2><button class="btn-export" onclick="exportarTurismo()">↓ Exportar TXT</button></div>
     <div class="table-wrap"><table>
       <thead><tr><th>Piloto</th><th>CI</th><th>Fecha</th><th>Cat.</th><th>Nº Auto</th><th>Marca/Modelo</th><th>Equipo</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Transponder</th><th>Acciones</th></tr></thead>
       <tbody id="tbodyTurismo"><tr><td colspan="13" class="loading">Cargando...</td></tr></tbody>
@@ -489,7 +489,7 @@
   </div>
 
   <div class="section-block" id="secRegularidad">
-    <div class="section-header"><h2>Regularidad</h2><button class="btn-export" onclick="exportarRegularidad()">↓ Exportar CSV</button></div>
+    <div class="section-header"><h2>Regularidad</h2><button class="btn-export" onclick="exportarRegularidad()">↓ Exportar TXT</button></div>
     <div class="table-wrap"><table>
       <thead><tr><th>Piloto</th><th>CI</th><th>Navegante</th><th>Fecha</th><th>Vehículo</th><th>Nº Auto</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Transponder</th><th>Acciones</th></tr></thead>
       <tbody id="tbodyRegularidad"><tr><td colspan="12" class="loading">Cargando...</td></tr></tbody>
@@ -497,7 +497,7 @@
   </div>
 
   <div class="section-block" id="secTrackDay">
-    <div class="section-header"><h2>Track Day</h2><button class="btn-export" onclick="exportarTrackDay()">↓ Exportar CSV</button></div>
+    <div class="section-header"><h2>Track Day</h2><button class="btn-export" onclick="exportarTrackDay()">↓ Exportar TXT</button></div>
     <div class="table-wrap"><table>
       <thead><tr><th>Conductor</th><th>CI</th><th>Acompañante</th><th>Fecha</th><th>Vehículo</th><th>Nº Auto</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Acciones</th></tr></thead>
       <tbody id="tbodyTrackDay"><tr><td colspan="11" class="loading">Cargando...</td></tr></tbody>
@@ -518,7 +518,7 @@
   </div>
 
   <div class="section-block" id="secPicadas">
-    <div class="section-header"><h2>Picadas 201mts</h2><button class="btn-export" onclick="exportarPicadas()">↓ Exportar CSV</button></div>
+    <div class="section-header"><h2>Picadas 201mts</h2><button class="btn-export" onclick="exportarPicadas()">↓ Exportar TXT</button></div>
     <div class="table-wrap"><table>
       <thead><tr><th>Dueño vehículo</th><th>Piloto</th><th>CI</th><th>Fecha</th><th>Categoría</th><th>Nº Vehículo</th><th>Reinsc.</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Acciones</th></tr></thead>
       <tbody id="tbodyPicadas"><tr><td colspan="12" class="loading">Cargando...</td></tr></tbody>
@@ -1141,105 +1141,98 @@
 
   checkSession();
 
-  function exportarCSV(rows, campos, nombre) {
+  function exportarTXT(rows, titulo, fmtLineas, nombre) {
     if (!rows || rows.length === 0) { alert('No hay datos para exportar con los filtros actuales.'); return; }
-    const lines = [
-      campos.map(c => c.label).join(','),
-      ...rows.map(r => campos.map(c => {
-        const v = c.get(r) ?? '';
-        const s = String(v);
-        return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s;
-      }).join(','))
+    const pagados = rows.filter(r => r.pago_confirmado && !r.baja).length;
+    const hoy = new Date().toLocaleDateString('es-UY', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const sep = '─'.repeat(48);
+    const header = [
+      '════════════════════════════════════════════════',
+      `  ${titulo}`,
+      `  Salto Automóvil Club`,
+      `  Exportado: ${hoy}`,
+      `  Total: ${rows.length} inscriptos · ${pagados} pagados`,
+      '════════════════════════════════════════════════',
+      '',
     ];
-    const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+    const cuerpo = rows.flatMap((r, i) => [
+      ...(i > 0 ? [sep, ''] : []),
+      ...fmtLineas(r),
+      '',
+    ]);
+    const blob = new Blob(['﻿' + [...header, ...cuerpo].join('\r\n')], { type: 'text/plain;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = nombre + '.csv'; a.click();
+    const a = document.createElement('a'); a.href = url; a.download = nombre + '.txt'; a.click();
     URL.revokeObjectURL(url);
   }
 
+  function fmtPago(r) {
+    if (!r.pago_confirmado) return 'PENDIENTE';
+    let s = 'PAGADO';
+    if (r.pago_monto) s += ` — $${Number(r.pago_monto).toLocaleString('es-UY')}`;
+    if (r.pago_medio) s += ` (${r.pago_medio})`;
+    if (r.pago_fecha) s += ` — ${fmtDate(r.pago_fecha)}`;
+    return s;
+  }
+
   function exportarKarting() {
-    exportarCSV(_kData, [
-      { label: 'Piloto',        get: r => r.nombre },
-      { label: 'CI',            get: r => r.cedula },
-      { label: 'Fecha carrera', get: r => fmtFecha(r.fecha_carrera) },
-      { label: 'Cilindrada',    get: r => r.cilindrada },
-      { label: 'Nº Kart',       get: r => r.numero_kart },
-      { label: 'Pagado',        get: r => r.pago_confirmado ? 'Sí' : 'No' },
-      { label: 'Monto',         get: r => r.pago_monto ?? '' },
-      { label: 'Medio pago',    get: r => r.pago_medio ?? '' },
-      { label: 'Fecha pago',    get: r => fmtDate(r.pago_fecha) },
-      { label: 'Transponder',   get: r => r.transponder ?? '' },
+    exportarTXT(_kData, 'KARTING', r => [
+      `Piloto:      ${r.nombre || '—'}`,
+      `CI:          ${fmtCI(r.cedula)}`,
+      `Fecha:       ${fmtFecha(r.fecha_carrera)}`,
+      `Cilindrada:  ${r.cilindrada || '—'}   ·   Nº Kart: ${r.numero_kart || '—'}`,
+      ...(r.transponder ? [`Transponder: ${r.transponder}`] : []),
+      `Pago:        ${fmtPago(r)}`,
     ], 'karting');
   }
 
   function exportarTurismo() {
-    exportarCSV(_tData, [
-      { label: 'Piloto',           get: r => r.nombre },
-      { label: 'CI',               get: r => r.cedula },
-      { label: 'Fecha carrera',    get: r => fmtFecha(r.fecha_carrera) },
-      { label: 'Categoría',        get: r => r.categoria },
-      { label: 'Nº Auto',          get: r => r.numero_auto },
-      { label: 'Marca/Modelo',     get: r => r.marca_modelo ?? '' },
-      { label: 'Concurrente',      get: r => r.nombre_concurrente ?? '' },
-      { label: 'Equipo',           get: r => r.nombre_equipo ?? '' },
-      { label: 'Pagado',           get: r => r.pago_confirmado ? 'Sí' : 'No' },
-      { label: 'Monto',            get: r => r.pago_monto ?? '' },
-      { label: 'Medio pago',       get: r => r.pago_medio ?? '' },
-      { label: 'Fecha pago',       get: r => fmtDate(r.pago_fecha) },
-      { label: 'Transponder',      get: r => r.transponder ?? '' },
+    exportarTXT(_tData, 'TURISMO', r => [
+      `Piloto:      ${r.nombre || '—'}`,
+      `CI:          ${fmtCI(r.cedula)}`,
+      `Fecha:       ${fmtFecha(r.fecha_carrera)}`,
+      `Categoría:   ${r.categoria || '—'}   ·   Nº Auto: ${r.numero_auto || '—'}`,
+      ...(r.marca_modelo ? [`Vehículo:    ${r.marca_modelo}`] : []),
+      ...(r.nombre_equipo ? [`Equipo:      ${r.nombre_equipo}`] : []),
+      ...(r.transponder ? [`Transponder: ${r.transponder}`] : []),
+      `Pago:        ${fmtPago(r)}`,
     ], 'turismo');
   }
 
   function exportarRegularidad() {
-    exportarCSV(_rData, [
-      { label: 'Piloto',            get: r => r.nombre_piloto },
-      { label: 'CI piloto',         get: r => r.cedula_piloto ?? '' },
-      { label: 'Navegante',         get: r => r.nombre_navegante ?? '' },
-      { label: 'CI navegante',      get: r => r.cedula_navegante ?? '' },
-      { label: 'Fecha carrera',     get: r => fmtFecha(r.fecha_carrera) },
-      { label: 'Marca',             get: r => r.marca ?? '' },
-      { label: 'Modelo',            get: r => r.modelo ?? '' },
-      { label: 'Año',               get: r => r.anio ?? '' },
-      { label: 'Nº Auto',           get: r => r.numero_auto },
-      { label: 'Pagado',            get: r => r.pago_confirmado ? 'Sí' : 'No' },
-      { label: 'Monto',             get: r => r.pago_monto ?? '' },
-      { label: 'Medio pago',        get: r => r.pago_medio ?? '' },
-      { label: 'Fecha pago',        get: r => fmtDate(r.pago_fecha) },
-      { label: 'Transponder',       get: r => r.transponder ?? '' },
+    exportarTXT(_rData, 'REGULARIDAD', r => [
+      `Piloto:      ${r.nombre_piloto || '—'}`,
+      ...(r.cedula_piloto ? [`CI piloto:   ${fmtCI(r.cedula_piloto)}`] : []),
+      ...(r.nombre_navegante ? [`Navegante:   ${r.nombre_navegante}`] : []),
+      ...(r.cedula_navegante ? [`CI naveg.:   ${fmtCI(r.cedula_navegante)}`] : []),
+      `Fecha:       ${fmtFecha(r.fecha_carrera)}`,
+      `Vehículo:    ${[r.marca, r.modelo, r.anio].filter(Boolean).join(' ') || '—'}   ·   Nº Auto: ${r.numero_auto || '—'}`,
+      ...(r.transponder ? [`Transponder: ${r.transponder}`] : []),
+      `Pago:        ${fmtPago(r)}`,
     ], 'regularidad');
   }
 
   function exportarTrackDay() {
-    exportarCSV(_tdData, [
-      { label: 'Conductor',         get: r => r.nombre_conductor },
-      { label: 'CI conductor',      get: r => r.cedula_conductor ?? '' },
-      { label: 'Acompañante',       get: r => r.nombre_acompanante ?? '' },
-      { label: 'Fecha carrera',     get: r => fmtFecha(r.fecha_carrera) },
-      { label: 'Marca',             get: r => r.marca ?? '' },
-      { label: 'Modelo',            get: r => r.modelo ?? '' },
-      { label: 'Año',               get: r => r.anio ?? '' },
-      { label: 'Nº Auto',           get: r => r.numero_auto },
-      { label: 'Pagado',            get: r => r.pago_confirmado ? 'Sí' : 'No' },
-      { label: 'Monto',             get: r => r.pago_monto ?? '' },
-      { label: 'Medio pago',        get: r => r.pago_medio ?? '' },
-      { label: 'Fecha pago',        get: r => fmtDate(r.pago_fecha) },
+    exportarTXT(_tdData, 'TRACK DAY', r => [
+      `Conductor:   ${r.nombre_conductor || '—'}`,
+      ...(r.cedula_conductor ? [`CI:          ${fmtCI(r.cedula_conductor)}`] : []),
+      ...(r.nombre_acompanante ? [`Acompañante: ${r.nombre_acompanante}`] : []),
+      `Fecha:       ${fmtFecha(r.fecha_carrera)}`,
+      `Vehículo:    ${[r.marca, r.modelo, r.anio].filter(Boolean).join(' ') || '—'}   ·   Nº Auto: ${r.numero_auto || '—'}`,
+      `Pago:        ${fmtPago(r)}`,
     ], 'trackday');
   }
 
   function exportarPicadas() {
-    exportarCSV(_picData, [
-      { label: 'Dueño vehículo',    get: r => r.nombre_dueno ?? '' },
-      { label: 'Piloto',            get: r => r.nombre_piloto },
-      { label: 'CI',                get: r => r.cedula ?? '' },
-      { label: 'Celular',           get: r => r.celular ?? '' },
-      { label: 'Fecha carrera',     get: r => fmtFecha(r.fecha_carrera) },
-      { label: 'Categoría',         get: r => r.categoria },
-      { label: 'Nº Vehículo',       get: r => r.numero_vehiculo ?? '' },
-      { label: 'Reinscripción',     get: r => r.reinscripcion ? 'Sí' : 'No' },
-      { label: 'Pagado',            get: r => r.pago_confirmado ? 'Sí' : 'No' },
-      { label: 'Monto',             get: r => r.pago_monto ?? '' },
-      { label: 'Medio pago',        get: r => r.pago_medio ?? '' },
-      { label: 'Fecha pago',        get: r => fmtDate(r.pago_fecha) },
+    exportarTXT(_picData, 'PICADAS 201mts', r => [
+      `Piloto:      ${r.nombre_piloto || '—'}`,
+      ...(r.nombre_dueno && r.nombre_dueno !== r.nombre_piloto ? [`Dueño:       ${r.nombre_dueno}`] : []),
+      ...(r.cedula ? [`CI:          ${fmtCI(r.cedula)}`] : []),
+      ...(r.celular ? [`Celular:     ${r.celular}`] : []),
+      `Fecha:       ${fmtFecha(r.fecha_carrera)}`,
+      `Categoría:   ${r.categoria || '—'}   ·   Nº Vehículo: ${r.numero_vehiculo || '—'}`,
+      ...(r.reinscripcion ? [`             (reinscripción)`] : []),
+      `Pago:        ${fmtPago(r)}`,
     ], 'picadas');
   }
 </script>
