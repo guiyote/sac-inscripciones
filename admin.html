@@ -54,6 +54,7 @@
     .summary-card { background: var(--gris-medio); border: 1px solid var(--borde); border-top: 3px solid var(--rojo); border-radius: 2px; padding: 1.1rem 1.25rem; }
     .summary-card.s-verde { border-top-color: var(--verde); }
     .summary-card .num { font-family: 'Barlow Condensed', sans-serif; font-size: 2rem; font-weight: 800; line-height: 1; }
+    #totalRecaudado { font-size: 1.1rem; }
     .summary-card .num.verde { color: #4ade80; }
     .summary-card .lbl { font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--texto-muted); margin-top: 0.3rem; }
 
@@ -521,7 +522,7 @@
     </table></div>
   </div>
 
-  <div class="section-block">
+  <div class="section-block" id="secResumenCamp">
     <h2>Resumen por fecha — Campeonato</h2>
     <div class="table-wrap"><table>
       <thead><tr><th>Fecha</th><th>Karting</th><th>TNS</th><th>TMZ</th><th>Regularidad</th><th>Track Day</th><th>Total</th><th>Pagados</th><th>Recaudado (UYU)</th></tr></thead>
@@ -883,19 +884,25 @@
     const filtroPago = document.getElementById('filtroPago').value;
     const filtroBaja = document.getElementById('filtroBaja').value;
 
-    const mostrarK   = !filtroCat || filtroCat === 'karting';
-    const mostrarT   = !filtroCat || filtroCat === 'turismo';
-    const mostrarR   = !filtroCat || filtroCat === 'regularidad';
-    const mostrarTD  = !filtroCat || filtroCat === 'trackday';
-    const mostrarPic = !filtroCat || filtroCat === 'picadas';
+    // Cuando se elige una fecha específica, campeonato y picadas son excluyentes
+    const esFechaPicadas = filtroFecha !== '' && filtroFecha in FECHAS_PICADAS;
+    const esFechaCamp    = filtroFecha !== '' && filtroFecha in FECHAS;
 
-    document.getElementById('secKarting').style.display      = mostrarK   ? '' : 'none';
-    document.getElementById('secTurismo').style.display      = mostrarT   ? '' : 'none';
-    document.getElementById('secRegularidad').style.display  = mostrarR   ? '' : 'none';
-    document.getElementById('secTrackDay').style.display     = mostrarTD  ? '' : 'none';
-    document.getElementById('secLogistica').style.display    = mostrarT   ? '' : 'none';
-    document.getElementById('secPicadas').style.display      = mostrarPic ? '' : 'none';
-    document.getElementById('secResumenPicadas').style.display = mostrarPic ? '' : 'none';
+    const mostrarK   = !esFechaPicadas && (!filtroCat || filtroCat === 'karting');
+    const mostrarT   = !esFechaPicadas && (!filtroCat || filtroCat === 'turismo');
+    const mostrarR   = !esFechaPicadas && (!filtroCat || filtroCat === 'regularidad');
+    const mostrarTD  = !esFechaPicadas && (!filtroCat || filtroCat === 'trackday');
+    const mostrarPic = !esFechaCamp    && (!filtroCat || filtroCat === 'picadas');
+    const mostrarCamp = !esFechaPicadas && (!filtroCat || filtroCat !== 'picadas');
+
+    document.getElementById('secKarting').style.display        = mostrarK    ? '' : 'none';
+    document.getElementById('secTurismo').style.display        = mostrarT    ? '' : 'none';
+    document.getElementById('secRegularidad').style.display    = mostrarR    ? '' : 'none';
+    document.getElementById('secTrackDay').style.display       = mostrarTD   ? '' : 'none';
+    document.getElementById('secLogistica').style.display      = mostrarT    ? '' : 'none';
+    document.getElementById('secResumenCamp').style.display    = mostrarCamp ? '' : 'none';
+    document.getElementById('secPicadas').style.display        = mostrarPic  ? '' : 'none';
+    document.getElementById('secResumenPicadas').style.display = mostrarPic  ? '' : 'none';
 
     const [kData, tData, rData, tdData, picData] = await Promise.all([
       mostrarK   ? queryTabla('inscripciones_karting',    filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
