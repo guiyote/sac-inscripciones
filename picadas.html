@@ -490,6 +490,23 @@
       btn.disabled = true;
       btn.textContent = 'Verificando...';
 
+      // Validación: número de vehículo ya tomado en esta fecha
+      if (numero_vehiculo) {
+        const { data: vehiculoTomado } = await sb
+          .from('inscripciones_picadas')
+          .select('id')
+          .eq('fecha_carrera', fecha_carrera)
+          .eq('numero_vehiculo', numero_vehiculo);
+
+        if (vehiculoTomado && vehiculoTomado.length > 0) {
+          msgBox.className = 'msg error';
+          msgBox.textContent = `El número de vehículo ${numero_vehiculo} ya está registrado para esta fecha.`;
+          btn.disabled = false;
+          btn.textContent = 'Enviar inscripción';
+          return;
+        }
+      }
+
       const { data: existentes } = await sb
         .from('inscripciones_picadas')
         .select('id')

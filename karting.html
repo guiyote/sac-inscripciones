@@ -502,6 +502,23 @@
       btn.disabled = true;
       btn.textContent = 'Verificando...';
 
+      // Validación: número de kart ya tomado en esta fecha
+      if (numero_kart) {
+        const { data: kartTomado } = await sb
+          .from('inscripciones_karting')
+          .select('id')
+          .eq('fecha_carrera', fecha_carrera)
+          .eq('numero_kart', numero_kart);
+
+        if (kartTomado && kartTomado.length > 0) {
+          msgBox.className = 'msg error';
+          msgBox.textContent = `El número de kart ${numero_kart} ya está registrado para esta fecha.`;
+          btn.disabled = false;
+          btn.textContent = 'Enviar inscripción';
+          return;
+        }
+      }
+
       // Validación duplicado: mismo nombre + número de kart + fecha
       const { data: existentes } = await sb
         .from('inscripciones_karting')

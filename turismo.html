@@ -294,6 +294,24 @@
       btn.disabled = true;
       btn.textContent = 'Verificando...';
 
+      // Validación: número de auto ya tomado en esta fecha y categoría
+      if (numero_auto) {
+        const { data: autoTomado } = await sb
+          .from('inscripciones_turismo')
+          .select('id')
+          .eq('fecha_carrera', fecha_carrera)
+          .eq('categoria', categoria)
+          .eq('numero_auto', numero_auto);
+
+        if (autoTomado && autoTomado.length > 0) {
+          msgBox.className = 'msg error';
+          msgBox.textContent = `El número de auto ${numero_auto} ya está registrado para esta fecha y categoría.`;
+          btn.disabled = false;
+          btn.textContent = 'Enviar inscripción';
+          return;
+        }
+      }
+
       // Validación duplicado: mismo nombre + número de auto + categoría + fecha
       const { data: existentes } = await sb
         .from('inscripciones_turismo')
