@@ -1,17 +1,17 @@
 #!/bin/bash
 # Backup de Supabase via pg_dump
 # Requiere: brew install postgresql
-# Uso: ./backup.sh TU_PASSWORD
+# Uso: ./backup.sh
 
-if [ -z "$1" ]; then
-  echo "Uso: ./backup.sh TU_PASSWORD"
-  exit 1
-fi
+read -s -p "Password de la base: " DB_PASSWORD
+echo
+BACKUP_DIR="/Users/gacosta/sac-inscripciones/backups"
+OUTPUT="$BACKUP_DIR/backup_$(date +%Y%m%d_%H%M%S).sql"
 
-OUTPUT="backup_$(date +%Y%m%d_%H%M%S).sql"
+mkdir -p "$BACKUP_DIR"
 
 echo "Conectando a Supabase..."
-pg_dump "postgresql://postgres:$1@db.qpveivsqkudlqjbxcxzh.supabase.co:5432/postgres" \
+pg_dump "postgresql://postgres.qpveivsqkudlqjbxcxzh:$DB_PASSWORD@aws-1-us-west-2.pooler.supabase.com:5432/postgres" \
   --no-owner \
   --no-acl \
   -f "$OUTPUT"

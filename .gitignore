@@ -1,3 +1,4 @@
 sql/supabase_asignar_roles.sql
 .claude/
-backup_*.sql
+backups/
+backup.sh
