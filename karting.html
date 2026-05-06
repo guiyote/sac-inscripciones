@@ -346,6 +346,10 @@
     <p>Completá los datos para inscribirte. GRACIAS</p>
   </div>
 
+  <div id="adminBypassBanner" style="display:none;max-width:600px;margin:1rem auto 0;padding:0 1.5rem">
+    <div style="background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.4);border-radius:4px;padding:0.6rem 1rem;font-family:'Barlow Condensed',sans-serif;font-size:0.85rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fde047;text-align:center">Modo admin — inscripciones cerradas para el público</div>
+  </div>
+
   <div id="avisoInscripcionesCerradas" style="display:none;max-width:600px;margin:4rem auto;padding:0 1.5rem;text-align:center">
     <div style="background:#2d2d2d;border:1px solid #3a3a3a;border-top:4px solid #CC0000;border-radius:2px;padding:2.5rem 2rem">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:800;text-transform:uppercase;letter-spacing:2px;margin-bottom:0.75rem">Inscripciones cerradas</div>
@@ -469,6 +473,13 @@
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     (async () => {
+      if (new URLSearchParams(window.location.search).get('admin') === '1') {
+        const { data: { session } } = await sb.auth.getSession();
+        if (session) {
+          document.getElementById('adminBypassBanner').style.display = '';
+          return;
+        }
+      }
       const { data } = await sb.from('configuracion').select('valor').eq('clave', 'inscripciones_karting').single();
       if (data?.valor === 'false') {
         document.getElementById('formWrap').style.display = 'none';
