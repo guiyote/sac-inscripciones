@@ -382,6 +382,23 @@
         </div>
       </div>
 
+      <div class="form-section">
+        <div class="section-title">Reinscripción</div>
+        <div class="field">
+          <label>¿Reinscripción? <span class="req">*</span></label>
+          <div class="radio-group" id="reinscripcion_group">
+            <label class="radio-item checked" onclick="toggleReinscripcion(this)">
+              <input type="radio" name="reinscripcion" value="false" checked>
+              <span class="radio-label">No</span>
+            </label>
+            <label class="radio-item" onclick="toggleReinscripcion(this)">
+              <input type="radio" name="reinscripcion" value="true">
+              <span class="radio-label">Sí — Reinscripción ($500)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
       <div class="form-section" id="categoriaSection">
         <div class="section-title">Categoría</div>
         <div class="field">
@@ -427,23 +444,6 @@
             <label class="radio-item"><input type="checkbox" value="FEMENINO" onchange="this.closest('.radio-item').classList.toggle('checked',this.checked)"><span class="radio-label">FEMENINO</span></label>
             <label class="radio-item"><input type="checkbox" value="AUTOS" onchange="this.closest('.radio-item').classList.toggle('checked',this.checked)"><span class="radio-label">AUTOS</span></label>
             <label class="radio-item"><input type="checkbox" value="OTROS" onchange="this.closest('.radio-item').classList.toggle('checked',this.checked)"><span class="radio-label">OTROS</span></label>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <div class="section-title">Reinscripción</div>
-        <div class="field">
-          <label>¿Reinscripción? <span class="req">*</span></label>
-          <div class="radio-group" id="reinscripcion_group">
-            <label class="radio-item checked" onclick="toggleReinscripcion(this)">
-              <input type="radio" name="reinscripcion" value="false" checked>
-              <span class="radio-label">No</span>
-            </label>
-            <label class="radio-item" onclick="toggleReinscripcion(this)">
-              <input type="radio" name="reinscripcion" value="true">
-              <span class="radio-label">Sí — Reinscripción ($500)</span>
-            </label>
           </div>
         </div>
       </div>
@@ -516,6 +516,24 @@
 
       btn.disabled = true;
       btn.textContent = 'Verificando...';
+
+      if (esReinscripcion) {
+        const { data: inscripcionBase } = await sb
+          .from('inscripciones_picadas')
+          .select('id')
+          .eq('fecha_carrera', fecha_carrera)
+          .eq('numero_vehiculo', numero_vehiculo)
+          .eq('reinscripcion', false)
+          .limit(1);
+
+        if (!inscripcionBase || inscripcionBase.length === 0) {
+          msgBox.className = 'msg error';
+          msgBox.textContent = `El vehículo ${numero_vehiculo} no tiene inscripción base para esta fecha. Inscribilo primero.`;
+          btn.disabled = false;
+          btn.textContent = 'Enviar inscripción';
+          return;
+        }
+      }
 
       if (esReinscripcion) {
         const categorias = Array.from(
