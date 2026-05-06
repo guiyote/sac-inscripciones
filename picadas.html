@@ -520,7 +520,7 @@
       if (esReinscripcion) {
         const { data: inscripcionBase } = await sb
           .from('inscripciones_picadas')
-          .select('id')
+          .select('nombre_dueno')
           .eq('fecha_carrera', fecha_carrera)
           .eq('numero_vehiculo', numero_vehiculo)
           .eq('reinscripcion', false)
@@ -529,6 +529,15 @@
         if (!inscripcionBase || inscripcionBase.length === 0) {
           msgBox.className = 'msg error';
           msgBox.textContent = `El vehículo ${numero_vehiculo} no tiene inscripción base para esta fecha. Inscribilo primero.`;
+          btn.disabled = false;
+          btn.textContent = 'Enviar inscripción';
+          return;
+        }
+
+        const duenoRegistrado = inscripcionBase[0].nombre_dueno;
+        if (duenoRegistrado.toLowerCase() !== nombre_dueno.toLowerCase()) {
+          msgBox.className = 'msg error';
+          msgBox.textContent = `El nombre no coincide con el dueño registrado para el vehículo ${numero_vehiculo}: ${duenoRegistrado}.`;
           btn.disabled = false;
           btn.textContent = 'Enviar inscripción';
           return;
