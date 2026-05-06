@@ -473,15 +473,16 @@
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     (async () => {
+      const { data } = await sb.from('configuracion').select('valor').eq('clave', 'inscripciones_karting').single();
+      const cerrada = data?.valor === 'false';
       if (new URLSearchParams(window.location.search).get('admin') === '1') {
         const { data: { session } } = await sb.auth.getSession();
         if (session) {
-          document.getElementById('adminBypassBanner').style.display = '';
+          if (cerrada) document.getElementById('adminBypassBanner').style.display = '';
           return;
         }
       }
-      const { data } = await sb.from('configuracion').select('valor').eq('clave', 'inscripciones_karting').single();
-      if (data?.valor === 'false') {
+      if (cerrada) {
         document.getElementById('formWrap').style.display = 'none';
         document.getElementById('avisoInscripcionesCerradas').style.display = '';
       }
