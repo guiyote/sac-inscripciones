@@ -345,14 +345,8 @@
     <div id="editSectionPicadas" style="display:none">
       <label>Nombre del dueño del vehículo</label>
       <input type="text" id="ePic_nombre_dueno">
-      <label>Nombre del piloto</label>
-      <input type="text" id="ePic_nombre_piloto">
-      <label>Cédula</label>
-      <input type="text" id="ePic_cedula">
       <label>Celular</label>
       <input type="text" id="ePic_celular">
-      <label>Fecha de nacimiento</label>
-      <input type="date" id="ePic_fecha_nacimiento">
       <label>Categoría</label>
       <select id="ePic_categoria">
         <option value="">Seleccioná...</option>
@@ -529,8 +523,8 @@
   <div class="section-block" id="secPicadas">
     <div class="section-header"><h2>Picadas 201mts</h2><button class="btn-export" onclick="exportarPicadas()">↓ Exportar TXT</button></div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Dueño vehículo</th><th>Piloto</th><th>CI</th><th>Fecha</th><th>Categoría</th><th>Nº Vehículo</th><th>Reinsc.</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Acciones</th></tr></thead>
-      <tbody id="tbodyPicadas"><tr><td colspan="12" class="loading">Cargando...</td></tr></tbody>
+      <thead><tr><th>Dueño vehículo</th><th>Fecha</th><th>Categoría</th><th>Nº Vehículo</th><th>Reinsc.</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Acciones</th></tr></thead>
+      <tbody id="tbodyPicadas"><tr><td colspan="10" class="loading">Cargando...</td></tr></tbody>
     </table></div>
   </div>
 
@@ -774,13 +768,10 @@
       document.getElementById('eTD_anio').value = r.anio || '';
       document.getElementById('eTD_numero_auto').value = r.numero_auto || '';
     } else if (tabla === 'inscripciones_picadas') {
-      document.getElementById('modalEditarNombre').textContent = r.nombre_piloto || '';
+      document.getElementById('modalEditarNombre').textContent = r.nombre_dueno || '';
       document.getElementById('editSectionPicadas').style.display = '';
       document.getElementById('ePic_nombre_dueno').value = r.nombre_dueno || '';
-      document.getElementById('ePic_nombre_piloto').value = r.nombre_piloto || '';
-      document.getElementById('ePic_cedula').value = r.cedula || '';
       document.getElementById('ePic_celular').value = r.celular || '';
-      document.getElementById('ePic_fecha_nacimiento').value = r.fecha_nacimiento || '';
       document.getElementById('ePic_categoria').value = r.categoria || '';
       document.getElementById('ePic_numero_vehiculo').value = r.numero_vehiculo || '';
       document.getElementById('ePic_reinscripcion').value = r.reinscripcion ? 'true' : 'false';
@@ -862,10 +853,7 @@
     } else if (tabla === 'inscripciones_picadas') {
       Object.assign(updates, {
         nombre_dueno: document.getElementById('ePic_nombre_dueno').value.trim() || null,
-        nombre_piloto: document.getElementById('ePic_nombre_piloto').value.trim() || null,
-        cedula: document.getElementById('ePic_cedula').value.trim() || null,
         celular: document.getElementById('ePic_celular').value.trim() || null,
-        fecha_nacimiento: document.getElementById('ePic_fecha_nacimiento').value || null,
         categoria: document.getElementById('ePic_categoria').value || null,
         numero_vehiculo: document.getElementById('ePic_numero_vehiculo').value.trim() || null,
         reinscripcion: document.getElementById('ePic_reinscripcion').value === 'true',
@@ -1032,11 +1020,9 @@
 
     // Picadas
     document.getElementById('tbodyPicadas').innerHTML = picData.length === 0
-      ? '<tr><td colspan="12" class="empty">Sin inscripciones</td></tr>'
+      ? '<tr><td colspan="10" class="empty">Sin inscripciones</td></tr>'
       : picData.map(r => `<tr class="${r.baja ? 'baja-row' : ''}">
           <td>${val(r.nombre_dueno)}</td>
-          <td>${val(r.nombre_piloto)}</td>
-          <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtCI(r.cedula)}</td>
           <td>${fmtFecha(r.fecha_carrera)}</td>
           <td><span class="badge badge-karting" style="background:rgba(234,179,8,0.12);color:#fde047;border-color:rgba(234,179,8,0.3)">${val(r.categoria)}</span></td>
           <td>${val(r.numero_vehiculo)}</td>
@@ -1047,8 +1033,8 @@
           <td>${fmtDate(r.pago_fecha)}</td>
           <td><div class="acciones">
             ${esAdmin ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_picadas','${r.id}')">Modificar</button>` : ''}
-            ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_picadas','${r.id}','${r.nombre_piloto}',${r.reinscripcion ? 500 : null})">Pago</button>` : ''}
-            ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_picadas','${r.id}','${r.nombre_piloto}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_picadas','${r.id}','${r.nombre_piloto}')">Alta</button>` : '—'}
+            ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_picadas','${r.id}','${r.nombre_dueno}',${r.reinscripcion ? 500 : null})">Pago</button>` : ''}
+            ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_picadas','${r.id}','${r.nombre_dueno}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_picadas','${r.id}','${r.nombre_dueno}')">Alta</button>` : '—'}
           </div></td>
         </tr>`).join('');
 
@@ -1234,9 +1220,7 @@
 
   function exportarPicadas() {
     exportarTXT(_picData, 'PICADAS 201mts', r => [
-      `Piloto:      ${r.nombre_piloto || '—'}`,
-      ...(r.nombre_dueno && r.nombre_dueno !== r.nombre_piloto ? [`Dueño:       ${r.nombre_dueno}`] : []),
-      ...(r.cedula ? [`CI:          ${fmtCI(r.cedula)}`] : []),
+      `Dueño:       ${r.nombre_dueno || '—'}`,
       ...(r.celular ? [`Celular:     ${r.celular}`] : []),
       `Fecha:       ${fmtFecha(r.fecha_carrera)}`,
       `Categoría:   ${r.categoria || '—'}   ·   Nº Vehículo: ${r.numero_vehiculo || '—'}`,

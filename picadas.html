@@ -369,39 +369,23 @@
       <div class="form-section">
         <div class="section-title">Datos del vehículo</div>
         <div class="field">
-          <label for="nombre_dueno">Nombre del dueño del vehículo</label>
-          <input type="text" id="nombre_dueno" placeholder="Ej: Juan Pérez">
+          <label for="nombre_dueno">Nombre del dueño del vehículo <span class="req">*</span></label>
+          <input type="text" id="nombre_dueno" placeholder="Ej: Juan Pérez" required>
         </div>
         <div class="field">
-          <label for="numero_vehiculo">Número del vehículo</label>
-          <input type="text" id="numero_vehiculo" placeholder="Ej: 7">
-        </div>
-      </div>
-
-      <div class="form-section">
-        <div class="section-title">Datos del piloto</div>
-        <div class="field">
-          <label for="nombre_piloto">Nombre del piloto <span class="req">*</span></label>
-          <input type="text" id="nombre_piloto" placeholder="Ej: Juan Pérez" required>
-        </div>
-        <div class="field">
-          <label for="cedula">Cédula del piloto</label>
-          <input type="text" id="cedula" placeholder="Ej: 1234567-8">
+          <label for="numero_vehiculo">Número del vehículo <span class="req">*</span></label>
+          <input type="text" id="numero_vehiculo" placeholder="Ej: 7" required>
         </div>
         <div class="field">
           <label for="celular">Celular <span class="opt">(opcional)</span></label>
           <input type="text" id="celular" placeholder="Ej: 099 123 456">
         </div>
-        <div class="field">
-          <label for="fecha_nacimiento">Fecha de nacimiento</label>
-          <input type="date" id="fecha_nacimiento">
-        </div>
       </div>
 
-      <div class="form-section">
-        <div class="section-title" id="categoriaTitle">Categoría</div>
+      <div class="form-section" id="categoriaSection">
+        <div class="section-title">Categoría</div>
         <div class="field">
-          <label for="categoria" id="categoriaLabel">Categoría <span class="req">*</span></label>
+          <label for="categoria">Categoría <span class="req">*</span></label>
           <div class="select-wrap">
             <select id="categoria" required>
               <option value="" disabled selected>Seleccioná una categoría...</option>
@@ -420,6 +404,29 @@
               <option value="AUTOS">AUTOS</option>
               <option value="OTROS">OTROS</option>
             </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section" id="categoriaMultiSection" style="display:none">
+        <div class="section-title">Categorías a reinscribirse</div>
+        <div class="field">
+          <label>Seleccioná una o más <span class="req">*</span></label>
+          <div class="radio-group" id="categoriaChecks">
+            <label class="radio-item"><input type="checkbox" value="110 ARMADA" onchange="this.closest('.radio-item').classList.toggle('checked',this.checked)"><span class="radio-label">110 ARMADA</span></label>
+            <label class="radio-item"><input type="checkbox" value="POLLERITA 2mm" onchange="this.closest('.radio-item').classList.toggle('checked',this.checked)"><span class="radio-label">POLLERITA 2mm</span></label>
+            <label class="radio-item"><input type="checkbox" value="POLLERITA LIBRE" onchange="this.closest('.radio-item').classList.toggle('checked',this.checked)"><span class="radio-label">POLLERITA LIBRE</span></label>
+            <label class="radio-item"><input type="checkbox" value="150 ARMADA" onchange="this.closest('.radio-item').classList.toggle('checked',this.checked)"><span class="radio-label">150 ARMADA</span></label>
+            <label class="radio-item"><input type="checkbox" value="200 LIMITADA" onchange="this.closest('.radio-item').classList.toggle('checked',this.checked)"><span class="radio-label">200 LIMITADA</span></label>
+            <label class="radio-item"><input type="checkbox" value="210 ARMADA" onchange="this.closest('.radio-item').classList.toggle('checked',this.checked)"><span class="radio-label">210 ARMADA</span></label>
+            <label class="radio-item"><input type="checkbox" value="4T ARMADA" onchange="this.closest('.radio-item').classList.toggle('checked',this.checked)"><span class="radio-label">4T ARMADA</span></label>
+            <label class="radio-item"><input type="checkbox" value="4T DRAGSTER" onchange="this.closest('.radio-item').classList.toggle('checked',this.checked)"><span class="radio-label">4T DRAGSTER</span></label>
+            <label class="radio-item"><input type="checkbox" value="VALE TODO" onchange="this.closest('.radio-item').classList.toggle('checked',this.checked)"><span class="radio-label">VALE TODO</span></label>
+            <label class="radio-item"><input type="checkbox" value="135 2T" onchange="this.closest('.radio-item').classList.toggle('checked',this.checked)"><span class="radio-label">135 2T</span></label>
+            <label class="radio-item"><input type="checkbox" value="2T LIBRE" onchange="this.closest('.radio-item').classList.toggle('checked',this.checked)"><span class="radio-label">2T LIBRE</span></label>
+            <label class="radio-item"><input type="checkbox" value="FEMENINO" onchange="this.closest('.radio-item').classList.toggle('checked',this.checked)"><span class="radio-label">FEMENINO</span></label>
+            <label class="radio-item"><input type="checkbox" value="AUTOS" onchange="this.closest('.radio-item').classList.toggle('checked',this.checked)"><span class="radio-label">AUTOS</span></label>
+            <label class="radio-item"><input type="checkbox" value="OTROS" onchange="this.closest('.radio-item').classList.toggle('checked',this.checked)"><span class="radio-label">OTROS</span></label>
           </div>
         </div>
       </div>
@@ -476,12 +483,22 @@
       document.querySelectorAll('#reinscripcion_group .radio-item').forEach(el => el.classList.remove('checked'));
       label.classList.add('checked');
       const esReinscripcion = label.querySelector('input').value === 'true';
-      document.getElementById('categoriaTitle').textContent = esReinscripcion ? 'Nueva categoría' : 'Categoría';
-      document.getElementById('categoriaLabel').innerHTML = esReinscripcion
-        ? 'Nueva categoría <span class="req">*</span>'
-        : 'Categoría <span class="req">*</span>';
-      document.getElementById('categoria').querySelector('option[disabled]').textContent =
-        esReinscripcion ? 'Seleccioná la nueva categoría...' : 'Seleccioná una categoría...';
+      document.getElementById('categoriaSection').style.display = esReinscripcion ? 'none' : '';
+      document.getElementById('categoriaMultiSection').style.display = esReinscripcion ? '' : 'none';
+      const cat = document.getElementById('categoria');
+      esReinscripcion ? cat.removeAttribute('required') : cat.setAttribute('required', '');
+    }
+
+    function resetForm(form) {
+      form.reset();
+      document.getElementById('categoria').value = '';
+      document.getElementById('categoria').setAttribute('required', '');
+      document.getElementById('categoriaSection').style.display = '';
+      document.getElementById('categoriaMultiSection').style.display = 'none';
+      document.querySelectorAll('#categoriaChecks .radio-item').forEach(el => el.classList.remove('checked'));
+      document.querySelectorAll('#reinscripcion_group .radio-item').forEach(el => el.classList.remove('checked'));
+      document.querySelector('#reinscripcion_group .radio-item').classList.add('checked');
+      document.querySelector('#reinscripcion_group input[value="false"]').checked = true;
     }
 
     document.getElementById('formPicadas').addEventListener('submit', async (e) => {
@@ -491,102 +508,114 @@
       msgBox.className = 'msg';
       msgBox.textContent = '';
 
-      const categoria = document.getElementById('categoria').value;
-      if (!categoria) {
-        msgBox.className = 'msg error';
-        msgBox.textContent = 'Por favor seleccioná una categoría.';
-        return;
-      }
-
-      const reinscripcionVal = document.querySelector('input[name="reinscripcion"]:checked')?.value;
-      const reinscripcion = reinscripcionVal === 'true';
-
+      const esReinscripcion = document.querySelector('input[name="reinscripcion"]:checked')?.value === 'true';
       const fecha_carrera = document.getElementById('fecha_carrera').value;
-      const nombre_piloto = document.getElementById('nombre_piloto').value.trim();
-      const numero_vehiculo = document.getElementById('numero_vehiculo').value.trim() || null;
+      const numero_vehiculo = document.getElementById('numero_vehiculo').value.trim();
+      const nombre_dueno = document.getElementById('nombre_dueno').value.trim();
+      const celular = document.getElementById('celular').value.trim() || null;
 
       btn.disabled = true;
       btn.textContent = 'Verificando...';
 
-      if (reinscripcion) {
-        // Reinscripción: validar que no esté ya inscripto en esa categoría para esa fecha
-        const { data: yaEnCategoria } = await sb
-          .from('inscripciones_picadas')
-          .select('id')
-          .eq('fecha_carrera', fecha_carrera)
-          .ilike('nombre_piloto', nombre_piloto)
-          .eq('numero_vehiculo', numero_vehiculo)
-          .eq('categoria', categoria);
+      if (esReinscripcion) {
+        const categorias = Array.from(
+          document.querySelectorAll('#categoriaChecks input[type="checkbox"]:checked')
+        ).map(el => el.value);
 
-        if (yaEnCategoria && yaEnCategoria.length > 0) {
+        if (categorias.length === 0) {
           msgBox.className = 'msg error';
-          msgBox.textContent = `Ya estás inscripto en la categoría "${categoria}" para esta fecha. Elegí una categoría diferente.`;
+          msgBox.textContent = 'Por favor seleccioná al menos una categoría.';
           btn.disabled = false;
           btn.textContent = 'Enviar inscripción';
           return;
         }
-      } else {
-        // Inscripción nueva: el número debe ser único en todas las categorías
-        if (numero_vehiculo) {
-          const { data: vehiculoTomado } = await sb
+
+        for (const cat of categorias) {
+          const { data: existe } = await sb
             .from('inscripciones_picadas')
             .select('id')
             .eq('fecha_carrera', fecha_carrera)
-            .eq('numero_vehiculo', numero_vehiculo);
+            .eq('numero_vehiculo', numero_vehiculo)
+            .eq('categoria', cat);
 
-          if (vehiculoTomado && vehiculoTomado.length > 0) {
+          if (existe && existe.length > 0) {
             msgBox.className = 'msg error';
-            msgBox.textContent = `El número de vehículo ${numero_vehiculo} ya está registrado para esta fecha en alguna categoría. Cada número debe ser único sin importar la categoría.`;
+            msgBox.textContent = `El vehículo ${numero_vehiculo} ya está inscripto en "${cat}" para esta fecha.`;
             btn.disabled = false;
             btn.textContent = 'Enviar inscripción';
             return;
           }
         }
 
-        const { data: existentes } = await sb
-          .from('inscripciones_picadas')
-          .select('id')
-          .eq('fecha_carrera', fecha_carrera)
-          .ilike('nombre_piloto', nombre_piloto)
-          .eq('numero_vehiculo', numero_vehiculo);
+        btn.textContent = 'Enviando...';
 
-        if (existentes && existentes.length > 0) {
+        const rows = categorias.map(cat => ({
+          fecha_carrera,
+          nombre_dueno,
+          numero_vehiculo,
+          celular,
+          categoria: cat,
+          reinscripcion: true,
+        }));
+
+        const { error } = await sb.from('inscripciones_picadas').insert(rows);
+
+        if (error) {
           msgBox.className = 'msg error';
-          msgBox.textContent = 'Ya existe una inscripción con ese piloto y número de vehículo para esta fecha.';
+          msgBox.textContent = 'Hubo un error al enviar. Por favor intentá nuevamente.';
+          console.error(error);
+        } else {
+          const n = categorias.length;
+          msgBox.className = 'msg success';
+          msgBox.textContent = `¡Reinscripción enviada en ${n} categoría${n > 1 ? 's' : ''}! Éxitos y nos vemos el fin de semana.`;
+          resetForm(e.target);
+        }
+
+      } else {
+        const categoria = document.getElementById('categoria').value;
+        if (!categoria) {
+          msgBox.className = 'msg error';
+          msgBox.textContent = 'Por favor seleccioná una categoría.';
           btn.disabled = false;
           btn.textContent = 'Enviar inscripción';
           return;
         }
-      }
 
-      btn.textContent = 'Enviando...';
+        const { data: vehiculoTomado } = await sb
+          .from('inscripciones_picadas')
+          .select('id')
+          .eq('fecha_carrera', fecha_carrera)
+          .eq('numero_vehiculo', numero_vehiculo)
+          .eq('reinscripcion', false);
 
-      const payload = {
-        fecha_carrera,
-        nombre_dueno: document.getElementById('nombre_dueno').value.trim() || null,
-        nombre_piloto,
-        cedula: document.getElementById('cedula').value.trim() || null,
-        celular: document.getElementById('celular').value.trim() || null,
-        fecha_nacimiento: document.getElementById('fecha_nacimiento').value || null,
-        categoria,
-        numero_vehiculo,
-        reinscripcion,
-      };
+        if (vehiculoTomado && vehiculoTomado.length > 0) {
+          msgBox.className = 'msg error';
+          msgBox.textContent = `El número de vehículo ${numero_vehiculo} ya está registrado para esta fecha.`;
+          btn.disabled = false;
+          btn.textContent = 'Enviar inscripción';
+          return;
+        }
 
-      const { error } = await sb.from('inscripciones_picadas').insert([payload]);
+        btn.textContent = 'Enviando...';
 
-      if (error) {
-        msgBox.className = 'msg error';
-        msgBox.textContent = 'Hubo un error al enviar. Por favor intentá nuevamente.';
-        console.error(error);
-      } else {
-        msgBox.className = 'msg success';
-        msgBox.textContent = '¡Inscripción enviada! Éxitos y nos vemos el fin de semana.';
-        e.target.reset();
-        document.getElementById('categoria').value = '';
-        document.querySelectorAll('#reinscripcion_group .radio-item').forEach(el => el.classList.remove('checked'));
-        document.querySelector('#reinscripcion_group .radio-item').classList.add('checked');
-        document.querySelector('#reinscripcion_group input[value="false"]').checked = true;
+        const { error } = await sb.from('inscripciones_picadas').insert([{
+          fecha_carrera,
+          nombre_dueno,
+          numero_vehiculo,
+          celular,
+          categoria,
+          reinscripcion: false,
+        }]);
+
+        if (error) {
+          msgBox.className = 'msg error';
+          msgBox.textContent = 'Hubo un error al enviar. Por favor intentá nuevamente.';
+          console.error(error);
+        } else {
+          msgBox.className = 'msg success';
+          msgBox.textContent = '¡Inscripción enviada! Éxitos y nos vemos el fin de semana.';
+          resetForm(e.target);
+        }
       }
 
       btn.disabled = false;
