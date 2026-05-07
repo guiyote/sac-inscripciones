@@ -1,4 +1,4 @@
--- Ubicación "Averiados / Descarte" para repuestos que no sirven.
+-- Ubicación "Defectuoso" para repuestos que no sirven.
 -- El stock en esta ubicación no se cuenta como stock disponible.
 
 ALTER TABLE stock_ubicaciones
@@ -6,9 +6,9 @@ ALTER TABLE stock_ubicaciones
 
 -- Crear la ubicación averiados (solo si no existe ya)
 INSERT INTO stock_ubicaciones (nombre, es_descarte)
-SELECT 'Averiados / Descarte', true
+SELECT 'Defectuoso', true
 WHERE NOT EXISTS (
-  SELECT 1 FROM stock_ubicaciones WHERE nombre = 'Averiados / Descarte'
+  SELECT 1 FROM stock_ubicaciones WHERE nombre = 'Defectuoso'
 );
 
 -- Inicializar filas en stock_por_ubicacion para todos los artículos
