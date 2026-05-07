@@ -52,6 +52,7 @@
     /* Cards de stock */
     .stock-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
     .stock-card { background: var(--gris-medio); border: 1px solid var(--borde); border-top: 3px solid var(--rojo); border-radius: 2px; padding: 1.25rem 1.5rem; }
+    .stock-card.bien { border-top-color: var(--verde); }
     .stock-card.bajo { border-top-color: var(--amarillo); }
     .stock-card.sin-stock { border-top-color: var(--rojo); opacity: 0.7; }
     .stock-card .art-nombre { font-family: 'Barlow Condensed', sans-serif; font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.25rem; }
@@ -536,9 +537,9 @@
     montoEditadoManualmente = false;
     // Cargar stock por ubicación para este artículo
     const { data } = await sb.from('stock_por_ubicacion')
-      .select('*, stock_ubicaciones(nombre)')
+      .select('*, stock_ubicaciones(nombre, es_descarte)')
       .eq('articulo_id', artId);
-    stockPorUbicacion = data || [];
+    stockPorUbicacion = (data || []).filter(s => !s.stock_ubicaciones.es_descarte);
     // Actualizar opciones con stock disponible
     const sel = document.getElementById('salidaUbicacion');
     sel.innerHTML = '<option value="">Seleccioná...</option>';
@@ -820,27 +821,33 @@
 
     // Cargar stock por ubicación para todas las cards
     const { data: stockUbData } = await sb.from('stock_por_ubicacion')
-      .select('*, stock_ubicaciones(nombre)')
+      .select('*, stock_ubicaciones(nombre, es_descarte)')
       .order('stock_ubicaciones(nombre)');
 
     cards.innerHTML = articulos.map(a => {
-      const bajo = a.stock_actual > 0 && a.stock_actual <= 3;
-      const sinStock = a.stock_actual === 0;
-      const colorClass = sinStock ? 'rojo' : bajo ? 'amarillo' : 'verde';
-      const cardClass = sinStock ? 'sin-stock' : bajo ? 'bajo' : '';
       const stockUbs = (stockUbData || []).filter(s => s.articulo_id === a.id);
-      const desglose = stockUbs.map(s =>
+      const realStock = stockUbs.filter(s => !s.stock_ubicaciones.es_descarte).reduce((sum, s) => sum + s.stock_actual, 0);
+      const descarteStock = stockUbs.filter(s => s.stock_ubicaciones.es_descarte).reduce((sum, s) => sum + s.stock_actual, 0);
+      const colorClass = realStock < 4 ? 'rojo' : realStock <= 6 ? 'amarillo' : 'verde';
+      const cardClass = realStock < 4 ? 'sin-stock' : realStock <= 6 ? 'bajo' : 'bien';
+      const desglose = stockUbs.filter(s => !s.stock_ubicaciones.es_descarte).map(s =>
         `<div style="display:flex;justify-content:space-between;font-size:0.78rem;color:${s.stock_actual === 0 ? 'var(--texto-muted)' : 'var(--blanco)'};margin-top:0.2rem">
           <span>${s.stock_ubicaciones.nombre}</span>
           <span style="font-weight:600">${s.stock_actual}</span>
         </div>`
       ).join('');
+      const descarteRow = descarteStock > 0
+        ? `<div style="display:flex;justify-content:space-between;font-size:0.78rem;color:#f87171;margin-top:0.2rem">
+            <span>⚠ Averiados</span>
+            <span style="font-weight:600">${descarteStock}</span>
+          </div>`
+        : '';
       return `<div class="stock-card ${cardClass}">
         <div class="art-nombre">${a.nombre}</div>
         <div class="art-precio">U$S ${a.precio_usd} c/u</div>
-        <div class="art-cantidad ${colorClass}">${a.stock_actual}</div>
-        <div class="art-label">total en stock</div>
-        ${desglose ? `<div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--borde)">${desglose}</div>` : ''}
+        <div class="art-cantidad ${colorClass}">${realStock}</div>
+        <div class="art-label">disponible en stock</div>
+        ${(desglose || descarteRow) ? `<div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--borde)">${desglose}${descarteRow}</div>` : ''}
         ${esAdmin ? `<div class="art-btns">
           <button class="btn-entrada" onclick="abrirEntrada('${a.id}','${a.nombre}')">+ Entrada</button>
           <button class="btn-salida" onclick="abrirSalida('${a.id}','${a.nombre}',${a.precio_usd})">− Salida</button>
@@ -914,7 +921,7 @@
     document.getElementById('transferenciaStockInfo').style.display = 'none';
 
     const { data } = await sb.from('stock_por_ubicacion')
-      .select('*, stock_ubicaciones(nombre)')
+      .select('*, stock_ubicaciones(nombre, es_descarte)')
       .eq('articulo_id', artId);
     stockPorUbicacion = data || [];
 
@@ -929,10 +936,13 @@
       optO.textContent = `${s.stock_ubicaciones.nombre} (${s.stock_actual} en stock)`;
       if (s.stock_actual === 0) optO.disabled = true;
       selOrigen.appendChild(optO);
+    });
 
+    // Destino: todas las ubicaciones, incluyendo Averiados
+    ubicaciones.forEach(u => {
       const optD = document.createElement('option');
-      optD.value = s.ubicacion_id;
-      optD.textContent = s.stock_ubicaciones.nombre;
+      optD.value = u.id;
+      optD.textContent = u.nombre;
       selDestino.appendChild(optD);
     });
 
@@ -969,7 +979,8 @@
     }
 
     const nombreOrigen = stockOrigen.stock_ubicaciones.nombre;
-    const nombreDestino = stockDestino.stock_ubicaciones.nombre;
+    const destinoUb = ubicaciones.find(u => u.id === destinoId);
+    const nombreDestino = destinoUb?.nombre || destinoId;
     const btn = document.getElementById('btnConfirmarTransferencia');
     btn.disabled = true; btn.textContent = 'Guardando...';
 
@@ -988,11 +999,21 @@
         .update({ stock_actual: stockOrigen.stock_actual - cantidad })
         .eq('articulo_id', modalCtx.artId)
         .eq('ubicacion_id', origenId);
-      // Sumar al destino
+      // Sumar al destino (upsert por si no existe la fila aún)
+      const destinoStockActual = stockPorUbicacion.find(s => s.ubicacion_id === destinoId)?.stock_actual || 0;
       await sb.from('stock_por_ubicacion')
-        .update({ stock_actual: (stockDestino?.stock_actual || 0) + cantidad })
-        .eq('articulo_id', modalCtx.artId)
-        .eq('ubicacion_id', destinoId);
+        .upsert({ articulo_id: modalCtx.artId, ubicacion_id: destinoId, stock_actual: destinoStockActual + cantidad },
+          { onConflict: 'articulo_id,ubicacion_id' });
+      // Si se mueve hacia/desde Averiados, ajustar el stock real del artículo
+      const origenEsDescarte = stockOrigen.stock_ubicaciones.es_descarte || false;
+      const destinoEsDescarte = destinoUb?.es_descarte || false;
+      if (destinoEsDescarte && !origenEsDescarte) {
+        const art = articulos.find(a => a.id === modalCtx.artId);
+        await sb.from('stock_articulos').update({ stock_actual: art.stock_actual - cantidad }).eq('id', modalCtx.artId);
+      } else if (origenEsDescarte && !destinoEsDescarte) {
+        const art = articulos.find(a => a.id === modalCtx.artId);
+        await sb.from('stock_articulos').update({ stock_actual: art.stock_actual + cantidad }).eq('id', modalCtx.artId);
+      }
       cerrarModal('modalTransferencia');
       cargarTodo();
     } else {
