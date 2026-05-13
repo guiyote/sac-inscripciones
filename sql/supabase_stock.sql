@@ -41,6 +41,13 @@ CREATE POLICY "auth_select_movimientos" ON stock_movimientos FOR SELECT TO authe
 CREATE POLICY "auth_insert_movimientos" ON stock_movimientos FOR INSERT TO authenticated WITH CHECK (true);
 CREATE POLICY "auth_update_movimientos" ON stock_movimientos FOR UPDATE TO authenticated USING (true);
 
+-- Grants (required for new projects after May 30 2026 / existing projects after Oct 30 2026)
+GRANT SELECT, UPDATE ON public.stock_articulos TO authenticated;
+GRANT ALL ON public.stock_articulos TO service_role;
+
+GRANT SELECT, INSERT, UPDATE ON public.stock_movimientos TO authenticated;
+GRANT ALL ON public.stock_movimientos TO service_role;
+
 -- Cargar los 4 artículos iniciales
 INSERT INTO stock_articulos (nombre, precio_usd, stock_actual) VALUES
   ('Pastillas', 120.00, 0),

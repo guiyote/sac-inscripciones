@@ -13,6 +13,10 @@ CREATE TABLE IF NOT EXISTS stock_ubicaciones (
 ALTER TABLE stock_ubicaciones ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "auth_select_ubicaciones" ON stock_ubicaciones FOR SELECT TO authenticated USING (true);
 
+-- Grants (required for new projects after May 30 2026 / existing projects after Oct 30 2026)
+GRANT SELECT ON public.stock_ubicaciones TO authenticated;
+GRANT ALL ON public.stock_ubicaciones TO service_role;
+
 -- Cargar las 3 ubicaciones
 INSERT INTO stock_ubicaciones (nombre) VALUES
   ('Todo Truck'),
@@ -33,6 +37,10 @@ ALTER TABLE stock_por_ubicacion ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "auth_select_stock_ub" ON stock_por_ubicacion FOR SELECT TO authenticated USING (true);
 CREATE POLICY "auth_insert_stock_ub" ON stock_por_ubicacion FOR INSERT TO authenticated WITH CHECK (true);
 CREATE POLICY "auth_update_stock_ub" ON stock_por_ubicacion FOR UPDATE TO authenticated USING (true);
+
+-- Grants
+GRANT SELECT, INSERT, UPDATE ON public.stock_por_ubicacion TO authenticated;
+GRANT ALL ON public.stock_por_ubicacion TO service_role;
 
 -- Agregar columna ubicacion_id a stock_movimientos
 ALTER TABLE stock_movimientos

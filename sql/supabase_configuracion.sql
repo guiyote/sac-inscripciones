@@ -17,3 +17,8 @@ CREATE POLICY "lectura_publica" ON configuracion
 -- Solo usuarios autenticados pueden actualizar
 CREATE POLICY "escritura_autenticados" ON configuracion
   FOR UPDATE USING (auth.role() = 'authenticated');
+
+-- Grants (required for new projects after May 30 2026 / existing projects after Oct 30 2026)
+GRANT SELECT ON public.configuracion TO anon;
+GRANT SELECT, UPDATE ON public.configuracion TO authenticated;
+GRANT ALL ON public.configuracion TO service_role;

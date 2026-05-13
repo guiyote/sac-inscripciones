@@ -37,3 +37,8 @@ create policy "autenticados pueden leer trackday"
 create policy "autenticados pueden actualizar trackday"
   on public.inscripciones_trackday for update
   to authenticated using (true);
+
+-- Grants (required for new projects after May 30 2026 / existing projects after Oct 30 2026)
+GRANT INSERT ON public.inscripciones_trackday TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.inscripciones_trackday TO authenticated;
+GRANT ALL ON public.inscripciones_trackday TO service_role;

@@ -15,6 +15,10 @@ ALTER TABLE user_roles ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "select_own_role" ON user_roles;
 CREATE POLICY "select_own_role" ON user_roles FOR SELECT TO authenticated USING (auth.uid() = user_id);
 
+-- Grants (required for new projects after May 30 2026 / existing projects after Oct 30 2026)
+GRANT SELECT ON public.user_roles TO authenticated;
+GRANT ALL ON public.user_roles TO service_role;
+
 -- Función que devuelve el rol del usuario actual
 CREATE OR REPLACE FUNCTION get_my_role()
 RETURNS TEXT AS $$

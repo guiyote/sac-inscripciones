@@ -73,3 +73,16 @@ CREATE POLICY "select_auth_turismo" ON inscripciones_turismo
 
 CREATE POLICY "select_auth_regularidad" ON inscripciones_regularidad
   FOR SELECT TO authenticated USING (true);
+
+-- Grants (required for new projects after May 30 2026 / existing projects after Oct 30 2026)
+GRANT INSERT ON public.inscripciones_karting TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.inscripciones_karting TO authenticated;
+GRANT ALL ON public.inscripciones_karting TO service_role;
+
+GRANT INSERT ON public.inscripciones_turismo TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.inscripciones_turismo TO authenticated;
+GRANT ALL ON public.inscripciones_turismo TO service_role;
+
+GRANT INSERT ON public.inscripciones_regularidad TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.inscripciones_regularidad TO authenticated;
+GRANT ALL ON public.inscripciones_regularidad TO service_role;

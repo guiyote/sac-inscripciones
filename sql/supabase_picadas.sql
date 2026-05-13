@@ -34,6 +34,11 @@ CREATE POLICY "select_auth_picadas" ON inscripciones_picadas
 CREATE POLICY "update_auth_picadas" ON inscripciones_picadas
   FOR UPDATE TO authenticated USING (true);
 
+-- Grants (required for new projects after May 30 2026 / existing projects after Oct 30 2026)
+GRANT INSERT ON public.inscripciones_picadas TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.inscripciones_picadas TO authenticated;
+GRANT ALL ON public.inscripciones_picadas TO service_role;
+
 -- Agregar clave de configuración para habilitar/deshabilitar inscripciones
 INSERT INTO configuracion (clave, valor)
 VALUES ('inscripciones_picadas', 'true')
