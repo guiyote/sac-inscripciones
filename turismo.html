@@ -170,7 +170,7 @@
           <label>Seleccioná tu categoría <span class="req">*</span></label>
           <div class="radio-group" id="cat_group">
             <label class="radio-item" onclick="toggleRadio(this, 'cat_group')">
-              <input type="radio" name="categoria" value="TNS">
+              <input type="radio" name="categoria" value="TNS" checked>
               <span class="radio-label">
                 TNS
                 <span class="radio-sub">Turismo N SAC</span>
@@ -382,28 +382,30 @@
     });
   </script>
   <script>
-    // Selección dinámica de fecha según mes actual
+    // Selección dinámica de fecha — disponible 30 días antes de la carrera
     (function() {
-      const mesActual = new Date().getMonth() + 1;
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      const limite = new Date(hoy);
+      limite.setDate(limite.getDate() + 30);
       const select = document.getElementById('fecha_carrera');
-      let encontrada = false;
+      let primeraHabilitada = null;
       Array.from(select.options).forEach(opt => {
-        const mes = parseInt(opt.getAttribute('data-mes'));
-        if (mes) {
-          if (mes === mesActual) {
-            opt.selected = true;
-            opt.disabled = false;
-            encontrada = true;
-          } else {
-            opt.disabled = true;
-            opt.style.color = '#555';
-          }
+        if (!opt.value) return;
+        const fecha = new Date(opt.value + 'T00:00:00');
+        if (fecha >= hoy && fecha <= limite) {
+          opt.disabled = false;
+          if (!primeraHabilitada) primeraHabilitada = opt;
+        } else {
+          opt.disabled = true;
+          opt.style.color = '#555';
         }
       });
-      // Si no hay fecha este mes, mostrar mensaje
-      if (!encontrada) {
+      if (primeraHabilitada) {
+        primeraHabilitada.selected = true;
+      } else {
         const placeholder = select.options[0];
-        placeholder.textContent = 'Sin fecha este mes';
+        placeholder.textContent = 'Sin fecha próxima';
         placeholder.selected = true;
         select.disabled = true;
         document.getElementById('submitBtn').disabled = true;
