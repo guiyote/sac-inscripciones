@@ -133,7 +133,7 @@
     <div class="costo-info">
       <div class="costo-info-title">Inscripción</div>
       <div class="costo-row"><span>TNS</span><strong>$8.000</strong></div>
-      <div class="costo-row"><span>TMZ</span><strong>$6.000</strong></div>
+      <div class="costo-row" style="opacity:0.4;text-decoration:line-through;"><span>TMZ</span><strong>$6.000</strong></div>
       <div class="costo-note">Incluye transponder</div>
       <hr class="costo-divider">
       <div class="costo-info-title" style="margin-top:0.25rem">Materiales del club</div>
@@ -176,11 +176,11 @@
                 <span class="radio-sub">Turismo N SAC</span>
               </span>
             </label>
-            <label class="radio-item" onclick="toggleRadio(this, 'cat_group')">
-              <input type="radio" name="categoria" value="TMZ">
+            <label class="radio-item" style="opacity:0.4;cursor:not-allowed;pointer-events:none;">
+              <input type="radio" name="categoria" value="TMZ" disabled>
               <span class="radio-label">
                 TMZ
-                <span class="radio-sub">Turismo Multimarca SAC</span>
+                <span class="radio-sub">Turismo Multimarca SAC — suspendido</span>
               </span>
             </label>
           </div>
