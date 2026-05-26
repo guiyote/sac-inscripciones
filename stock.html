@@ -488,12 +488,29 @@
     document.getElementById('btnLogout').style.display = 'none';
   });
 
+  function setDefaultFechas() {
+    const FECHAS_CAMP = ['2026-04-26','2026-06-14','2026-07-12','2026-08-16','2026-09-13','2026-10-18','2026-11-29'];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let closest = null, minDiff = Infinity;
+    FECHAS_CAMP.forEach(f => {
+      const diff = Math.abs(new Date(f) - today);
+      if (diff < minDiff) { minDiff = diff; closest = f; }
+    });
+    if (!closest) return;
+    ['filtroResumenFecha','filtroPedidoFecha','filtroHistorialFecha'].forEach(id => {
+      const sel = document.getElementById(id);
+      if (sel && !sel.value) sel.value = closest;
+    });
+  }
+
   async function showPanel() {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('stockPanel').style.display = 'block';
     document.getElementById('btnLogout').style.display = 'inline-block';
     const { data: rol } = await sb.rpc('get_my_role');
     esAdmin = rol === 'admin';
+    setDefaultFechas();
     await cargarUbicaciones();
     await cargarTodo();
   }

@@ -618,12 +618,26 @@
   });
   let esAdmin = false;
 
+  function setDefaultFecha() {
+    const sel = document.getElementById('filtroFecha');
+    if (sel.value) return;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let closest = null, minDiff = Infinity;
+    Object.keys(TODAS_FECHAS).forEach(f => {
+      const diff = Math.abs(new Date(f) - today);
+      if (diff < minDiff) { minDiff = diff; closest = f; }
+    });
+    if (closest) sel.value = closest;
+  }
+
   async function showPanel() {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('adminPanel').style.display = 'block';
     document.getElementById('btnLogout').style.display = 'inline-block';
     const { data: rol } = await sb.rpc('get_my_role');
     esAdmin = rol === 'admin';
+    setDefaultFecha();
     cargarDatos();
   }
 
