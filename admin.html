@@ -624,7 +624,7 @@
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     let closest = null, minDiff = Infinity;
-    Object.keys(TODAS_FECHAS).forEach(f => {
+    Object.keys(FECHAS).forEach(f => {
       const diff = Math.abs(new Date(f) - today);
       if (diff < minDiff) { minDiff = diff; closest = f; }
     });
