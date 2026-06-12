@@ -360,6 +360,7 @@
       <div class="summary-card s-verde"><div class="num verde" id="sumPagadas">—</div><div class="lbl">Pagadas</div></div>
       <div class="summary-card s-verde"><div class="num verde" id="sumRecaudado">—</div><div class="lbl">Recaudado U$S</div></div>
       <div class="summary-card s-amarillo"><div class="num amarillo" id="sumPendiente">—</div><div class="lbl">Pendiente U$S</div></div>
+      <div class="summary-card"><div class="num" id="sumTotal">—</div><div class="lbl">Total U$S</div></div>
     </div>
     <div class="table-wrap">
       <table>
@@ -872,6 +873,8 @@
     document.getElementById('sumPagadas').textContent = pagadas.length || '—';
     document.getElementById('sumRecaudado').textContent = recaudado ? `U$S ${recaudado.toFixed(2)}` : '—';
     document.getElementById('sumPendiente').textContent = pendiente ? `U$S ${pendiente.toFixed(2)}` : '—';
+    const total = recaudado + pendiente;
+    document.getElementById('sumTotal').textContent = total ? `U$S ${total.toFixed(2)}` : '—';
 
     const porArt = {};
     salidas.forEach(m => {
