@@ -817,7 +817,8 @@
       tipo: 'devolucion',
       cantidad,
       piloto: modalCtx.piloto,
-      notas: notas || `Devolución de salida`,
+      origen_id: modalCtx.movId,
+      notas: notas || null,
     }]);
 
     if (!errMov) {
@@ -1008,7 +1009,7 @@
     const filtroFecha = document.getElementById('filtroHistorialFecha').value;
 
     let q = sb.from('stock_movimientos')
-      .select('*, stock_articulos(nombre), stock_ubicaciones(nombre)')
+      .select('*, origen_id, stock_articulos(nombre), stock_ubicaciones(nombre)')
       .order('created_at', { ascending: false });
 
     if (filtroArt) q = q.eq('articulo_id', filtroArt);
@@ -1035,6 +1036,7 @@
     }
 
     movimientosCache = movs;
+    const salidasDevueltas = new Set(movs.filter(m => m.tipo === 'devolucion' && m.origen_id).map(m => m.origen_id));
     tbody.innerHTML = movs.map(m => {
       const esSalida = m.tipo === 'salida';
       const esTransferencia = m.tipo === 'transferencia';
@@ -1043,8 +1045,9 @@
       const badgeLabel = esTransferencia ? 'Traslado' : esSalida ? 'Salida' : esDevolucion ? 'Devolución' : 'Entrada';
       const accionBtns = [];
       if (esAdmin && esSalida) {
-        if (!m.pago_confirmado) accionBtns.push(`<button class="btn-pago-mov" onclick="abrirPagoMov('${m.id}','${m.piloto}')">Pago</button>`);
-        accionBtns.push(`<button class="btn-devolucion" onclick="abrirDevolucion('${m.id}')">Devolver</button>`);
+        const devuelta = salidasDevueltas.has(m.id);
+        if (!devuelta && !m.pago_confirmado) accionBtns.push(`<button class="btn-pago-mov" onclick="abrirPagoMov('${m.id}','${m.piloto}')">Pago</button>`);
+        if (!devuelta) accionBtns.push(`<button class="btn-devolucion" onclick="abrirDevolucion('${m.id}')">Devolver</button>`);
       }
       return `<tr>
         <td>${fmtDate(m.created_at)}</td>
