@@ -105,6 +105,11 @@
 
     .btn-pago-mov { border: none; border-radius: 2px; padding: 0.25rem 0.5rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; background: rgba(22,163,74,0.2); color: #4ade80; border: 1px solid rgba(22,163,74,0.4); }
     .btn-pago-mov:hover { background: rgba(22,163,74,0.35); }
+    .btn-devolucion { border-radius: 2px; padding: 0.25rem 0.5rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; background: rgba(202,138,4,0.2); color: #fde047; border: 1px solid rgba(202,138,4,0.4); }
+    .btn-devolucion:hover { background: rgba(202,138,4,0.35); }
+    .btn-ok-amarillo { background: var(--amarillo); color: var(--blanco); }
+    .btn-ok-amarillo:hover { background: #a16207; }
+    .badge-devolucion { background: rgba(202,138,4,0.15); color: #fde047; border: 1px solid rgba(202,138,4,0.3); }
 
     .empty { padding: 2rem; text-align: center; color: var(--texto-muted); font-size: 0.9rem; }
 
@@ -296,6 +301,27 @@
   </div>
 </div>
 
+<!-- MODAL DEVOLUCIÓN -->
+<div class="modal-overlay" id="modalDevolucion">
+  <div class="modal" style="border-top:4px solid var(--amarillo)">
+    <h3>Devolución de stock</h3>
+    <p class="modal-sub" id="modalDevolucionNombre"></p>
+    <div id="devolucionPagoAviso" style="display:none;background:rgba(202,138,4,0.12);border:1px solid rgba(202,138,4,0.35);border-radius:3px;padding:0.75rem 1rem;margin-bottom:0.25rem;font-size:0.85rem;color:#fde047;line-height:1.5"></div>
+    <label>Vuelve a la ubicación <span style="color:var(--rojo)">*</span></label>
+    <select id="devolucionUbicacion">
+      <option value="">Seleccioná...</option>
+    </select>
+    <label>Cantidad a devolver</label>
+    <input type="number" id="devolucionCantidad" min="1" placeholder="0">
+    <label>Notas <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+    <textarea id="devolucionNotas" placeholder="Estado del artículo, motivo de devolución..."></textarea>
+    <div class="modal-btns">
+      <button class="btn-cancelar" onclick="cerrarModal('modalDevolucion')">Cancelar</button>
+      <button class="btn-ok-amarillo" id="btnConfirmarDevolucion">Confirmar devolución</button>
+    </div>
+  </div>
+</div>
+
 <!-- PANEL -->
 <div id="stockPanel">
   <div class="panel-header">
@@ -333,11 +359,12 @@
       <div class="summary-card"><div class="num" id="sumTotalSalidas">—</div><div class="lbl">Total salidas</div></div>
       <div class="summary-card s-verde"><div class="num verde" id="sumPagadas">—</div><div class="lbl">Pagadas</div></div>
       <div class="summary-card s-verde"><div class="num verde" id="sumRecaudado">—</div><div class="lbl">Recaudado U$S</div></div>
+      <div class="summary-card s-amarillo"><div class="num amarillo" id="sumPendiente">—</div><div class="lbl">Pendiente U$S</div></div>
     </div>
     <div class="table-wrap">
       <table>
         <thead><tr>
-          <th>Artículo</th><th>Salidas</th><th>Pagadas</th><th>Recaudado (U$S)</th>
+          <th>Artículo</th><th>Salidas</th><th>Pagadas</th><th>Recaudado (U$S)</th><th>Pendiente (U$S)</th>
         </tr></thead>
         <tbody id="tbodyResumenArt"><tr><td colspan="4" class="empty">Cargando...</td></tr></tbody>
       </table>
@@ -407,6 +434,7 @@
           <option value="entrada">Solo entradas</option>
           <option value="salida">Solo salidas</option>
           <option value="transferencia">Solo traslados</option>
+          <option value="devolucion">Solo devoluciones</option>
         </select>
       </div>
       <div class="filter-group">
@@ -460,6 +488,7 @@
   let articulos = [];
   let ubicaciones = [];
   let stockPorUbicacion = [];
+  let movimientosCache = [];
   let modalCtx = null;
   let esAdmin = false;
 
@@ -728,6 +757,91 @@
     else alert('Error al guardar.');
   });
 
+  // DEVOLUCIÓN
+  function abrirDevolucion(movId) {
+    const mov = movimientosCache.find(m => m.id === movId);
+    if (!mov) return;
+    modalCtx = {
+      movId,
+      artId: mov.articulo_id,
+      artNombre: mov.stock_articulos?.nombre,
+      piloto: mov.piloto,
+      cantidadOriginal: mov.cantidad,
+      pagoConfirmado: mov.pago_confirmado,
+      pagoMonto: mov.pago_monto,
+      ubicacionOriginal: mov.ubicacion_id,
+    };
+    document.getElementById('modalDevolucionNombre').textContent = `${mov.stock_articulos?.nombre} — ${mov.piloto}`;
+    const aviso = document.getElementById('devolucionPagoAviso');
+    if (mov.pago_confirmado && mov.pago_monto) {
+      aviso.style.display = 'block';
+      aviso.textContent = `⚠ El piloto pagó U$S ${Number(mov.pago_monto).toFixed(2)} por esta salida. Recordá gestionar el reembolso si corresponde.`;
+    } else if (mov.pago_confirmado) {
+      aviso.style.display = 'block';
+      aviso.textContent = `⚠ Esta salida ya fue marcada como pagada. Recordá gestionar el reembolso si corresponde.`;
+    } else {
+      aviso.style.display = 'none';
+    }
+    // Poblar ubicaciones (excluir descarte)
+    const sel = document.getElementById('devolucionUbicacion');
+    sel.innerHTML = '<option value="">Seleccioná...</option>';
+    ubicaciones.filter(u => !u.es_descarte).forEach(u => {
+      const opt = document.createElement('option');
+      opt.value = u.id;
+      opt.textContent = u.nombre;
+      if (u.id === mov.ubicacion_id) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    document.getElementById('devolucionCantidad').value = mov.cantidad;
+    document.getElementById('devolucionNotas').value = '';
+    document.getElementById('modalDevolucion').classList.add('open');
+  }
+
+  document.getElementById('btnConfirmarDevolucion').addEventListener('click', async () => {
+    if (!modalCtx) return;
+    const ubicacionId = document.getElementById('devolucionUbicacion').value;
+    if (!ubicacionId) { alert('Seleccioná una ubicación.'); return; }
+    const cantidad = parseInt(document.getElementById('devolucionCantidad').value);
+    if (!cantidad || cantidad < 1) { alert('Ingresá una cantidad válida.'); return; }
+    if (cantidad > modalCtx.cantidadOriginal) {
+      alert(`No podés devolver más de ${modalCtx.cantidadOriginal} (cantidad original de la salida).`);
+      return;
+    }
+    const btn = document.getElementById('btnConfirmarDevolucion');
+    btn.disabled = true; btn.textContent = 'Guardando...';
+
+    const notas = document.getElementById('devolucionNotas').value.trim();
+    const { error: errMov } = await sb.from('stock_movimientos').insert([{
+      articulo_id: modalCtx.artId,
+      ubicacion_id: ubicacionId,
+      tipo: 'devolucion',
+      cantidad,
+      piloto: modalCtx.piloto,
+      notas: notas || `Devolución de salida`,
+    }]);
+
+    if (!errMov) {
+      // Sumar al stock_por_ubicacion (upsert por si no existe la fila)
+      const { data: existing } = await sb.from('stock_por_ubicacion')
+        .select('stock_actual')
+        .eq('articulo_id', modalCtx.artId)
+        .eq('ubicacion_id', ubicacionId)
+        .single();
+      const nuevoStock = (existing?.stock_actual || 0) + cantidad;
+      await sb.from('stock_por_ubicacion')
+        .upsert({ articulo_id: modalCtx.artId, ubicacion_id: ubicacionId, stock_actual: nuevoStock },
+          { onConflict: 'articulo_id,ubicacion_id' });
+      // Actualizar stock total del artículo
+      const art = articulos.find(a => a.id === modalCtx.artId);
+      if (art) await sb.from('stock_articulos').update({ stock_actual: art.stock_actual + cantidad }).eq('id', modalCtx.artId);
+      cerrarModal('modalDevolucion');
+      cargarTodo();
+    } else {
+      alert('Error al guardar. Intentá nuevamente.');
+    }
+    btn.disabled = false; btn.textContent = 'Confirmar devolución';
+  });
+
   // DATOS
   async function cargarTodo() {
     await cargarArticulos();
@@ -741,7 +855,7 @@
   async function cargarResumenPagos() {
     const filtroFecha = document.getElementById('filtroResumenFecha').value;
     let q = sb.from('stock_movimientos')
-      .select('tipo, pago_confirmado, pago_monto, stock_articulos(nombre)')
+      .select('tipo, pago_confirmado, pago_monto, cantidad, stock_articulos(nombre, precio_usd)')
       .eq('tipo', 'salida');
     if (filtroFecha === 'sin-fecha') q = q.is('fecha_carrera', null);
     else if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
@@ -750,26 +864,32 @@
     const salidas = movs || [];
     const pagadas = salidas.filter(m => m.pago_confirmado);
     const recaudado = pagadas.reduce((s, m) => s + (parseFloat(m.pago_monto) || 0), 0);
+    const pendiente = salidas.filter(m => !m.pago_confirmado)
+      .reduce((s, m) => s + ((m.stock_articulos?.precio_usd || 0) * (m.cantidad || 0)), 0);
 
     document.getElementById('sumTotalSalidas').textContent = salidas.length || '—';
     document.getElementById('sumPagadas').textContent = pagadas.length || '—';
     document.getElementById('sumRecaudado').textContent = recaudado ? `U$S ${recaudado.toFixed(2)}` : '—';
+    document.getElementById('sumPendiente').textContent = pendiente ? `U$S ${pendiente.toFixed(2)}` : '—';
 
     const porArt = {};
     salidas.forEach(m => {
       const nombre = m.stock_articulos?.nombre || 'Desconocido';
-      if (!porArt[nombre]) porArt[nombre] = { salidas: 0, pagadas: 0, recaudado: 0 };
+      const precio = m.stock_articulos?.precio_usd || 0;
+      if (!porArt[nombre]) porArt[nombre] = { salidas: 0, pagadas: 0, recaudado: 0, pendiente: 0 };
       porArt[nombre].salidas++;
       if (m.pago_confirmado) {
         porArt[nombre].pagadas++;
         porArt[nombre].recaudado += parseFloat(m.pago_monto) || 0;
+      } else {
+        porArt[nombre].pendiente += precio * (m.cantidad || 0);
       }
     });
 
     const tbody = document.getElementById('tbodyResumenArt');
     const rows = Object.entries(porArt).sort((a, b) => a[0].localeCompare(b[0]));
     if (rows.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="4" class="empty">Sin ventas registradas</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" class="empty">Sin ventas registradas</td></tr>';
       return;
     }
     tbody.innerHTML = rows.map(([nombre, d]) => `<tr>
@@ -777,6 +897,7 @@
       <td>${d.salidas}</td>
       <td>${d.pagadas || '—'}</td>
       <td>${d.recaudado ? `U$S ${d.recaudado.toFixed(2)}` : '—'}</td>
+      <td style="color:${d.pendiente ? '#fde047' : 'inherit'}">${d.pendiente ? `U$S ${d.pendiente.toFixed(2)}` : '—'}</td>
     </tr>`).join('');
   }
 
@@ -913,23 +1034,32 @@
       return;
     }
 
+    movimientosCache = movs;
     tbody.innerHTML = movs.map(m => {
       const esSalida = m.tipo === 'salida';
       const esTransferencia = m.tipo === 'transferencia';
+      const esDevolucion = m.tipo === 'devolucion';
+      const badgeClass = esTransferencia ? 'badge-transferencia' : esSalida ? 'badge-salida' : esDevolucion ? 'badge-devolucion' : 'badge-entrada';
+      const badgeLabel = esTransferencia ? 'Traslado' : esSalida ? 'Salida' : esDevolucion ? 'Devolución' : 'Entrada';
+      const accionBtns = [];
+      if (esAdmin && esSalida) {
+        if (!m.pago_confirmado) accionBtns.push(`<button class="btn-pago-mov" onclick="abrirPagoMov('${m.id}','${m.piloto}')">Pago</button>`);
+        accionBtns.push(`<button class="btn-devolucion" onclick="abrirDevolucion('${m.id}')">Devolver</button>`);
+      }
       return `<tr>
         <td>${fmtDate(m.created_at)}</td>
         <td>${m.stock_articulos?.nombre || '—'}</td>
-        <td><span class="badge ${m.tipo === 'transferencia' ? 'badge-transferencia' : esSalida ? 'badge-salida' : 'badge-entrada'}">${m.tipo === 'transferencia' ? 'Traslado' : esSalida ? 'Salida' : 'Entrada'}</span></td>
+        <td><span class="badge ${badgeClass}">${badgeLabel}</span></td>
         <td>${m.stock_ubicaciones?.nombre || '—'}</td>
         <td>${m.cantidad}</td>
-        <td>${esTransferencia ? '—' : esSalida ? val(m.piloto) : val(m.proveedor)}</td>
+        <td>${esTransferencia ? '—' : (esSalida || esDevolucion) ? val(m.piloto) : val(m.proveedor)}</td>
         <td>${m.fecha_carrera ? FECHAS_HIST[m.fecha_carrera] || m.fecha_carrera : '—'}</td>
-        <td>${esSalida && !esTransferencia ? `<span class="badge ${m.pago_confirmado ? 'badge-pagado' : 'badge-pendiente'}">${m.pago_confirmado ? 'Pagado' : 'Pendiente'}</span>` : '—'}</td>
+        <td>${esSalida ? `<span class="badge ${m.pago_confirmado ? 'badge-pagado' : 'badge-pendiente'}">${m.pago_confirmado ? 'Pagado' : 'Pendiente'}</span>` : '—'}</td>
         <td>${m.pago_monto != null ? `U$S ${Number(m.pago_monto).toFixed(2)}` : '—'}</td>
         <td>${capFirst(m.pago_medio)}</td>
         <td>${fmtDateSimple(m.pago_fecha)}</td>
         <td>${val(m.notas)}</td>
-        <td>${esAdmin && esSalida && !m.pago_confirmado && m.tipo !== 'transferencia' ? `<button class="btn-pago-mov" onclick="abrirPagoMov('${m.id}','${m.piloto}')">Pago</button>` : '—'}</td>
+        <td style="white-space:nowrap">${accionBtns.length ? accionBtns.join(' ') : '—'}</td>
       </tr>`;
     }).join('');
   }
