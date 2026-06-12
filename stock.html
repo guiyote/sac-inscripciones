@@ -107,6 +107,8 @@
     .btn-pago-mov:hover { background: rgba(22,163,74,0.35); }
     .btn-devolucion { border-radius: 2px; padding: 0.25rem 0.5rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; background: rgba(202,138,4,0.2); color: #fde047; border: 1px solid rgba(202,138,4,0.4); }
     .btn-devolucion:hover { background: rgba(202,138,4,0.35); }
+    .btn-editar-mov { border-radius: 2px; padding: 0.25rem 0.5rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; background: rgba(99,102,241,0.2); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.4); }
+    .btn-editar-mov:hover { background: rgba(99,102,241,0.35); }
     .btn-ok-amarillo { background: var(--amarillo); color: var(--blanco); }
     .btn-ok-amarillo:hover { background: #a16207; }
     .badge-devolucion { background: rgba(202,138,4,0.15); color: #fde047; border: 1px solid rgba(202,138,4,0.3); }
@@ -318,6 +320,42 @@
     <div class="modal-btns">
       <button class="btn-cancelar" onclick="cerrarModal('modalDevolucion')">Cancelar</button>
       <button class="btn-ok-amarillo" id="btnConfirmarDevolucion">Confirmar devolución</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR MOVIMIENTO -->
+<div class="modal-overlay" id="modalEditarMov">
+  <div class="modal" style="border-top:4px solid #6366f1">
+    <h3>Editar movimiento</h3>
+    <p class="modal-sub" id="modalEditarMovSub"></p>
+    <div id="editarPilotoRow">
+      <label id="editarPilotoLabel">Piloto</label>
+      <input type="text" id="editarPiloto" placeholder="Nombre">
+    </div>
+    <div id="editarFechaCarreraRow">
+      <label>Fecha de carrera</label>
+      <select id="editarFechaCarrera">
+        <option value="">Sin asignar</option>
+        <option value="2026-04-26">1º — 25/26 Abril</option>
+        <option value="2026-06-14">2º — 13/14 Junio</option>
+        <option value="2026-07-12">3º — 11/12 Julio</option>
+        <option value="2026-08-16">4º — 15/16 Agosto</option>
+        <option value="2026-09-13">5º — 12/13 Setiembre</option>
+        <option value="2026-10-18">6º — 17/18 Octubre</option>
+        <option value="2026-11-29">7º — 28/29 Noviembre</option>
+      </select>
+    </div>
+    <div id="editarCantidadRow">
+      <label>Cantidad</label>
+      <input type="number" id="editarCantidad" min="1" placeholder="0">
+      <div id="editarCantidadAviso" style="display:none;margin-top:0.4rem;font-size:0.8rem;color:#fde047">Cambiar la cantidad ajusta el stock automáticamente.</div>
+    </div>
+    <label>Notas <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+    <textarea id="editarNotas" placeholder="Observaciones..."></textarea>
+    <div class="modal-btns">
+      <button class="btn-cancelar" onclick="cerrarModal('modalEditarMov')">Cancelar</button>
+      <button id="btnConfirmarEditar" style="flex:1;padding:0.75rem;border:none;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;background:#6366f1;color:var(--blanco);transition:background 0.15s">Guardar cambios</button>
     </div>
   </div>
 </div>
@@ -1047,10 +1085,13 @@
       const badgeClass = esTransferencia ? 'badge-transferencia' : esSalida ? 'badge-salida' : esDevolucion ? 'badge-devolucion' : 'badge-entrada';
       const badgeLabel = esTransferencia ? 'Traslado' : esSalida ? 'Salida' : esDevolucion ? 'Devolución' : 'Entrada';
       const accionBtns = [];
-      if (esAdmin && esSalida) {
-        const devuelta = salidasDevueltas.has(m.id);
-        if (!devuelta && !m.pago_confirmado) accionBtns.push(`<button class="btn-pago-mov" onclick="abrirPagoMov('${m.id}','${m.piloto}')">Pago</button>`);
-        if (!devuelta) accionBtns.push(`<button class="btn-devolucion" onclick="abrirDevolucion('${m.id}')">Devolver</button>`);
+      if (esAdmin) {
+        accionBtns.push(`<button class="btn-editar-mov" onclick="abrirEditarMov('${m.id}')">Editar</button>`);
+        if (esSalida) {
+          const devuelta = salidasDevueltas.has(m.id);
+          if (!devuelta && !m.pago_confirmado) accionBtns.push(`<button class="btn-pago-mov" onclick="abrirPagoMov('${m.id}','${m.piloto}')">Pago</button>`);
+          if (!devuelta) accionBtns.push(`<button class="btn-devolucion" onclick="abrirDevolucion('${m.id}')">Devolver</button>`);
+        }
       }
       return `<tr>
         <td>${fmtDate(m.created_at)}</td>
@@ -1179,6 +1220,142 @@
       alert('Error al guardar. Intentá nuevamente.');
     }
     btn.disabled = false; btn.textContent = 'Confirmar traslado';
+  });
+
+  // EDITAR MOVIMIENTO
+  function abrirEditarMov(movId) {
+    const mov = movimientosCache.find(m => m.id === movId);
+    if (!mov) return;
+    modalCtx = {
+      movId,
+      tipo: mov.tipo,
+      artId: mov.articulo_id,
+      ubicacionId: mov.ubicacion_id,
+      cantidadOriginal: mov.cantidad,
+    };
+    const tipoLabel = { salida: 'Salida', entrada: 'Entrada', transferencia: 'Traslado', devolucion: 'Devolución' };
+    document.getElementById('modalEditarMovSub').textContent =
+      `${mov.stock_articulos?.nombre || ''} — ${tipoLabel[mov.tipo] || mov.tipo} — ${fmtDate(mov.created_at)}`;
+
+    const esSalida = mov.tipo === 'salida';
+    const esEntrada = mov.tipo === 'entrada';
+    const esTransferencia = mov.tipo === 'transferencia';
+    const esDevolucion = mov.tipo === 'devolucion';
+
+    const pilotoRow = document.getElementById('editarPilotoRow');
+    const pilotoLabel = document.getElementById('editarPilotoLabel');
+    const pilotoInput = document.getElementById('editarPiloto');
+    if (esSalida || esDevolucion) {
+      pilotoRow.style.display = 'block';
+      pilotoLabel.textContent = 'Piloto';
+      pilotoInput.value = mov.piloto || '';
+    } else if (esEntrada) {
+      pilotoRow.style.display = 'block';
+      pilotoLabel.textContent = 'Proveedor';
+      pilotoInput.value = mov.proveedor || '';
+    } else {
+      pilotoRow.style.display = 'none';
+    }
+
+    const fechaRow = document.getElementById('editarFechaCarreraRow');
+    if (esSalida) {
+      fechaRow.style.display = 'block';
+      document.getElementById('editarFechaCarrera').value = mov.fecha_carrera || '';
+    } else {
+      fechaRow.style.display = 'none';
+    }
+
+    const cantRow = document.getElementById('editarCantidadRow');
+    if (esTransferencia) {
+      cantRow.style.display = 'none';
+    } else {
+      cantRow.style.display = 'block';
+      document.getElementById('editarCantidad').value = mov.cantidad;
+      document.getElementById('editarCantidadAviso').style.display = 'none';
+    }
+
+    document.getElementById('editarNotas').value = mov.notas || '';
+    document.getElementById('modalEditarMov').classList.add('open');
+  }
+
+  document.getElementById('editarCantidad').addEventListener('input', function() {
+    const orig = modalCtx?.cantidadOriginal;
+    const aviso = document.getElementById('editarCantidadAviso');
+    aviso.style.display = (orig != null && parseInt(this.value) !== orig) ? 'block' : 'none';
+  });
+
+  document.getElementById('btnConfirmarEditar').addEventListener('click', async () => {
+    if (!modalCtx) return;
+    const { movId, tipo, artId, ubicacionId, cantidadOriginal } = modalCtx;
+    const esSalida = tipo === 'salida';
+    const esEntrada = tipo === 'entrada';
+    const esTransferencia = tipo === 'transferencia';
+    const esDevolucion = tipo === 'devolucion';
+
+    const nuevaCantidad = esTransferencia ? cantidadOriginal : parseInt(document.getElementById('editarCantidad').value);
+    if (!esTransferencia && (!nuevaCantidad || nuevaCantidad < 1)) {
+      alert('Ingresá una cantidad válida.');
+      return;
+    }
+    const diff = nuevaCantidad - cantidadOriginal;
+    // salida: más cantidad = menos stock; entrada/devolucion: más cantidad = más stock
+    const stockDelta = esSalida ? -diff : diff;
+
+    const btn = document.getElementById('btnConfirmarEditar');
+    btn.disabled = true; btn.textContent = 'Guardando...';
+
+    // Verificar stock si la cantidad cambia
+    if (diff !== 0 && !esTransferencia) {
+      const { data: stockUbCurrent } = await sb.from('stock_por_ubicacion')
+        .select('stock_actual')
+        .eq('articulo_id', artId)
+        .eq('ubicacion_id', ubicacionId)
+        .single();
+      const currentStock = stockUbCurrent?.stock_actual || 0;
+      if (esSalida && diff > 0 && currentStock < diff) {
+        alert(`Stock insuficiente para aumentar la cantidad. Disponible: ${currentStock}`);
+        btn.disabled = false; btn.textContent = 'Guardar cambios';
+        return;
+      }
+      if ((esEntrada || esDevolucion) && diff < 0 && currentStock + diff < 0) {
+        alert(`No hay suficiente stock para reducir esa cantidad.`);
+        btn.disabled = false; btn.textContent = 'Guardar cambios';
+        return;
+      }
+    }
+
+    // Armar el objeto de actualización
+    const update = { notas: document.getElementById('editarNotas').value.trim() || null };
+    if (!esTransferencia) update.cantidad = nuevaCantidad;
+    if (esSalida || esDevolucion) update.piloto = document.getElementById('editarPiloto').value.trim() || null;
+    if (esEntrada) update.proveedor = document.getElementById('editarPiloto').value.trim() || null;
+    if (esSalida) update.fecha_carrera = document.getElementById('editarFechaCarrera').value || null;
+
+    const { error } = await sb.from('stock_movimientos').update(update).eq('id', movId);
+    if (error) {
+      alert('Error al guardar. Intentá nuevamente.');
+      btn.disabled = false; btn.textContent = 'Guardar cambios';
+      return;
+    }
+
+    // Ajustar stock si cambió la cantidad
+    if (diff !== 0 && !esTransferencia) {
+      const { data: stockUb } = await sb.from('stock_por_ubicacion')
+        .select('stock_actual')
+        .eq('articulo_id', artId)
+        .eq('ubicacion_id', ubicacionId)
+        .single();
+      await sb.from('stock_por_ubicacion')
+        .update({ stock_actual: (stockUb?.stock_actual || 0) + stockDelta })
+        .eq('articulo_id', artId)
+        .eq('ubicacion_id', ubicacionId);
+      const art = articulos.find(a => a.id === artId);
+      if (art) await sb.from('stock_articulos').update({ stock_actual: art.stock_actual + stockDelta }).eq('id', artId);
+    }
+
+    btn.disabled = false; btn.textContent = 'Guardar cambios';
+    cerrarModal('modalEditarMov');
+    cargarTodo();
   });
 
   // Filtros historial
