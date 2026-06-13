@@ -256,12 +256,14 @@
       btn.disabled = true;
       btn.textContent = 'Verificando...';
 
-      const { data: existentes } = await sb
+      const dupQuery = sb
         .from('inscripciones_trackday')
         .select('id')
         .eq('fecha_carrera', fecha_carrera)
-        .ilike('nombre_conductor', nombre_conductor)
-        .eq('numero_auto', numero_auto);
+        .ilike('nombre_conductor', nombre_conductor);
+      if (numero_auto === null) dupQuery.is('numero_auto', null);
+      else dupQuery.eq('numero_auto', numero_auto);
+      const { data: existentes } = await dupQuery;
 
       if (existentes && existentes.length > 0) {
         msgBox.className = 'msg error';
