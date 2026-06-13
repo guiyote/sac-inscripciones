@@ -275,12 +275,14 @@
       }
 
       // Validación duplicado: mismo nombre piloto + número de auto + fecha
-      const { data: existentes } = await sb
+      const dupQuery = sb
         .from('inscripciones_regularidad')
         .select('id')
         .eq('fecha_carrera', fecha_carrera)
-        .ilike('nombre_piloto', nombre_piloto)
-        .eq('numero_auto', numero_auto);
+        .ilike('nombre_piloto', nombre_piloto);
+      if (numero_auto === null) dupQuery.is('numero_auto', null);
+      else dupQuery.eq('numero_auto', numero_auto);
+      const { data: existentes } = await dupQuery;
 
       if (existentes && existentes.length > 0) {
         msgBox.className = 'msg error';
