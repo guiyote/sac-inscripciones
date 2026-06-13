@@ -30,6 +30,10 @@ create policy "anon puede insertar trackday"
   on public.inscripciones_trackday for insert
   to anon with check (true);
 
+create policy "autenticados pueden insertar trackday"
+  on public.inscripciones_trackday for insert
+  to authenticated with check (true);
+
 create policy "autenticados pueden leer trackday"
   on public.inscripciones_trackday for select
   to authenticated using (true);

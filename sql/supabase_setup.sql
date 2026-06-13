@@ -54,15 +54,21 @@ ALTER TABLE inscripciones_karting ENABLE ROW LEVEL SECURITY;
 ALTER TABLE inscripciones_turismo ENABLE ROW LEVEL SECURITY;
 ALTER TABLE inscripciones_regularidad ENABLE ROW LEVEL SECURITY;
 
--- Política: cualquiera puede insertar
+-- Política: cualquiera puede insertar (anon = público, authenticated = admin logueado)
 CREATE POLICY "insert_public_karting" ON inscripciones_karting
   FOR INSERT TO anon WITH CHECK (true);
+CREATE POLICY "insert_auth_karting" ON inscripciones_karting
+  FOR INSERT TO authenticated WITH CHECK (true);
 
 CREATE POLICY "insert_public_turismo" ON inscripciones_turismo
   FOR INSERT TO anon WITH CHECK (true);
+CREATE POLICY "insert_auth_turismo" ON inscripciones_turismo
+  FOR INSERT TO authenticated WITH CHECK (true);
 
 CREATE POLICY "insert_public_regularidad" ON inscripciones_regularidad
   FOR INSERT TO anon WITH CHECK (true);
+CREATE POLICY "insert_auth_regularidad" ON inscripciones_regularidad
+  FOR INSERT TO authenticated WITH CHECK (true);
 
 -- Política: solo autenticados pueden leer (para el admin)
 CREATE POLICY "select_auth_karting" ON inscripciones_karting
