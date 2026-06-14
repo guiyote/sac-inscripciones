@@ -20,7 +20,7 @@ create table if not exists public.inscripciones_trackday (
   pago_fecha      date,
   pago_medio      text,
   baja            boolean default false,
-  motivo_baja     text
+  baja_motivo     text
 );
 
 -- RLS: INSERT público (anon), SELECT solo autenticados
