@@ -101,6 +101,8 @@
     .btn-transponder:hover { background: rgba(139,92,246,0.35); }
     .btn-editar { background: rgba(234,179,8,0.18); color: #fde047; border: 1px solid rgba(234,179,8,0.4); }
     .btn-editar:hover { background: rgba(234,179,8,0.32); }
+    .btn-motivo { background: rgba(251,146,60,0.15); color: #fb923c; border: 1px solid rgba(251,146,60,0.3); }
+    .btn-motivo:hover { background: rgba(251,146,60,0.28); }
     .modal-xl { max-width: 560px !important; max-height: 88vh; overflow-y: auto; }
     .badge-confirmado { background: rgba(22,163,74,0.15); color: #4ade80; border: 1px solid rgba(22,163,74,0.3); }
     .badge-en-espera { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
@@ -195,6 +197,18 @@
     <div class="modal-btns">
       <button class="btn-cancelar" onclick="cerrarModal('modalBaja')">Cancelar</button>
       <button class="btn-confirmar-rojo" id="btnConfirmarBaja">Confirmar baja</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MOTIVO BAJA -->
+<div class="modal-overlay" id="modalMotivoBaja">
+  <div class="modal rojo-top">
+    <h3>Motivo de baja</h3>
+    <p class="modal-sub" id="modalMotivoBajaNombre"></p>
+    <div id="modalMotivoBajaTexto" style="background:var(--gris-campo);border:1px solid var(--borde);border-radius:3px;padding:0.75rem 1rem;color:var(--blanco);font-size:0.95rem;min-height:60px;white-space:pre-wrap;line-height:1.5"></div>
+    <div class="modal-btns">
+      <button class="btn-cancelar" onclick="cerrarModal('modalMotivoBaja')" style="flex:none;padding:0.75rem 2rem">Cerrar</button>
     </div>
   </div>
 </div>
@@ -682,6 +696,22 @@
     else alert('Error al guardar. Intentá nuevamente.');
   });
 
+  function mostrarMotivoBaja(tabla, id) {
+    const datasets = {
+      'inscripciones_karting': _kData,
+      'inscripciones_turismo': _tData,
+      'inscripciones_regularidad': _rData,
+      'inscripciones_trackday': _tdData,
+      'inscripciones_picadas': _picData,
+    };
+    const row = (datasets[tabla] || []).find(r => r.id === id);
+    if (!row) return;
+    const nombre = row.nombre || row.nombre_piloto || row.nombre_conductor || row.nombre_dueno || '';
+    document.getElementById('modalMotivoBajaNombre').textContent = nombre;
+    document.getElementById('modalMotivoBajaTexto').textContent = row.baja_motivo || 'Sin motivo registrado.';
+    document.getElementById('modalMotivoBaja').classList.add('open');
+  }
+
   async function darAlta(tabla, id, nombre) {
     if (!confirm(`¿Dar de alta a ${nombre}?`)) return;
     const { error } = await sb.from(tabla).update({ baja: false, baja_motivo: null }).eq('id', id);
@@ -953,7 +983,7 @@
             ${esAdmin ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_karting','${r.id}')">Modificar</button>` : ''}
             ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_karting','${r.id}','${r.nombre}')">Pago</button>` : ''}
             ${esAdmin && r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-transponder" onclick="abrirModalTransponder('inscripciones_karting','${r.id}','${r.nombre}','${r.transponder||''}')">${r.transponder ? 'T: '+r.transponder : 'Transponder'}</button>` : ''}
-            ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_karting','${r.id}','${r.nombre}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_karting','${r.id}','${r.nombre}')">Alta</button>` : '—'}
+            ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_karting','${r.id}','${r.nombre}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-motivo" onclick="mostrarMotivoBaja('inscripciones_karting','${r.id}')">Motivo</button><button class="btn-accion btn-alta" onclick="darAlta('inscripciones_karting','${r.id}','${r.nombre}')">Alta</button>` : '—'}
           </div></td>
         </tr>`).join('');
 
@@ -977,7 +1007,7 @@
             ${esAdmin ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_turismo','${r.id}')">Modificar</button>` : ''}
             ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_turismo','${r.id}','${r.nombre}')">Pago</button>` : ''}
             ${esAdmin && r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-transponder" onclick="abrirModalTransponder('inscripciones_turismo','${r.id}','${r.nombre}','${r.transponder||''}')">${r.transponder ? 'T: '+r.transponder : 'Transponder'}</button>` : ''}
-            ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_turismo','${r.id}','${r.nombre}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_turismo','${r.id}','${r.nombre}')">Alta</button>` : '—'}
+            ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_turismo','${r.id}','${r.nombre}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-motivo" onclick="mostrarMotivoBaja('inscripciones_turismo','${r.id}')">Motivo</button><button class="btn-accion btn-alta" onclick="darAlta('inscripciones_turismo','${r.id}','${r.nombre}')">Alta</button>` : '—'}
           </div></td>
         </tr>`).join('');
 
@@ -1000,7 +1030,7 @@
             ${esAdmin ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_regularidad','${r.id}')">Modificar</button>` : ''}
             ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Pago</button>` : ''}
             ${esAdmin && r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-transponder" onclick="abrirModalTransponder('inscripciones_regularidad','${r.id}','${r.nombre_piloto}','${r.transponder||''}')">${r.transponder ? 'T: '+r.transponder : 'Transponder'}</button>` : ''}
-            ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Alta</button>` : '—'}
+            ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-motivo" onclick="mostrarMotivoBaja('inscripciones_regularidad','${r.id}')">Motivo</button><button class="btn-accion btn-alta" onclick="darAlta('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Alta</button>` : '—'}
           </div></td>
         </tr>`).join('');
 
@@ -1021,7 +1051,7 @@
           <td><div class="acciones">
             ${esAdmin ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_trackday','${r.id}')">Modificar</button>` : ''}
             ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_trackday','${r.id}','${r.nombre_conductor}')">Pago</button>` : ''}
-            ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_trackday','${r.id}','${r.nombre_conductor}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_trackday','${r.id}','${r.nombre_conductor}')">Alta</button>` : '—'}
+            ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_trackday','${r.id}','${r.nombre_conductor}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-motivo" onclick="mostrarMotivoBaja('inscripciones_trackday','${r.id}')">Motivo</button><button class="btn-accion btn-alta" onclick="darAlta('inscripciones_trackday','${r.id}','${r.nombre_conductor}')">Alta</button>` : '—'}
           </div></td>
         </tr>`).join('');
 
@@ -1041,7 +1071,7 @@
           <td><div class="acciones">
             ${esAdmin ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_picadas','${r.id}')">Modificar</button>` : ''}
             ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_picadas','${r.id}','${r.nombre_dueno}',${r.reinscripcion ? 500 : null})">Pago</button>` : ''}
-            ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_picadas','${r.id}','${r.nombre_dueno}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_picadas','${r.id}','${r.nombre_dueno}')">Alta</button>` : '—'}
+            ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_picadas','${r.id}','${r.nombre_dueno}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-motivo" onclick="mostrarMotivoBaja('inscripciones_picadas','${r.id}')">Motivo</button><button class="btn-accion btn-alta" onclick="darAlta('inscripciones_picadas','${r.id}','${r.nombre_dueno}')">Alta</button>` : '—'}
           </div></td>
         </tr>`).join('');
 
