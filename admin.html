@@ -704,7 +704,7 @@
       'inscripciones_trackday': _tdData,
       'inscripciones_picadas': _picData,
     };
-    const row = (datasets[tabla] || []).find(r => r.id === id);
+    const row = (datasets[tabla] || []).find(r => String(r.id) === id);
     if (!row) return;
     const nombre = row.nombre || row.nombre_piloto || row.nombre_conductor || row.nombre_dueno || '';
     document.getElementById('modalMotivoBajaNombre').textContent = nombre;
