@@ -317,6 +317,27 @@
       .cards { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
       footer { padding: 1rem; }
     }
+
+    /* FECHAS */
+    .fechas-section { max-width: 960px; margin: 0 auto; padding: 0 1.5rem 2.5rem; }
+    .table-wrap-fechas { border: 1px solid #333; border-radius: 2px; overflow-x: auto; }
+    .table-wrap-fechas table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .table-wrap-fechas thead th { background: #222; padding: 0.6rem 1rem; text-align: left; font-family: 'Barlow Condensed', sans-serif; font-size: 0.68rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #777; border-bottom: 1px solid #333; }
+    .table-wrap-fechas tbody tr { border-bottom: 1px solid #252525; }
+    .table-wrap-fechas tbody tr:last-child { border-bottom: none; }
+    .table-wrap-fechas tbody td { padding: 0.65rem 1rem; color: var(--blanco); vertical-align: middle; }
+    .table-wrap-fechas tbody tr.proxima-row { background: rgba(204,0,0,0.04); }
+    .table-wrap-fechas .col-n { font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; font-weight: 700; color: var(--texto-muted); width: 3rem; }
+    .table-wrap-fechas .col-evento { font-size: 0.78rem; color: #666; }
+    .table-wrap-fechas .col-fecha { font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 600; letter-spacing: 0.5px; }
+    .table-wrap-fechas tr.proxima-row .col-fecha { color: #f87171; }
+    .badge-estado { display: inline-block; padding: 0.18rem 0.55rem; border-radius: 2px; font-family: 'Barlow Condensed', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+    .badge-proxima { background: rgba(204,0,0,0.15); color: #f87171; border: 1px solid rgba(204,0,0,0.4); }
+    .badge-realizada { background: rgba(100,100,100,0.12); color: #555; border: 1px solid #2d2d2d; }
+    .badge-pendiente { background: transparent; color: var(--texto-muted); border: 1px solid #2a2a2a; }
+    @media (max-width: 600px) {
+      .fechas-section { padding: 0 1rem 2rem; }
+    }
   </style>
 </head>
 <body>
@@ -400,6 +421,16 @@
     </div>
   </div>
 
+  <div class="fechas-section">
+    <p class="section-label">Calendario 2026</p>
+    <div class="table-wrap-fechas">
+      <table>
+        <thead><tr><th>Nº</th><th>Fecha</th><th>Estado</th></tr></thead>
+        <tbody id="tbodyFechas"></tbody>
+      </table>
+    </div>
+  </div>
+
   <footer>
     <strong>Salto Automóvil Club</strong> &mdash; Fundado el 18 de Julio de 1938
     &nbsp;&nbsp;·&nbsp;&nbsp;
@@ -411,6 +442,42 @@
     const SUPABASE_URL = 'https://qpveivsqkudlqjbxcxzh.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_H6Q0geOf0yqMVQ8MfCcr9Q_31LSQMVg';
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    (function renderFechas() {
+      const CAMP = [
+        { n: '1º', evento: 'Campeonato', label: '25-26 Abril',     iso: '2026-04-26' },
+        { n: '2º', evento: 'Campeonato', label: '13-14 Junio',     iso: '2026-06-14' },
+        { n: '3º', evento: 'Campeonato', label: '11-12 Julio',     iso: '2026-07-12' },
+        { n: '4º', evento: 'Campeonato', label: '15-16 Agosto',    iso: '2026-08-16' },
+        { n: '5º', evento: 'Campeonato', label: '12-13 Setiembre', iso: '2026-09-13' },
+        { n: '6º', evento: 'Campeonato', label: '17-18 Octubre',   iso: '2026-10-18' },
+      ];
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      function estadoBadge(iso, isProxima) {
+        const d = new Date(iso);
+        if (d < today) return '<span class="badge-estado badge-realizada">Realizada</span>';
+        if (isProxima)  return '<span class="badge-estado badge-proxima">Próxima</span>';
+        return '<span class="badge-estado badge-pendiente">Pendiente</span>';
+      }
+
+      function asignarProxima(lista) {
+        const idx = lista.findIndex(f => new Date(f.iso) >= today);
+        return lista.map((f, i) => ({ ...f, isProxima: i === idx }));
+      }
+
+      const campConEstado = asignarProxima(CAMP);
+
+      const filas = campConEstado.map(f => `<tr${f.isProxima ? ' class="proxima-row"' : ''}>
+          <td class="col-n">${f.n}</td>
+          <td class="col-fecha">${f.label}</td>
+          <td>${estadoBadge(f.iso, f.isProxima)}</td>
+        </tr>`);
+
+      document.getElementById('tbodyFechas').innerHTML = filas.join('');
+    })();
 
     (async () => {
       const claves = ['inscripciones_karting', 'inscripciones_turismo', 'inscripciones_trackday', 'inscripciones_regularidad', 'inscripciones_picadas'];

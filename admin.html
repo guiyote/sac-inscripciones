@@ -980,7 +980,7 @@
           <td>${fmtDate(r.pago_fecha)}</td>
           <td>${transponderCell(r)}</td>
           <td><div class="acciones">
-            ${esAdmin ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_karting','${r.id}')">Modificar</button>` : ''}
+            ${esAdmin && !r.baja ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_karting','${r.id}')">Modificar</button>` : ''}
             ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_karting','${r.id}','${r.nombre}')">Pago</button>` : ''}
             ${esAdmin && r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-transponder" onclick="abrirModalTransponder('inscripciones_karting','${r.id}','${r.nombre}','${r.transponder||''}')">${r.transponder ? 'T: '+r.transponder : 'Transponder'}</button>` : ''}
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_karting','${r.id}','${r.nombre}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-motivo" onclick="mostrarMotivoBaja('inscripciones_karting','${r.id}')">Motivo</button><button class="btn-accion btn-alta" onclick="darAlta('inscripciones_karting','${r.id}','${r.nombre}')">Alta</button>` : '—'}
@@ -1004,7 +1004,7 @@
           <td>${fmtDate(r.pago_fecha)}</td>
           <td>${transponderCell(r)}</td>
           <td><div class="acciones">
-            ${esAdmin ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_turismo','${r.id}')">Modificar</button>` : ''}
+            ${esAdmin && !r.baja ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_turismo','${r.id}')">Modificar</button>` : ''}
             ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_turismo','${r.id}','${r.nombre}')">Pago</button>` : ''}
             ${esAdmin && r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-transponder" onclick="abrirModalTransponder('inscripciones_turismo','${r.id}','${r.nombre}','${r.transponder||''}')">${r.transponder ? 'T: '+r.transponder : 'Transponder'}</button>` : ''}
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_turismo','${r.id}','${r.nombre}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-motivo" onclick="mostrarMotivoBaja('inscripciones_turismo','${r.id}')">Motivo</button><button class="btn-accion btn-alta" onclick="darAlta('inscripciones_turismo','${r.id}','${r.nombre}')">Alta</button>` : '—'}
@@ -1027,7 +1027,7 @@
           <td>${fmtDate(r.pago_fecha)}</td>
           <td>${transponderCell(r)}</td>
           <td><div class="acciones">
-            ${esAdmin ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_regularidad','${r.id}')">Modificar</button>` : ''}
+            ${esAdmin && !r.baja ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_regularidad','${r.id}')">Modificar</button>` : ''}
             ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Pago</button>` : ''}
             ${esAdmin && r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-transponder" onclick="abrirModalTransponder('inscripciones_regularidad','${r.id}','${r.nombre_piloto}','${r.transponder||''}')">${r.transponder ? 'T: '+r.transponder : 'Transponder'}</button>` : ''}
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-motivo" onclick="mostrarMotivoBaja('inscripciones_regularidad','${r.id}')">Motivo</button><button class="btn-accion btn-alta" onclick="darAlta('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Alta</button>` : '—'}
@@ -1049,7 +1049,7 @@
           <td>${capFirst(r.pago_medio)}</td>
           <td>${fmtDate(r.pago_fecha)}</td>
           <td><div class="acciones">
-            ${esAdmin ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_trackday','${r.id}')">Modificar</button>` : ''}
+            ${esAdmin && !r.baja ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_trackday','${r.id}')">Modificar</button>` : ''}
             ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_trackday','${r.id}','${r.nombre_conductor}')">Pago</button>` : ''}
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_trackday','${r.id}','${r.nombre_conductor}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-motivo" onclick="mostrarMotivoBaja('inscripciones_trackday','${r.id}')">Motivo</button><button class="btn-accion btn-alta" onclick="darAlta('inscripciones_trackday','${r.id}','${r.nombre_conductor}')">Alta</button>` : '—'}
           </div></td>
@@ -1069,7 +1069,7 @@
           <td>${capFirst(r.pago_medio)}</td>
           <td>${fmtDate(r.pago_fecha)}</td>
           <td><div class="acciones">
-            ${esAdmin ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_picadas','${r.id}')">Modificar</button>` : ''}
+            ${esAdmin && !r.baja ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_picadas','${r.id}')">Modificar</button>` : ''}
             ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_picadas','${r.id}','${r.nombre_dueno}',${r.reinscripcion ? 500 : null})">Pago</button>` : ''}
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_picadas','${r.id}','${r.nombre_dueno}')">Baja</button>` : esAdmin ? `<button class="btn-accion btn-motivo" onclick="mostrarMotivoBaja('inscripciones_picadas','${r.id}')">Motivo</button><button class="btn-accion btn-alta" onclick="darAlta('inscripciones_picadas','${r.id}','${r.nombre_dueno}')">Alta</button>` : '—'}
           </div></td>
