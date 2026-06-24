@@ -1,13 +1,13 @@
 # SAC Inscripciones
 
-Sitio de pre-inscripciones y gestión del Campeonato Regional 2026 del Salto Automóvil Club.
+Sitio de inscripciones y gestión del Campeonato Regional 2026 del Salto Automóvil Club.
 
 ## Estructura de archivos
 
 ```
 sac-inscripciones/
 ├── index.html                    ← Landing con las 3 categorías
-├── karting.html                  ← Pre-inscripción Karting (Copa Nuevo Uruguay)
+├── karting.html                  ← Inscripción Karting (Copa Nuevo Uruguay)
 ├── turismo.html                  ← Inscripción Turismo TNS/TMZ
 ├── regularidad.html              ← Inscripción Regularidad
 ├── admin.html                    ← Panel de administración (requiere login)
