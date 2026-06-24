@@ -226,11 +226,10 @@
       <option value="">Sin asignar</option>
       <option value="2026-04-26">1º — 25/26 Abril</option>
       <option value="2026-06-14">2º — 13/14 Junio</option>
-      <option value="2026-07-12">3º — 11/12 Julio</option>
-      <option value="2026-08-16">4º — 15/16 Agosto</option>
-      <option value="2026-09-13">5º — 12/13 Setiembre</option>
-      <option value="2026-10-18">6º — 17/18 Octubre</option>
-      <option value="2026-11-29">7º — 28/29 Noviembre</option>
+      <option value="2026-08-16">3º — 15/16 Agosto</option>
+      <option value="2026-09-13">4º — 12/13 Setiembre</option>
+      <option value="2026-10-18">5º — 17/18 Octubre</option>
+      <option value="2026-11-22">6º — 21/22 Noviembre</option>
     </select>
     <label>¿Pagó?</label>
     <select id="salidaPago">
@@ -339,11 +338,10 @@
         <option value="">Sin asignar</option>
         <option value="2026-04-26">1º — 25/26 Abril</option>
         <option value="2026-06-14">2º — 13/14 Junio</option>
-        <option value="2026-07-12">3º — 11/12 Julio</option>
-        <option value="2026-08-16">4º — 15/16 Agosto</option>
-        <option value="2026-09-13">5º — 12/13 Setiembre</option>
-        <option value="2026-10-18">6º — 17/18 Octubre</option>
-        <option value="2026-11-29">7º — 28/29 Noviembre</option>
+        <option value="2026-08-16">3º — 15/16 Agosto</option>
+        <option value="2026-09-13">4º — 12/13 Setiembre</option>
+        <option value="2026-10-18">5º — 17/18 Octubre</option>
+        <option value="2026-11-22">6º — 21/22 Noviembre</option>
       </select>
     </div>
     <div id="editarCantidadRow">
@@ -385,11 +383,10 @@
           <option value="sin-fecha">Fuera de fecha</option>
           <option value="2026-04-26">1º — 25/26 Abril</option>
           <option value="2026-06-14">2º — 13/14 Junio</option>
-          <option value="2026-07-12">3º — 11/12 Julio</option>
-          <option value="2026-08-16">4º — 15/16 Agosto</option>
-          <option value="2026-09-13">5º — 12/13 Setiembre</option>
-          <option value="2026-10-18">6º — 17/18 Octubre</option>
-          <option value="2026-11-29">7º — 28/29 Noviembre</option>
+          <option value="2026-08-16">3º — 15/16 Agosto</option>
+          <option value="2026-09-13">4º — 12/13 Setiembre</option>
+          <option value="2026-10-18">5º — 17/18 Octubre</option>
+          <option value="2026-11-22">6º — 21/22 Noviembre</option>
         </select>
       </div>
     </div>
@@ -422,11 +419,10 @@
           <option value="">Todas las fechas</option>
           <option value="2026-04-26">1º — 25/26 Abril</option>
           <option value="2026-06-14">2º — 13/14 Junio</option>
-          <option value="2026-07-12">3º — 11/12 Julio</option>
-          <option value="2026-08-16">4º — 15/16 Agosto</option>
-          <option value="2026-09-13">5º — 12/13 Setiembre</option>
-          <option value="2026-10-18">6º — 17/18 Octubre</option>
-          <option value="2026-11-29">7º — 28/29 Noviembre</option>
+          <option value="2026-08-16">3º — 15/16 Agosto</option>
+          <option value="2026-09-13">4º — 12/13 Setiembre</option>
+          <option value="2026-10-18">5º — 17/18 Octubre</option>
+          <option value="2026-11-22">6º — 21/22 Noviembre</option>
         </select>
       </div>
       <div class="filter-group">
@@ -491,11 +487,10 @@
           <option value="sin-fecha">Fuera de fecha</option>
           <option value="2026-04-26">1º — 25/26 Abril</option>
           <option value="2026-06-14">2º — 13/14 Junio</option>
-          <option value="2026-07-12">3º — 11/12 Julio</option>
-          <option value="2026-08-16">4º — 15/16 Agosto</option>
-          <option value="2026-09-13">5º — 12/13 Setiembre</option>
-          <option value="2026-10-18">6º — 17/18 Octubre</option>
-          <option value="2026-11-29">7º — 28/29 Noviembre</option>
+          <option value="2026-08-16">3º — 15/16 Agosto</option>
+          <option value="2026-09-13">4º — 12/13 Setiembre</option>
+          <option value="2026-10-18">5º — 17/18 Octubre</option>
+          <option value="2026-11-22">6º — 21/22 Noviembre</option>
         </select>
       </div>
     </div>
@@ -557,7 +552,7 @@
   });
 
   function setDefaultFechas() {
-    const FECHAS_CAMP = ['2026-04-26','2026-06-14','2026-07-12','2026-08-16','2026-09-13','2026-10-18','2026-11-29'];
+    const FECHAS_CAMP = ['2026-04-26','2026-06-14','2026-07-12','2026-08-16','2026-09-13','2026-10-18','2026-11-22'];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     let closest = null, minDiff = Infinity;
@@ -961,9 +956,9 @@
     const tbody = document.getElementById('tbodyPedidos');
     const FECHAS = {
       '2026-04-26': '1º — 25/26 Abril', '2026-06-14': '2º — 13/14 Junio',
-      '2026-07-12': '3º — 11/12 Julio', '2026-08-16': '4º — 15/16 Agosto',
-      '2026-09-13': '5º — 12/13 Setiembre', '2026-10-18': '6º — 17/18 Octubre',
-      '2026-11-29': '7º — 28/29 Noviembre',
+      '2026-07-12': '— 11/12 Julio (reprog.)', '2026-08-16': '3º — 15/16 Agosto',
+      '2026-09-13': '4º — 12/13 Setiembre', '2026-10-18': '5º — 17/18 Octubre',
+      '2026-11-22': '6º — 21/22 Noviembre',
     };
 
     if (rows.length === 0) {
@@ -1065,9 +1060,9 @@
 
     const FECHAS_HIST = {
       '2026-04-26': '1º Abril', '2026-06-14': '2º Junio',
-      '2026-07-12': '3º Julio', '2026-08-16': '4º Agosto',
-      '2026-09-13': '5º Set.', '2026-10-18': '6º Oct.',
-      '2026-11-29': '7º Nov.',
+      '2026-07-12': 'Julio (reprog.)', '2026-08-16': '3º Agosto',
+      '2026-09-13': '4º Set.', '2026-10-18': '5º Oct.',
+      '2026-11-22': '6º Nov.',
     };
 
     const tbody = document.getElementById('tbodyHistorial');
