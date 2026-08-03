@@ -521,8 +521,8 @@
   <div class="section-block" id="secTrackDay">
     <div class="section-header"><h2>Track Day</h2><button class="btn-export" onclick="exportarTrackDay()">↓ Exportar TXT</button></div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Conductor</th><th>CI</th><th>Acompañante</th><th>Fecha</th><th>Vehículo</th><th>Nº Auto</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Acciones</th></tr></thead>
-      <tbody id="tbodyTrackDay"><tr><td colspan="11" class="loading">Cargando...</td></tr></tbody>
+      <thead><tr><th>Conductor</th><th>CI</th><th>Acompañante</th><th>Fecha</th><th>Vehículo</th><th>Nº Auto</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Transponder</th><th>Acciones</th></tr></thead>
+      <tbody id="tbodyTrackDay"><tr><td colspan="12" class="loading">Cargando...</td></tr></tbody>
     </table></div>
   </div>
 
@@ -1034,7 +1034,7 @@
 
     // Track Day
     document.getElementById('tbodyTrackDay').innerHTML = tdData.length === 0
-      ? '<tr><td colspan="11" class="empty">Sin inscripciones</td></tr>'
+      ? '<tr><td colspan="12" class="empty">Sin inscripciones</td></tr>'
       : tdData.map(r => `<tr class="${r.baja ? 'baja-row' : ''}">
           <td>${val(r.nombre_conductor)}</td>
           <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtCI(r.cedula_conductor)}</td>
@@ -1046,9 +1046,11 @@
           <td>${fmtMonto(r.pago_monto)}</td>
           <td>${capFirst(r.pago_medio)}</td>
           <td>${fmtDate(r.pago_fecha)}</td>
+          <td>${transponderCell(r)}</td>
           <td><div class="acciones">
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_trackday','${r.id}')">Modificar</button>` : ''}
             ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_trackday','${r.id}','${r.nombre_conductor}')">Pago</button>` : ''}
+            ${esAdmin && r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-transponder" onclick="abrirModalTransponder('inscripciones_trackday','${r.id}','${r.nombre_conductor}','${r.transponder||''}')">${r.transponder ? 'T: '+r.transponder : 'Transponder'}</button>` : ''}
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_trackday','${r.id}','${r.nombre_conductor}')">Baja</button>` : esAdmin ? `${r.baja_motivo ? `<button class="btn-accion btn-motivo" onclick="mostrarMotivoBaja('inscripciones_trackday','${r.id}')">Motivo</button>` : ''}<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_trackday','${r.id}','${r.nombre_conductor}')">Alta</button>` : '—'}
           </div></td>
         </tr>`).join('');
@@ -1211,6 +1213,7 @@
       ...(r.nombre_acompanante ? [`Acompañante: ${r.nombre_acompanante}`] : []),
       `Fecha:       ${fmtFecha(r.fecha_carrera)}`,
       `Vehículo:    ${[r.marca, r.modelo, r.anio].filter(Boolean).join(' ') || '—'}   ·   Nº Auto: ${r.numero_auto || '—'}`,
+      ...(r.transponder ? [`Transponder: ${r.transponder}`] : []),
       `Pago:        ${fmtPago(r)}`,
     ], 'trackday');
   }
