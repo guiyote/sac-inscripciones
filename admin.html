@@ -285,15 +285,6 @@
       <input type="text" id="eT_cedula">
       <label>Celular</label>
       <input type="text" id="eT_celular">
-      <label>Departamento</label>
-      <select id="eT_departamento">
-        <option value="">Seleccioná...</option>
-        <option>Artigas</option><option>Canelones</option><option>Cerro Largo</option><option>Colonia</option>
-        <option>Durazno</option><option>Flores</option><option>Florida</option><option>Lavalleja</option>
-        <option>Maldonado</option><option>Montevideo</option><option>Paysandú</option><option>Río Negro</option>
-        <option>Rivera</option><option>Rocha</option><option>Salto</option><option>San José</option>
-        <option>Soriano</option><option>Tacuarembó</option><option>Treinta y Tres</option>
-      </select>
       <label>Fecha de nacimiento</label>
       <input type="date" id="eT_fecha_nacimiento">
       <label>Categoría</label>
@@ -769,7 +760,6 @@
       document.getElementById('eT_nombre').value = r.nombre || '';
       document.getElementById('eT_cedula').value = r.cedula || '';
       document.getElementById('eT_celular').value = r.celular || '';
-      document.getElementById('eT_departamento').value = r.departamento || '';
       document.getElementById('eT_fecha_nacimiento').value = r.fecha_nacimiento || '';
       document.getElementById('eT_categoria').value = r.categoria || '';
       document.getElementById('eT_numero_auto').value = r.numero_auto || '';
@@ -851,7 +841,6 @@
         nombre: document.getElementById('eT_nombre').value.trim() || null,
         cedula: document.getElementById('eT_cedula').value.trim() || null,
         celular: document.getElementById('eT_celular').value.trim() || null,
-        departamento: document.getElementById('eT_departamento').value || null,
         fecha_nacimiento: document.getElementById('eT_fecha_nacimiento').value || null,
         categoria: document.getElementById('eT_categoria').value || null,
         numero_auto: document.getElementById('eT_numero_auto').value.trim() || null,
