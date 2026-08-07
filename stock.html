@@ -948,12 +948,18 @@
     </tr>`).join('');
   }
 
+  function normalizeNombre(s) {
+    return (s || '').trim().toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, ' ');
+  }
+
   function estadoPedidoItem(nombrePiloto, fechaCarrera, articulo, cantidad, salidas) {
     if (!cantidad || !articulo) return null;
-    const nombreNorm = (nombrePiloto || '').trim().toLowerCase();
+    const nombreNorm = normalizeNombre(nombrePiloto);
     const matches = salidas.filter(m => m.articulo_id === articulo.id
       && m.fecha_carrera === fechaCarrera
-      && (m.piloto || '').trim().toLowerCase() === nombreNorm);
+      && normalizeNombre(m.piloto) === nombreNorm);
     if (matches.length === 0) return { label: 'Sin solicitar', cls: 'badge-sin-solicitar' };
     return matches.every(m => m.pago_confirmado)
       ? { label: 'Pagado', cls: 'badge-pagado' }
