@@ -349,6 +349,14 @@
       <input type="number" id="editarCantidad" min="1" placeholder="0">
       <div id="editarCantidadAviso" style="display:none;margin-top:0.4rem;font-size:0.8rem;color:#fde047">Cambiar la cantidad ajusta el stock automáticamente.</div>
     </div>
+    <div id="editarMedioRow">
+      <label>Medio de pago</label>
+      <select id="editarMedio">
+        <option value="">Seleccioná...</option>
+        <option value="efectivo">Efectivo</option>
+        <option value="transferencia">Transferencia</option>
+      </select>
+    </div>
     <label>Notas <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
     <textarea id="editarNotas" placeholder="Observaciones..."></textarea>
     <div class="modal-btns">
@@ -1227,6 +1235,7 @@
       artId: mov.articulo_id,
       ubicacionId: mov.ubicacion_id,
       cantidadOriginal: mov.cantidad,
+      pagoConfirmado: mov.pago_confirmado,
     };
     const tipoLabel = { salida: 'Salida', entrada: 'Entrada', transferencia: 'Traslado', devolucion: 'Devolución' };
     document.getElementById('modalEditarMovSub').textContent =
@@ -1269,6 +1278,14 @@
       document.getElementById('editarCantidadAviso').style.display = 'none';
     }
 
+    const medioRow = document.getElementById('editarMedioRow');
+    if (esSalida && mov.pago_confirmado) {
+      medioRow.style.display = 'block';
+      document.getElementById('editarMedio').value = mov.pago_medio || '';
+    } else {
+      medioRow.style.display = 'none';
+    }
+
     document.getElementById('editarNotas').value = mov.notas || '';
     document.getElementById('modalEditarMov').classList.add('open');
   }
@@ -1281,7 +1298,7 @@
 
   document.getElementById('btnConfirmarEditar').addEventListener('click', async () => {
     if (!modalCtx) return;
-    const { movId, tipo, artId, ubicacionId, cantidadOriginal } = modalCtx;
+    const { movId, tipo, artId, ubicacionId, cantidadOriginal, pagoConfirmado } = modalCtx;
     const esSalida = tipo === 'salida';
     const esEntrada = tipo === 'entrada';
     const esTransferencia = tipo === 'transferencia';
@@ -1325,6 +1342,7 @@
     if (esSalida || esDevolucion) update.piloto = document.getElementById('editarPiloto').value.trim() || null;
     if (esEntrada) update.proveedor = document.getElementById('editarPiloto').value.trim() || null;
     if (esSalida) update.fecha_carrera = document.getElementById('editarFechaCarrera').value || null;
+    if (esSalida && pagoConfirmado) update.pago_medio = document.getElementById('editarMedio').value || null;
 
     const { error } = await sb.from('stock_movimientos').update(update).eq('id', movId);
     if (error) {
