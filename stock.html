@@ -102,6 +102,8 @@
     .badge-salida { background: rgba(204,0,0,0.15); color: #f87171; border: 1px solid rgba(204,0,0,0.3); }
     .badge-pagado { background: rgba(22,163,74,0.15); color: #4ade80; border: 1px solid rgba(22,163,74,0.3); }
     .badge-pendiente { background: rgba(234,179,8,0.12); color: #fde047; border: 1px solid rgba(234,179,8,0.25); }
+    .badge-sin-solicitar { background: rgba(136,136,136,0.12); color: var(--texto-muted); border: 1px solid rgba(136,136,136,0.25); }
+    .pedido-item { display: flex; flex-direction: column; align-items: flex-start; gap: 0.25rem; }
 
     .btn-pago-mov { border: none; border-radius: 2px; padding: 0.25rem 0.5rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; background: rgba(22,163,74,0.2); color: #4ade80; border: 1px solid rgba(22,163,74,0.4); }
     .btn-pago-mov:hover { background: rgba(22,163,74,0.35); }
@@ -946,6 +948,24 @@
     </tr>`).join('');
   }
 
+  function estadoPedidoItem(nombrePiloto, fechaCarrera, articulo, cantidad, salidas) {
+    if (!cantidad || !articulo) return null;
+    const nombreNorm = (nombrePiloto || '').trim().toLowerCase();
+    const matches = salidas.filter(m => m.articulo_id === articulo.id
+      && m.fecha_carrera === fechaCarrera
+      && (m.piloto || '').trim().toLowerCase() === nombreNorm);
+    if (matches.length === 0) return { label: 'Sin solicitar', cls: 'badge-sin-solicitar' };
+    return matches.every(m => m.pago_confirmado)
+      ? { label: 'Pagado', cls: 'badge-pagado' }
+      : { label: 'Pendiente', cls: 'badge-pendiente' };
+  }
+
+  function celdaPedido(cantidad, estado) {
+    if (!cantidad) return '<td>—</td>';
+    if (!estado) return `<td>${cantidad}</td>`;
+    return `<td><div class="pedido-item"><span>${cantidad}</span><span class="badge ${estado.cls}">${estado.label}</span></div></td>`;
+  }
+
   async function cargarPedidos() {
     const filtroFecha = document.getElementById('filtroPedidoFecha').value;
     const filtroCat = document.getElementById('filtroPedidoCat').value;
@@ -958,8 +978,16 @@
     if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
     if (filtroCat) q = q.eq('categoria', filtroCat);
 
-    const { data } = await q;
+    const [{ data }, { data: salidasData }] = await Promise.all([
+      q,
+      sb.from('stock_movimientos').select('piloto, fecha_carrera, articulo_id, pago_confirmado').eq('tipo', 'salida'),
+    ]);
     const rows = (data || []).filter(r => r.cantidad_gomas || r.cantidad_pastillas || r.cantidad_discos);
+    const salidas = salidasData || [];
+
+    const artGomas = articulos.find(a => /cubiert/i.test(a.nombre));
+    const artPastillas = articulos.find(a => /pastilla/i.test(a.nombre));
+    const artDiscos = articulos.find(a => /disco/i.test(a.nombre));
 
     const tbody = document.getElementById('tbodyPedidos');
     const FECHAS = {
@@ -982,9 +1010,9 @@
       <td><span class="badge ${r.categoria === 'TNS' ? 'badge-tns' : 'badge-tmz'}">${r.categoria}</span></td>
       <td>${FECHAS[r.fecha_carrera] || r.fecha_carrera}</td>
       <td>${fmtDate(r.created_at)}</td>
-      <td>${r.cantidad_gomas || '—'}</td>
-      <td>${r.cantidad_pastillas || '—'}</td>
-      <td>${r.cantidad_discos || '—'}</td>
+      ${celdaPedido(r.cantidad_gomas, estadoPedidoItem(r.nombre, r.fecha_carrera, artGomas, r.cantidad_gomas, salidas))}
+      ${celdaPedido(r.cantidad_pastillas, estadoPedidoItem(r.nombre, r.fecha_carrera, artPastillas, r.cantidad_pastillas, salidas))}
+      ${celdaPedido(r.cantidad_discos, estadoPedidoItem(r.nombre, r.fecha_carrera, artDiscos, r.cantidad_discos, salidas))}
     </tr>`).join('');
 
     document.getElementById('pedidoTotalGomas').textContent = rows.reduce((s,r) => s + (r.cantidad_gomas || 0), 0) || '—';
