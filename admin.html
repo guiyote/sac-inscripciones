@@ -58,7 +58,8 @@
     .btn-refresh { background: var(--rojo); color: var(--blanco); border: none; border-radius: 3px; padding: 0.6rem 1.25rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.95rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
     .btn-refresh:hover { background: var(--rojo-oscuro); }
 
-    .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+    .summary-cards.money { grid-template-columns: repeat(auto-fit, minmax(140px, 220px)); margin-bottom: 2rem; }
     .summary-card { background: var(--gris-medio); border: 1px solid var(--borde); border-top: 3px solid var(--rojo); border-radius: 2px; padding: 1.1rem 1.25rem; display: flex; flex-direction: column; justify-content: flex-end; }
     .summary-card.s-verde { border-top-color: var(--verde); }
     .summary-card.s-ambar { border-top-color: #fb923c; }
@@ -485,6 +486,8 @@
     <div class="summary-card"><div class="num" id="totalTrackDay">—</div><div class="lbl">Track Day</div></div>
     <div class="summary-card"><div class="num" id="totalPicadas">—</div><div class="lbl">Picadas</div></div>
     <div class="summary-card"><div class="num" id="totalGeneral">—</div><div class="lbl">Total</div></div>
+  </div>
+  <div class="summary-cards money">
     <div class="summary-card s-verde"><div class="num verde" id="totalPagados">—</div><div class="lbl">Pagos</div></div>
     <div class="summary-card s-ambar"><div class="num ambar" id="totalDiferidos">—</div><div class="lbl">Pago diferido</div></div>
     <div class="summary-card s-verde"><div class="num verde" id="totalRecaudado">—</div><div class="lbl">Recaudado</div></div>
@@ -956,9 +959,10 @@
     _kData = kData; _tData = tData; _rData = rData; _tdData = tdData; _picData = picData;
 
     const todos = [...kData, ...tData, ...rData, ...tdData, ...picData];
-    const pagados = todos.filter(r => r.pago_confirmado && !r.baja);
-    const diferidos = pagados.filter(r => esDiferido(r));
-    const recaudado = pagados.reduce((s, r) => s + (parseFloat(r.pago_monto) || 0), 0);
+    const confirmados = todos.filter(r => r.pago_confirmado && !r.baja);
+    const diferidos = confirmados.filter(r => esDiferido(r));
+    const pagados = confirmados.filter(r => !esDiferido(r));
+    const recaudado = confirmados.reduce((s, r) => s + (parseFloat(r.pago_monto) || 0), 0);
 
     document.getElementById('totalKarting').textContent      = kData.length;
     document.getElementById('totalTurismo').textContent      = tData.length;
