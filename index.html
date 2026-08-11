@@ -168,7 +168,7 @@
 
     .cards {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 0.75rem;
     }
 
@@ -302,9 +302,6 @@
       color: var(--rojo);
     }
 
-    @media (max-width: 900px) {
-      .cards { grid-template-columns: repeat(3, 1fr); }
-    }
     @media (max-width: 600px) {
       .cards { grid-template-columns: repeat(2, 1fr); }
     }
@@ -396,6 +393,17 @@
         </div>
       </a>
 
+      <a class="card" id="card-copiloto" href="copiloto.html">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2l3 5 5 1-4 4 1 5-5-3-5 3 1-5-4-4 5-1z"/></svg>
+        </div>
+        <h2>Copiloto</h2>
+        <div class="card-cta">
+          Inscribirse
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+
       <a class="card" id="card-trackday" href="trackday.html">
         <div class="card-icon">
           <svg viewBox="0 0 24 24"><path d="M4 21V3"/><path d="M4 3h16v10H4"/><path d="M4 6.3h16M4 9.7h16"/><path d="M9.3 3v10M14.7 3v10"/></svg>
@@ -480,10 +488,10 @@
     })();
 
     (async () => {
-      const claves = ['inscripciones_karting', 'inscripciones_turismo', 'inscripciones_trackday', 'inscripciones_regularidad', 'inscripciones_picadas'];
+      const claves = ['inscripciones_karting', 'inscripciones_turismo', 'inscripciones_trackday', 'inscripciones_regularidad', 'inscripciones_picadas', 'inscripciones_copiloto'];
       const { data } = await sb.from('configuracion').select('clave,valor').in('clave', claves);
       if (!data) return;
-      const mapa = { inscripciones_karting: 'karting', inscripciones_turismo: 'turismo', inscripciones_trackday: 'trackday', inscripciones_regularidad: 'regularidad', inscripciones_picadas: 'picadas' };
+      const mapa = { inscripciones_karting: 'karting', inscripciones_turismo: 'turismo', inscripciones_trackday: 'trackday', inscripciones_regularidad: 'regularidad', inscripciones_picadas: 'picadas', inscripciones_copiloto: 'copiloto' };
       data.forEach(({ clave, valor }) => {
         if (valor === 'false') {
           const card = document.getElementById('card-' + mapa[clave]);

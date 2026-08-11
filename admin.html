@@ -389,6 +389,18 @@
       </select>
     </div>
 
+    <!-- Copiloto -->
+    <div id="editSectionCopiloto" style="display:none">
+      <label>Nombre y apellido</label>
+      <input type="text" id="eCP_nombre">
+      <label>Cédula</label>
+      <input type="text" id="eCP_cedula">
+      <label>Celular</label>
+      <input type="text" id="eCP_celular">
+      <label>Fecha de nacimiento</label>
+      <input type="date" id="eCP_fecha_nacimiento">
+    </div>
+
     <!-- Pago (común a todas las categorías) -->
     <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--borde)">
       <label>Estado de pago</label>
@@ -428,6 +440,7 @@
     <a href="regularidad.html?admin=1" target="_blank" style="font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#34d399;text-decoration:none;padding:0.3rem 0.75rem;border:1px solid rgba(52,211,153,0.3);border-radius:4px;transition:background 0.15s" onmouseover="this.style.background='rgba(52,211,153,0.1)'" onmouseout="this.style.background='transparent'">Regularidad</a>
     <a href="trackday.html?admin=1" target="_blank" style="font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#fde047;text-decoration:none;padding:0.3rem 0.75rem;border:1px solid rgba(234,179,8,0.3);border-radius:4px;transition:background 0.15s" onmouseover="this.style.background='rgba(234,179,8,0.1)'" onmouseout="this.style.background='transparent'">Track Day</a>
     <a href="picadas.html?admin=1" target="_blank" style="font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#c084fc;text-decoration:none;padding:0.3rem 0.75rem;border:1px solid rgba(192,132,252,0.3);border-radius:4px;transition:background 0.15s" onmouseover="this.style.background='rgba(192,132,252,0.1)'" onmouseout="this.style.background='transparent'">Picadas</a>
+    <a href="copiloto.html?admin=1" target="_blank" style="font-family:'Barlow Condensed',sans-serif;font-size:0.9rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#22d3ee;text-decoration:none;padding:0.3rem 0.75rem;border:1px solid rgba(34,211,238,0.3);border-radius:4px;transition:background 0.15s" onmouseover="this.style.background='rgba(34,211,238,0.1)'" onmouseout="this.style.background='transparent'">Copiloto</a>
   </div>
 
   <div class="filters">
@@ -457,6 +470,7 @@
         <option value="regularidad">Regularidad</option>
         <option value="trackday">Track Day</option>
         <option value="picadas">Picadas</option>
+        <option value="copiloto">Copiloto</option>
       </select>
     </div>
     <div class="filter-group">
@@ -485,6 +499,7 @@
     <div class="summary-card"><div class="num" id="totalRegularidad">—</div><div class="lbl">Regularidad</div></div>
     <div class="summary-card"><div class="num" id="totalTrackDay">—</div><div class="lbl">Track Day</div></div>
     <div class="summary-card"><div class="num" id="totalPicadas">—</div><div class="lbl">Picadas</div></div>
+    <div class="summary-card"><div class="num" id="totalCopiloto">—</div><div class="lbl">Copiloto</div></div>
     <div class="summary-card"><div class="num" id="totalGeneral">—</div><div class="lbl">Total</div></div>
   </div>
   <div class="summary-cards money">
@@ -536,11 +551,19 @@
     </table></div>
   </div>
 
+  <div class="section-block" id="secCopiloto">
+    <div class="section-header"><h2>Copiloto</h2><button class="btn-export" onclick="exportarCopiloto()">↓ Exportar TXT</button></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Nombre</th><th>CI</th><th>Fecha</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Acciones</th></tr></thead>
+      <tbody id="tbodyCopiloto"><tr><td colspan="8" class="loading">Cargando...</td></tr></tbody>
+    </table></div>
+  </div>
+
   <div class="section-block" id="secResumenCamp">
     <h2>Resumen por fecha — Campeonato</h2>
     <div class="table-wrap"><table>
-      <thead><tr><th>Fecha</th><th>Karting</th><th>TNS</th><th>TMZ</th><th>Regularidad</th><th>Track Day</th><th>Total</th><th>Pagos</th><th>Recaudado (UYU)</th></tr></thead>
-      <tbody id="tbodyPorFecha"><tr><td colspan="9" class="loading">Cargando...</td></tr></tbody>
+      <thead><tr><th>Fecha</th><th>Karting</th><th>TNS</th><th>TMZ</th><th>Regularidad</th><th>Track Day</th><th>Copiloto</th><th>Total</th><th>Pagos</th><th>Recaudado (UYU)</th></tr></thead>
+      <tbody id="tbodyPorFecha"><tr><td colspan="10" class="loading">Cargando...</td></tr></tbody>
     </table></div>
   </div>
 
@@ -577,7 +600,7 @@
 
   const TODAS_FECHAS = { ...FECHAS, ...FECHAS_PICADAS };
 
-  let _kData = [], _tData = [], _rData = [], _tdData = [], _picData = [];
+  let _kData = [], _tData = [], _rData = [], _tdData = [], _picData = [], _cpData = [];
 
   function fmtFecha(iso) { return TODAS_FECHAS[iso] || iso || '—'; }
   function fmtCI(v) {
@@ -703,6 +726,7 @@
       'inscripciones_regularidad': _rData,
       'inscripciones_trackday': _tdData,
       'inscripciones_picadas': _picData,
+      'inscripciones_copiloto': _cpData,
     };
     const row = (datasets[tabla] || []).find(r => String(r.id) === id);
     if (!row) return;
@@ -762,6 +786,7 @@
     document.getElementById('editSectionRegularidad').style.display = 'none';
     document.getElementById('editSectionTrackDay').style.display = 'none';
     document.getElementById('editSectionPicadas').style.display = 'none';
+    document.getElementById('editSectionCopiloto').style.display = 'none';
 
     document.getElementById('editFechaCarrera').value = r.fecha_carrera || '';
 
@@ -822,6 +847,13 @@
       document.getElementById('ePic_categoria').value = r.categoria || '';
       document.getElementById('ePic_numero_vehiculo').value = r.numero_vehiculo || '';
       document.getElementById('ePic_reinscripcion').value = r.reinscripcion ? 'true' : 'false';
+    } else if (tabla === 'inscripciones_copiloto') {
+      document.getElementById('modalEditarNombre').textContent = r.nombre || '';
+      document.getElementById('editSectionCopiloto').style.display = '';
+      document.getElementById('eCP_nombre').value = r.nombre || '';
+      document.getElementById('eCP_cedula').value = r.cedula || '';
+      document.getElementById('eCP_celular').value = r.celular || '';
+      document.getElementById('eCP_fecha_nacimiento').value = r.fecha_nacimiento || '';
     }
 
     document.getElementById('edit_pago_confirmado').value = r.pago_confirmado ? 'true' : 'false';
@@ -904,6 +936,13 @@
         numero_vehiculo: document.getElementById('ePic_numero_vehiculo').value.trim() || null,
         reinscripcion: document.getElementById('ePic_reinscripcion').value === 'true',
       });
+    } else if (tabla === 'inscripciones_copiloto') {
+      Object.assign(updates, {
+        nombre: document.getElementById('eCP_nombre').value.trim() || null,
+        cedula: document.getElementById('eCP_cedula').value.trim() || null,
+        celular: document.getElementById('eCP_celular').value.trim() || null,
+        fecha_nacimiento: document.getElementById('eCP_fecha_nacimiento').value || null,
+      });
     }
 
     const { error } = await sb.from(tabla).update(updates).eq('id', id);
@@ -942,6 +981,7 @@
     const mostrarR   = !esFechaPicadas && (!filtroCat || filtroCat === 'regularidad');
     const mostrarTD  = !esFechaPicadas && (!filtroCat || filtroCat === 'trackday');
     const mostrarPic = !esFechaCamp    && (!filtroCat || filtroCat === 'picadas');
+    const mostrarCP  = !esFechaPicadas && (!filtroCat || filtroCat === 'copiloto');
     const mostrarCamp = !esFechaPicadas && (!filtroCat || filtroCat !== 'picadas');
 
     document.getElementById('secKarting').style.display        = mostrarK    ? '' : 'none';
@@ -951,17 +991,19 @@
     document.getElementById('secResumenCamp').style.display    = mostrarCamp ? '' : 'none';
     document.getElementById('secPicadas').style.display        = mostrarPic  ? '' : 'none';
     document.getElementById('secResumenPicadas').style.display = mostrarPic  ? '' : 'none';
+    document.getElementById('secCopiloto').style.display       = mostrarCP   ? '' : 'none';
 
-    const [kData, tData, rData, tdData, picData] = await Promise.all([
+    const [kData, tData, rData, tdData, picData, cpData] = await Promise.all([
       mostrarK   ? queryTabla('inscripciones_karting',    filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
       mostrarT   ? queryTabla('inscripciones_turismo',    filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
       mostrarR   ? queryTabla('inscripciones_regularidad',filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
       mostrarTD  ? queryTabla('inscripciones_trackday',   filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
       mostrarPic ? queryTabla('inscripciones_picadas',    filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
+      mostrarCP  ? queryTabla('inscripciones_copiloto',   filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
     ]);
-    _kData = kData; _tData = tData; _rData = rData; _tdData = tdData; _picData = picData;
+    _kData = kData; _tData = tData; _rData = rData; _tdData = tdData; _picData = picData; _cpData = cpData;
 
-    const todos = [...kData, ...tData, ...rData, ...tdData, ...picData];
+    const todos = [...kData, ...tData, ...rData, ...tdData, ...picData, ...cpData];
     const confirmados = todos.filter(r => r.pago_confirmado && !r.baja);
     const diferidos = confirmados.filter(r => esDiferido(r));
     const pagados = confirmados.filter(r => !esDiferido(r));
@@ -972,6 +1014,7 @@
     document.getElementById('totalRegularidad').textContent  = rData.length;
     document.getElementById('totalTrackDay').textContent     = tdData.length;
     document.getElementById('totalPicadas').textContent      = picData.length;
+    document.getElementById('totalCopiloto').textContent     = cpData.length;
     document.getElementById('totalGeneral').textContent      = todos.length;
     document.getElementById('totalPagados').textContent      = pagados.length;
     document.getElementById('totalDiferidos').textContent    = diferidos.length;
@@ -1089,16 +1132,35 @@
           </div></td>
         </tr>`).join('');
 
+    // Copiloto
+    document.getElementById('tbodyCopiloto').innerHTML = cpData.length === 0
+      ? '<tr><td colspan="8" class="empty">Sin inscripciones</td></tr>'
+      : cpData.map(r => `<tr class="${r.baja ? 'baja-row' : ''}">
+          <td>${val(r.nombre)}</td>
+          <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtCI(r.cedula)}</td>
+          <td>${fmtFecha(r.fecha_carrera)}</td>
+          <td><span class="badge ${badgePago(r).cls}">${badgePago(r).label}</span></td>
+          <td>${fmtMonto(r.pago_monto)}</td>
+          <td>${capFirst(r.pago_medio)}</td>
+          <td>${fmtDate(r.pago_fecha)}</td>
+          <td><div class="acciones">
+            ${esAdmin && !r.baja ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_copiloto','${r.id}')">Modificar</button>` : ''}
+            ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_copiloto','${r.id}','${r.nombre}',500)">Pago</button>` : ''}
+            ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_copiloto','${r.id}','${r.nombre}')">Baja</button>` : esAdmin ? `${r.baja_motivo ? `<button class="btn-accion btn-motivo" onclick="mostrarMotivoBaja('inscripciones_copiloto','${r.id}')">Motivo</button>` : ''}<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_copiloto','${r.id}','${r.nombre}')">Alta</button>` : '—'}
+          </div></td>
+        </tr>`).join('');
+
     await cargarPorFecha(filtroFecha);
     await cargarResumenPicadas();
   }
 
   async function cargarPorFecha(filtroFecha) {
-    const [{ data: kAll }, { data: tAll }, { data: rAll }, { data: tdAll }] = await Promise.all([
+    const [{ data: kAll }, { data: tAll }, { data: rAll }, { data: tdAll }, { data: cpAll }] = await Promise.all([
       sb.from('inscripciones_karting').select('fecha_carrera, pago_confirmado, pago_monto, baja'),
       sb.from('inscripciones_turismo').select('fecha_carrera, categoria, pago_confirmado, pago_monto, baja'),
       sb.from('inscripciones_regularidad').select('fecha_carrera, pago_confirmado, pago_monto, baja'),
       sb.from('inscripciones_trackday').select('fecha_carrera, pago_confirmado, pago_monto, baja'),
+      sb.from('inscripciones_copiloto').select('fecha_carrera, pago_confirmado, pago_monto, baja'),
     ]);
 
     const rows = Object.keys(FECHAS).map(f => {
@@ -1107,18 +1169,19 @@
       const tmz = (tAll  || []).filter(r => r.fecha_carrera === f && r.categoria === 'TMZ' && !r.baja);
       const reg = (rAll  || []).filter(r => r.fecha_carrera === f && !r.baja);
       const td  = (tdAll || []).filter(r => r.fecha_carrera === f && !r.baja);
-      const todos = [...k, ...tns, ...tmz, ...reg, ...td];
+      const cp  = (cpAll || []).filter(r => r.fecha_carrera === f && !r.baja);
+      const todos = [...k, ...tns, ...tmz, ...reg, ...td, ...cp];
       const pagados = todos.filter(r => r.pago_confirmado).length;
       const recaudado = todos.filter(r => r.pago_confirmado).reduce((s, r) => s + (parseFloat(r.pago_monto) || 0), 0);
-      return { f, k: k.length, tns: tns.length, tmz: tmz.length, reg: reg.length, td: td.length, total: todos.length, pagados, recaudado };
+      return { f, k: k.length, tns: tns.length, tmz: tmz.length, reg: reg.length, td: td.length, cp: cp.length, total: todos.length, pagados, recaudado };
     }).filter(r => !filtroFecha || r.f === filtroFecha);
 
     const hayDatos = rows.some(r => r.total > 0);
     document.getElementById('tbodyPorFecha').innerHTML = !hayDatos
-      ? '<tr><td colspan="9" class="empty">Sin inscripciones</td></tr>'
+      ? '<tr><td colspan="10" class="empty">Sin inscripciones</td></tr>'
       : rows.map(r => `<tr>
           <td>${FECHAS[r.f]}</td>
-          <td>${r.k || '—'}</td><td>${r.tns || '—'}</td><td>${r.tmz || '—'}</td><td>${r.reg || '—'}</td><td>${r.td || '—'}</td>
+          <td>${r.k || '—'}</td><td>${r.tns || '—'}</td><td>${r.tmz || '—'}</td><td>${r.reg || '—'}</td><td>${r.td || '—'}</td><td>${r.cp || '—'}</td>
           <td><strong>${r.total || '—'}</strong></td>
           <td>${r.pagados || '—'}</td>
           <td>${r.recaudado ? `$ ${r.recaudado.toLocaleString('es-UY')}` : '—'}</td>
@@ -1241,6 +1304,16 @@
       ...(r.reinscripcion ? [`             (reinscripción)`] : []),
       `Pago:        ${fmtPago(r)}`,
     ], 'picadas');
+  }
+
+  function exportarCopiloto() {
+    exportarTXT(_cpData, 'COPILOTO', r => [
+      `Nombre:      ${r.nombre || '—'}`,
+      `CI:          ${fmtCI(r.cedula)}`,
+      ...(r.celular ? [`Celular:     ${r.celular}`] : []),
+      `Fecha:       ${fmtFecha(r.fecha_carrera)}`,
+      `Pago:        ${fmtPago(r)}`,
+    ], 'copiloto');
   }
 </script>
 </body>
