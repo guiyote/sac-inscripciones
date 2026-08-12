@@ -71,6 +71,16 @@
     .deslinde-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--rojo); cursor: pointer; flex-shrink: 0; margin-top: 2px; }
     .deslinde-texto { font-size: 0.85rem; color: #ccc; line-height: 1.55; cursor: pointer; }
 
+    .dia-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .dia-item { position: relative; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; background: var(--gris-campo); border: 1px solid var(--borde); border-radius: 3px; padding: 1rem 0.75rem; cursor: pointer; text-align: center; transition: border-color 0.15s, opacity 0.15s; }
+    .dia-item:hover { border-color: #555; }
+    .dia-item.checked { border-color: var(--rojo); background: rgba(204,0,0,0.06); }
+    .dia-item input[type="radio"] { position: absolute; opacity: 0; pointer-events: none; }
+    .dia-nombre { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1rem; letter-spacing: 1px; text-transform: uppercase; }
+    .dia-cupos { font-size: 0.78rem; color: var(--texto-muted); }
+    .dia-item.full { opacity: 0.5; cursor: not-allowed; }
+    .dia-item.full .dia-cupos { color: var(--rojo); }
+
     .submit-btn { width: 100%; background: var(--rojo); color: var(--blanco); border: none; border-radius: 3px; padding: 1rem; font-family: 'Barlow Condensed', sans-serif; font-size: 1.1rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; margin-top: 2rem; transition: background 0.15s; }
     .submit-btn:hover { background: var(--rojo-oscuro); }
     .submit-btn:disabled { background: #555; cursor: not-allowed; }
@@ -155,6 +165,21 @@
             </select>
           </div>
         </div>
+        <div class="field">
+          <label>Día <span class="req">*</span></label>
+          <div class="dia-grid" id="diaGrid">
+            <label class="dia-item" id="diaItemSabado">
+              <input type="radio" name="dia" id="diaSabado" value="sabado" required>
+              <span class="dia-nombre">Sábado</span>
+              <span class="dia-cupos" id="cuposSabado">Cargando cupos...</span>
+            </label>
+            <label class="dia-item" id="diaItemDomingo">
+              <input type="radio" name="dia" id="diaDomingo" value="domingo" required>
+              <span class="dia-nombre">Domingo</span>
+              <span class="dia-cupos" id="cuposDomingo">Cargando cupos...</span>
+            </label>
+          </div>
+        </div>
       </div>
 
       <div class="form-section">
@@ -223,6 +248,57 @@
       document.getElementById('deslindeItem').classList.toggle('checked', this.checked);
     });
 
+    Array.from(document.querySelectorAll('.dia-item input[type="radio"]')).forEach(input => {
+      input.addEventListener('change', function() {
+        document.querySelectorAll('.dia-item').forEach(el => el.classList.remove('checked'));
+        if (this.checked) this.closest('.dia-item').classList.add('checked');
+      });
+    });
+
+    function pintarDia(dia, cupoMax, ocupados) {
+      const disponibles = Math.max(cupoMax - ocupados, 0);
+      const sufijo = dia === 'sabado' ? 'Sabado' : 'Domingo';
+      const item = document.getElementById('diaItem' + sufijo);
+      const cuposEl = document.getElementById('cupos' + sufijo);
+      const input = document.getElementById('dia' + sufijo);
+      const lleno = disponibles <= 0;
+      input.disabled = lleno;
+      item.classList.toggle('full', lleno);
+      cuposEl.textContent = lleno ? 'Sin cupos disponibles' : `${disponibles} cupo${disponibles === 1 ? '' : 's'} disponible${disponibles === 1 ? '' : 's'}`;
+      if (lleno && input.checked) {
+        input.checked = false;
+        item.classList.remove('checked');
+      }
+    }
+
+    async function contarOcupados(fecha_carrera) {
+      const { data } = await sb.from('inscripciones_copiloto')
+        .select('dia')
+        .eq('fecha_carrera', fecha_carrera)
+        .eq('baja', false);
+      return {
+        sabado: (data || []).filter(r => r.dia === 'sabado').length,
+        domingo: (data || []).filter(r => r.dia === 'domingo').length,
+      };
+    }
+
+    async function actualizarCupos() {
+      const fecha_carrera = document.getElementById('fecha_carrera').value;
+      if (!fecha_carrera) return;
+
+      const { data: cfgData } = await sb.from('configuracion')
+        .select('clave, valor')
+        .in('clave', ['cupos_copiloto_sabado', 'cupos_copiloto_domingo']);
+      const cfg = {};
+      (cfgData || []).forEach(r => { cfg[r.clave] = parseInt(r.valor) || 0; });
+
+      const ocupados = await contarOcupados(fecha_carrera);
+      pintarDia('sabado', cfg['cupos_copiloto_sabado'] || 0, ocupados.sabado);
+      pintarDia('domingo', cfg['cupos_copiloto_domingo'] || 0, ocupados.domingo);
+    }
+
+    document.getElementById('fecha_carrera').addEventListener('change', actualizarCupos);
+
     function calcularEdad(fechaISO) {
       const hoy = new Date();
       const nac = new Date(fechaISO + 'T00:00:00');
@@ -240,11 +316,19 @@
       msgBox.textContent = '';
 
       const fecha_carrera = document.getElementById('fecha_carrera').value;
+      const diaInput = document.querySelector('input[name="dia"]:checked');
+      const dia = diaInput ? diaInput.value : null;
       const nombre = document.getElementById('nombre').value.trim();
       const cedula = document.getElementById('cedula').value.trim();
       const celular = document.getElementById('celular').value.trim() || null;
       const fecha_nacimiento = document.getElementById('fecha_nacimiento').value;
       const acepta_deslinde = document.getElementById('acepta_deslinde').checked;
+
+      if (!dia) {
+        msgBox.className = 'msg error';
+        msgBox.textContent = 'Seleccioná el día en el que querés participar.';
+        return;
+      }
 
       if (!acepta_deslinde) {
         msgBox.className = 'msg error';
@@ -276,10 +360,27 @@
         return;
       }
 
+      const { data: cfgData } = await sb.from('configuracion')
+        .select('valor')
+        .eq('clave', 'cupos_copiloto_' + dia)
+        .single();
+      const cupoMax = parseInt(cfgData?.valor) || 0;
+      const ocupados = await contarOcupados(fecha_carrera);
+
+      if (ocupados[dia] >= cupoMax) {
+        msgBox.className = 'msg error';
+        msgBox.textContent = 'Se acaban de agotar los cupos para ese día. Elegí el otro día disponible.';
+        await actualizarCupos();
+        btn.disabled = false;
+        btn.textContent = 'Enviar inscripción';
+        return;
+      }
+
       btn.textContent = 'Enviando...';
 
       const { error } = await sb.from('inscripciones_copiloto').insert([{
         fecha_carrera,
+        dia,
         nombre,
         cedula,
         celular,
@@ -289,13 +390,18 @@
 
       if (error) {
         msgBox.className = 'msg error';
-        msgBox.textContent = 'Hubo un error al enviar. Por favor intentá nuevamente.';
+        msgBox.textContent = error.message && error.message.includes('Cupo lleno')
+          ? 'Se acaban de agotar los cupos para ese día. Elegí el otro día disponible.'
+          : 'Hubo un error al enviar. Por favor intentá nuevamente.';
         console.error(error);
+        await actualizarCupos();
       } else {
         msgBox.className = 'msg success';
         msgBox.innerHTML = '¡Inscripción enviada! Nos vemos en la pista.<br><br>Para confirmar tu pago transferí a:<br><strong>BROU · Salto Automóvil Club</strong><br>CA 001540985-00003<br><br>También podés abonar en efectivo el día del evento.';
         e.target.reset();
         document.getElementById('deslindeItem').classList.remove('checked');
+        document.querySelectorAll('.dia-item').forEach(el => el.classList.remove('checked'));
+        await actualizarCupos();
       }
 
       btn.disabled = false;
@@ -327,6 +433,8 @@
         placeholder.selected = true;
         select.disabled = true;
         document.getElementById('submitBtn').disabled = true;
+      } else {
+        actualizarCupos();
       }
     })();
   </script>

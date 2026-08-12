@@ -80,6 +80,15 @@
 
     .saving-indicator { display: none; font-size: 0.75rem; color: var(--texto-muted); letter-spacing: 1px; margin-top: 0.25rem; }
 
+    .toggle-card.con-cupos { flex-direction: column; align-items: stretch; }
+    .toggle-card-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .cupos-row { display: flex; gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--borde); }
+    .cupos-field { flex: 1; }
+    .cupos-field label { display: block; font-size: 0.7rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--texto-muted); margin-bottom: 0.35rem; }
+    .cupos-field input { width: 100%; background: var(--gris-campo); border: 1px solid var(--borde); border-radius: 3px; padding: 0.5rem 0.75rem; color: var(--blanco); font-family: 'Barlow', sans-serif; font-size: 0.95rem; outline: none; }
+    .cupos-field input:focus { border-color: var(--rojo); }
+    .cupos-field input:disabled { opacity: 0.6; cursor: not-allowed; }
+
     .viewer-notice { background: rgba(255,255,255,0.04); border: 1px solid var(--borde); border-radius: 2px; padding: 0.75rem 1rem; margin-bottom: 1.5rem; font-size: 0.85rem; color: var(--texto-muted); }
 
     @media (max-width: 600px) {
@@ -151,8 +160,10 @@
       { clave: 'inscripciones_trackday',    nombre: 'Track Day' },
       { clave: 'inscripciones_regularidad', nombre: 'Regularidad' },
       { clave: 'inscripciones_picadas',     nombre: 'Picadas 201mts' },
-      { clave: 'inscripciones_copiloto',    nombre: 'Copiloto' },
+      { clave: 'inscripciones_copiloto',    nombre: 'Copiloto', cupos: true },
     ];
+
+    const CUPOS_CLAVES = ['cupos_copiloto_sabado', 'cupos_copiloto_domingo'];
 
     let isAdmin = false;
 
@@ -160,34 +171,66 @@
       const grid = document.getElementById('toggleGrid');
       grid.innerHTML = '';
 
-      CATEGORIAS.forEach(({ clave, nombre }) => {
+      CATEGORIAS.forEach(({ clave, nombre, cupos }) => {
         const habilitada = valores[clave] !== 'false';
 
         const card = document.createElement('div');
-        card.className = 'toggle-card' + (habilitada ? ' habilitada' : '');
+        card.className = 'toggle-card' + (habilitada ? ' habilitada' : '') + (cupos ? ' con-cupos' : '');
         card.id = 'card-' + clave;
 
         card.innerHTML = `
-          <div class="toggle-info">
-            <div class="toggle-nombre">${nombre}</div>
-            <div class="toggle-estado ${habilitada ? 'on' : 'off'}" id="estado-${clave}">
-              ${habilitada ? 'Habilitada' : 'Deshabilitada'}
+          <div class="toggle-card-top">
+            <div class="toggle-info">
+              <div class="toggle-nombre">${nombre}</div>
+              <div class="toggle-estado ${habilitada ? 'on' : 'off'}" id="estado-${clave}">
+                ${habilitada ? 'Habilitada' : 'Deshabilitada'}
+              </div>
+              <div class="saving-indicator" id="saving-${clave}">Guardando…</div>
             </div>
-            <div class="saving-indicator" id="saving-${clave}">Guardando…</div>
+            <label class="switch${isAdmin ? '' : ' readonly'}">
+              <input type="checkbox" id="toggle-${clave}" ${habilitada ? 'checked' : ''} ${isAdmin ? '' : 'disabled'}>
+              <span class="slider"></span>
+            </label>
           </div>
-          <label class="switch${isAdmin ? '' : ' readonly'}">
-            <input type="checkbox" id="toggle-${clave}" ${habilitada ? 'checked' : ''} ${isAdmin ? '' : 'disabled'}>
-            <span class="slider"></span>
-          </label>
+          ${cupos ? `
+          <div class="cupos-row">
+            <div class="cupos-field">
+              <label for="cupo-sabado">Cupos sábado</label>
+              <input type="number" min="0" step="1" id="cupo-sabado" value="${valores['cupos_copiloto_sabado'] ?? ''}" ${isAdmin ? '' : 'disabled'}>
+            </div>
+            <div class="cupos-field">
+              <label for="cupo-domingo">Cupos domingo</label>
+              <input type="number" min="0" step="1" id="cupo-domingo" value="${valores['cupos_copiloto_domingo'] ?? ''}" ${isAdmin ? '' : 'disabled'}>
+            </div>
+          </div>` : ''}
         `;
 
         if (isAdmin) {
           const input = card.querySelector('input[type=checkbox]');
           input.addEventListener('change', () => handleToggle(clave, input.checked));
+
+          if (cupos) {
+            card.querySelector('#cupo-sabado').addEventListener('change', e => handleCupo('cupos_copiloto_sabado', e.target));
+            card.querySelector('#cupo-domingo').addEventListener('change', e => handleCupo('cupos_copiloto_domingo', e.target));
+          }
         }
 
         grid.appendChild(card);
       });
+    }
+
+    async function handleCupo(clave, input) {
+      const valor = parseInt(input.value);
+      if (isNaN(valor) || valor < 0) {
+        alert('Ingresá un número de cupos válido (0 o más).');
+        return;
+      }
+      input.disabled = true;
+      const { error } = await sb.from('configuracion')
+        .update({ valor: String(valor) })
+        .eq('clave', clave);
+      input.disabled = false;
+      if (error) alert('Error al guardar. Intentá de nuevo.');
     }
 
     async function handleToggle(clave, habilitada) {
@@ -225,7 +268,7 @@
         document.getElementById('viewerNotice').style.display = '';
       }
 
-      const claves = CATEGORIAS.map(c => c.clave);
+      const claves = CATEGORIAS.map(c => c.clave).concat(CUPOS_CLAVES);
       const { data } = await sb.from('configuracion').select('clave,valor').in('clave', claves);
       const valores = {};
       (data || []).forEach(r => { valores[r.clave] = r.valor; });

@@ -399,6 +399,11 @@
       <input type="text" id="eCP_celular">
       <label>Fecha de nacimiento</label>
       <input type="date" id="eCP_fecha_nacimiento">
+      <label>Día</label>
+      <select id="eCP_dia">
+        <option value="sabado">Sábado</option>
+        <option value="domingo">Domingo</option>
+      </select>
     </div>
 
     <!-- Pago (común a todas las categorías) -->
@@ -554,8 +559,8 @@
   <div class="section-block" id="secCopiloto">
     <div class="section-header"><h2>Copiloto</h2><button class="btn-export" onclick="exportarCopiloto()">↓ Exportar TXT</button></div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Nombre</th><th>CI</th><th>Fecha</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Acciones</th></tr></thead>
-      <tbody id="tbodyCopiloto"><tr><td colspan="8" class="loading">Cargando...</td></tr></tbody>
+      <thead><tr><th>Nombre</th><th>CI</th><th>Fecha</th><th>Día</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Acciones</th></tr></thead>
+      <tbody id="tbodyCopiloto"><tr><td colspan="9" class="loading">Cargando...</td></tr></tbody>
     </table></div>
   </div>
 
@@ -615,6 +620,7 @@
   function val(v) { return (v != null && v !== '') ? v : '—'; }
   function fmtMonto(v) { return v != null ? `$ ${Number(v).toLocaleString('es-UY')}` : '—'; }
   function capFirst(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : '—'; }
+  function fmtDia(dia) { return dia === 'sabado' ? 'Sábado' : dia === 'domingo' ? 'Domingo' : '—'; }
 
   // AUTH
   async function checkSession() {
@@ -740,7 +746,7 @@
     if (!confirm(`¿Dar de alta a ${nombre}?`)) return;
     const { error } = await sb.from(tabla).update({ baja: false, baja_motivo: null }).eq('id', id);
     if (!error) cargarDatos();
-    else alert('Error al dar de alta. Intentá nuevamente.');
+    else alert(error.message && error.message.includes('Cupo lleno') ? 'No hay cupo para ese día.' : 'Error al dar de alta. Intentá nuevamente.');
   }
 
   function esDiferido(r) {
@@ -854,6 +860,7 @@
       document.getElementById('eCP_cedula').value = r.cedula || '';
       document.getElementById('eCP_celular').value = r.celular || '';
       document.getElementById('eCP_fecha_nacimiento').value = r.fecha_nacimiento || '';
+      document.getElementById('eCP_dia').value = r.dia || 'sabado';
     }
 
     document.getElementById('edit_pago_confirmado').value = r.pago_confirmado ? 'true' : 'false';
@@ -942,13 +949,14 @@
         cedula: document.getElementById('eCP_cedula').value.trim() || null,
         celular: document.getElementById('eCP_celular').value.trim() || null,
         fecha_nacimiento: document.getElementById('eCP_fecha_nacimiento').value || null,
+        dia: document.getElementById('eCP_dia').value || null,
       });
     }
 
     const { error } = await sb.from(tabla).update(updates).eq('id', id);
     btn.disabled = false; btn.textContent = 'Guardar cambios';
     if (!error) { cerrarModal('modalEditar'); cargarDatos(); }
-    else alert('Error al guardar. Intentá nuevamente.');
+    else alert(error.message && error.message.includes('Cupo lleno') ? 'No hay cupo para ese día.' : 'Error al guardar. Intentá nuevamente.');
   });
 
   // DATOS
@@ -1134,11 +1142,12 @@
 
     // Copiloto
     document.getElementById('tbodyCopiloto').innerHTML = cpData.length === 0
-      ? '<tr><td colspan="8" class="empty">Sin inscripciones</td></tr>'
+      ? '<tr><td colspan="9" class="empty">Sin inscripciones</td></tr>'
       : cpData.map(r => `<tr class="${r.baja ? 'baja-row' : ''}">
           <td>${val(r.nombre)}</td>
           <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtCI(r.cedula)}</td>
           <td>${fmtFecha(r.fecha_carrera)}</td>
+          <td>${fmtDia(r.dia)}</td>
           <td><span class="badge ${badgePago(r).cls}">${badgePago(r).label}</span></td>
           <td>${fmtMonto(r.pago_monto)}</td>
           <td>${capFirst(r.pago_medio)}</td>
@@ -1312,6 +1321,7 @@
       `CI:          ${fmtCI(r.cedula)}`,
       ...(r.celular ? [`Celular:     ${r.celular}`] : []),
       `Fecha:       ${fmtFecha(r.fecha_carrera)}`,
+      `Día:         ${fmtDia(r.dia)}`,
       `Pago:        ${fmtPago(r)}`,
     ], 'copiloto');
   }
