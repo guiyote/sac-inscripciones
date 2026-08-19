@@ -1160,7 +1160,7 @@
           <td>${fmtDate(r.pago_fecha)}</td>
           <td><div class="acciones">
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_copiloto','${r.id}')">Modificar</button>` : ''}
-            ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_copiloto','${r.id}','${r.nombre}',500)">Pago</button>` : ''}
+            ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_copiloto','${r.id}','${r.nombre}',1000)">Pago</button>` : ''}
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_copiloto','${r.id}','${r.nombre}')">Baja</button>` : esAdmin ? `${r.baja_motivo ? `<button class="btn-accion btn-motivo" onclick="mostrarMotivoBaja('inscripciones_copiloto','${r.id}')">Motivo</button>` : ''}<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_copiloto','${r.id}','${r.nombre}')">Alta</button>` : '—'}
           </div></td>
         </tr>`).join('');
