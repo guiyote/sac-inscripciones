@@ -89,6 +89,7 @@
     .badge-tmz { background: rgba(168,85,247,0.12); color: #d8b4fe; border: 1px solid rgba(168,85,247,0.25); }
     .badge-pagado { background: rgba(22,163,74,0.15); color: #4ade80; border: 1px solid rgba(22,163,74,0.3); }
     .badge-pendiente { background: rgba(234,179,8,0.12); color: #fde047; border: 1px solid rgba(234,179,8,0.25); }
+    .badge-recargo { background: rgba(236,72,153,0.15); color: #f472b6; border: 1px solid rgba(236,72,153,0.3); }
     .badge-diferido { background: rgba(251,146,60,0.15); color: #fb923c; border: 1px solid rgba(251,146,60,0.3); }
     .badge-baja { background: rgba(100,100,100,0.15); color: #999; border: 1px solid #444; }
     .badge-trackday { background: rgba(234,179,8,0.12); color: #fde047; border: 1px solid rgba(234,179,8,0.25); }
@@ -485,6 +486,7 @@
         <option value="pagado">Pagos</option>
         <option value="diferido">Pago diferido</option>
         <option value="pendiente">Pendientes</option>
+        <option value="recargo">Pendientes c/recargo</option>
       </select>
     </div>
     <div class="filter-group">
@@ -754,7 +756,10 @@
   }
 
   function badgePago(r) {
-    if (!r.pago_confirmado) return { cls: 'badge-pendiente', label: 'Pendiente' };
+    if (!r.pago_confirmado) {
+      if (r.con_recargo) return { cls: 'badge-recargo', label: 'Pendiente c/recargo' };
+      return { cls: 'badge-pendiente', label: 'Pendiente' };
+    }
     if (esDiferido(r)) return { cls: 'badge-diferido', label: 'Pago diferido' };
     return { cls: 'badge-pagado', label: 'Pagado' };
   }
@@ -968,6 +973,7 @@
     if (filtroPago === 'pagado') q = q.eq('pago_confirmado', true);
     if (filtroPago === 'diferido') q = q.eq('pago_confirmado', true).or('pago_monto.eq.0,pago_monto.is.null');
     if (filtroPago === 'pendiente') q = q.eq('pago_confirmado', false);
+    if (filtroPago === 'recargo') q = q.eq('pago_confirmado', false).eq('con_recargo', true);
     if (filtroBaja === 'activos') q = q.eq('baja', false);
     if (filtroBaja === 'bajas') q = q.eq('baja', true);
     const { data } = await q;
@@ -1044,7 +1050,7 @@
           <td>${transponderCell(r)}</td>
           <td><div class="acciones">
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_karting','${r.id}')">Modificar</button>` : ''}
-            ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_karting','${r.id}','${r.nombre}')">Pago</button>` : ''}
+            ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_karting','${r.id}','${r.nombre}',${r.con_recargo ? 4500 : 'null'})">Pago</button>` : ''}
             ${esAdmin && r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-transponder" onclick="abrirModalTransponder('inscripciones_karting','${r.id}','${r.nombre}','${r.transponder||''}')">${r.transponder ? 'T: '+r.transponder : 'Transponder'}</button>` : ''}
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_karting','${r.id}','${r.nombre}')">Baja</button>` : esAdmin ? `${r.baja_motivo ? `<button class="btn-accion btn-motivo" onclick="mostrarMotivoBaja('inscripciones_karting','${r.id}')">Motivo</button>` : ''}<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_karting','${r.id}','${r.nombre}')">Alta</button>` : '—'}
           </div></td>
@@ -1068,7 +1074,7 @@
           <td>${transponderCell(r)}</td>
           <td><div class="acciones">
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_turismo','${r.id}')">Modificar</button>` : ''}
-            ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_turismo','${r.id}','${r.nombre}')">Pago</button>` : ''}
+            ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_turismo','${r.id}','${r.nombre}',${r.con_recargo ? (r.categoria === 'TNS' ? 8500 : 6500) : 'null'})">Pago</button>` : ''}
             ${esAdmin && r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-transponder" onclick="abrirModalTransponder('inscripciones_turismo','${r.id}','${r.nombre}','${r.transponder||''}')">${r.transponder ? 'T: '+r.transponder : 'Transponder'}</button>` : ''}
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_turismo','${r.id}','${r.nombre}')">Baja</button>` : esAdmin ? `${r.baja_motivo ? `<button class="btn-accion btn-motivo" onclick="mostrarMotivoBaja('inscripciones_turismo','${r.id}')">Motivo</button>` : ''}<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_turismo','${r.id}','${r.nombre}')">Alta</button>` : '—'}
           </div></td>
@@ -1091,7 +1097,7 @@
           <td>${transponderCell(r)}</td>
           <td><div class="acciones">
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-editar" onclick="abrirModalEditar('inscripciones_regularidad','${r.id}')">Modificar</button>` : ''}
-            ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Pago</button>` : ''}
+            ${esAdmin && !r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-pago" onclick="abrirModalPago('inscripciones_regularidad','${r.id}','${r.nombre_piloto}',${r.con_recargo ? 2500 : 'null'})">Pago</button>` : ''}
             ${esAdmin && r.pago_confirmado && !r.baja ? `<button class="btn-accion btn-transponder" onclick="abrirModalTransponder('inscripciones_regularidad','${r.id}','${r.nombre_piloto}','${r.transponder||''}')">${r.transponder ? 'T: '+r.transponder : 'Transponder'}</button>` : ''}
             ${esAdmin && !r.baja ? `<button class="btn-accion btn-baja" onclick="abrirModalBaja('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Baja</button>` : esAdmin ? `${r.baja_motivo ? `<button class="btn-accion btn-motivo" onclick="mostrarMotivoBaja('inscripciones_regularidad','${r.id}')">Motivo</button>` : ''}<button class="btn-accion btn-alta" onclick="darAlta('inscripciones_regularidad','${r.id}','${r.nombre_piloto}')">Alta</button>` : '—'}
           </div></td>
@@ -1247,7 +1253,7 @@
   }
 
   function fmtPago(r) {
-    if (!r.pago_confirmado) return 'PENDIENTE';
+    if (!r.pago_confirmado) return r.con_recargo ? 'PENDIENTE C/RECARGO ($500)' : 'PENDIENTE';
     let s = esDiferido(r) ? 'PAGO DIFERIDO' : 'PAGADO';
     if (r.pago_monto) s += ` — $${Number(r.pago_monto).toLocaleString('es-UY')}`;
     if (r.pago_medio) s += ` (${r.pago_medio})`;
