@@ -12,6 +12,7 @@ sac-inscripciones/
 ├── regularidad.html              ← Inscripción Regularidad
 ├── admin.html                    ← Panel de administración (requiere login)
 ├── stock.html                    ← Gestión de stock de repuestos (requiere login)
+├── reset-password.html           ← Restablecer contraseña (link enviado por email)
 ├── logo.jpeg                     ← Logo SAC
 └── sql/
     ├── supabase_setup.sql            ← Tablas base + RLS inicial
@@ -47,7 +48,26 @@ Ir a **SQL Editor** en el dashboard de Supabase y ejecutar los archivos en este 
 
 En Supabase → **Authentication → Users → Add user → Create new user**. Ese mismo usuario sirve para el admin y el stock.
 
-### 3. GitHub Pages
+### 3. Emails de Auth (reset de contraseña) — SMTP con Mailgun
+
+Por defecto Supabase envía los emails de Auth (reset de contraseña, invitaciones) con su propio servicio, que tiene límites muy bajos y no es confiable para producción. Para que salgan desde `sac.uy` vía Mailgun:
+
+1. Supabase Dashboard → **Project Settings → Authentication → SMTP Settings** → activar "Enable Custom SMTP".
+2. Completar con los datos de Mailgun para el dominio `sac.uy`:
+   - **Host**: `smtp.mailgun.org`
+   - **Port**: `587`
+   - **Username**: el usuario SMTP de Mailgun (ej. `postmaster@sac.uy` o el que figure en Mailgun → Sending → Domain settings → SMTP credentials)
+   - **Password**: la contraseña SMTP de ese usuario
+   - **Sender email**: una dirección del dominio `sac.uy` (ej. `no-reply@sac.uy`)
+   - **Sender name**: `SAC`
+3. Supabase Dashboard → **Authentication → URL Configuration**:
+   - **Site URL**: `https://sac.uy`
+   - **Redirect URLs**: agregar `https://sac.uy/reset-password.html`
+4. (Opcional) **Authentication → Emails → Reset Password** para personalizar el template del mail en español.
+
+Sin este paso, el flujo de "¿Olvidaste tu contraseña?" funciona igual pero los mails salen del servicio default de Supabase (poco confiable / puede ir a spam).
+
+### 4. GitHub Pages
 
 ```bash
 git init
