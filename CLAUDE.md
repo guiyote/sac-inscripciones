@@ -63,7 +63,7 @@ Dark theme with CSS custom properties defined in `:root` on each page:
 ## Championship dates 2026
 
 The date selector in all inscription forms is pre-populated with these race weekends:
-25-26 Apr · 13-14 Jun · 8-9 Aug · 19-20 Sep · 23-24 Oct · 21-22 Nov
+25-26 Apr · 13-14 Jun · 8-9 Aug · 19-20 Sep · 24-25 Oct · 20-21 Nov (Oct is diurna, Sat-Sun; Nov is nocturna, Fri-Sat)
 
 The current month's date is pre-selected dynamically in JS.
 
