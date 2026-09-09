@@ -52,6 +52,7 @@
     .field { margin-bottom: 1.25rem; }
     label { display: block; font-size: 0.8rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; margin-bottom: 0.5rem; }
     label .req { color: var(--rojo); margin-left: 2px; }
+    .hint-doc { display: block; font-size: 0.75rem; color: #E67E22; margin-top: 0.35rem; text-transform: none; letter-spacing: normal; }
     label .opt { color: var(--texto-muted); font-weight: 400; font-size: 0.7rem; letter-spacing: 1px; margin-left: 4px; text-transform: none; }
 
     input[type="text"], input[type="date"], input[type="number"], select {
@@ -160,8 +161,9 @@
           <input type="text" id="nombre_conductor" placeholder="Ej: Juan Pérez" required>
         </div>
         <div class="field">
-          <label for="cedula_conductor">Cédula de identidad <span class="req">*</span></label>
+          <label for="cedula_conductor">Documento de identidad <span class="req">*</span></label>
           <input type="text" id="cedula_conductor" placeholder="Ej: 1234567-8" required>
+          <span class="hint-doc">Ej: Cédula, DNI, Registro Geral</span>
         </div>
         <div class="field">
           <label for="celular_conductor">Celular <span class="opt">(opcional)</span></label>

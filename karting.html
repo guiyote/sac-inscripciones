@@ -187,6 +187,15 @@
       margin-left: 2px;
     }
 
+    .hint-doc {
+      display: block;
+      font-size: 0.75rem;
+      color: #E67E22;
+      margin-top: 0.35rem;
+      text-transform: none;
+      letter-spacing: normal;
+    }
+
     input[type="text"],
     input[type="date"],
     select {
@@ -408,8 +417,9 @@
           <input type="text" id="nombre" placeholder="Ej: Juan Pérez" required>
         </div>
         <div class="field">
-          <label for="cedula">Cédula de identidad <span class="req">*</span></label>
+          <label for="cedula">Documento de identidad <span class="req">*</span></label>
           <input type="text" id="cedula" placeholder="Ej: 1234567-8" required>
+          <span class="hint-doc">Ej: Cédula, DNI, Registro Geral</span>
         </div>
         <div class="field">
           <label for="celular">Celular <span class="opt">(opcional)</span></label>
