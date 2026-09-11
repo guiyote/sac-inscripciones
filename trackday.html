@@ -176,27 +176,15 @@
       </div>
 
       <div class="form-section">
-        <div class="section-title">Acompañante <span style="font-size:0.65rem;font-weight:400;letter-spacing:1px;text-transform:none;color:var(--texto-muted);margin-left:4px">(opcional)</span></div>
-        <div class="field">
-          <label for="nombre_acompanante">Nombre y apellido <span class="opt">(opcional)</span></label>
-          <input type="text" id="nombre_acompanante" placeholder="Ej: María García">
-        </div>
-        <div class="field">
-          <label for="fecha_nacimiento_acompanante">Fecha de nacimiento <span class="opt">(opcional)</span></label>
-          <input type="date" id="fecha_nacimiento_acompanante">
-        </div>
-      </div>
-
-      <div class="form-section">
         <div class="section-title">Vehículo</div>
         <div class="three-col">
           <div class="field">
-            <label for="marca">Marca</label>
-            <input type="text" id="marca" placeholder="Ej: Ford">
+            <label for="marca">Marca <span class="req">*</span></label>
+            <input type="text" id="marca" placeholder="Ej: Ford" required>
           </div>
           <div class="field">
-            <label for="modelo">Modelo</label>
-            <input type="text" id="modelo" placeholder="Ej: Falcon">
+            <label for="modelo">Modelo <span class="req">*</span></label>
+            <input type="text" id="modelo" placeholder="Ej: Falcon" required>
           </div>
           <div class="field">
             <label for="anio">Año</label>
@@ -211,7 +199,7 @@
 
       <div style="display:flex;align-items:flex-start;gap:0.75rem;background:#2d2d2d;border:1px solid #3a3a3a;border-left:4px solid #CC0000;border-radius:2px;padding:0.9rem 1.1rem;margin-top:1.5rem;margin-bottom:0.5rem">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CC0000" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <p style="font-size:0.9rem;line-height:1.5;color:#ccc"><strong style="color:#fff">Importante:</strong> Tanto el conductor como el acompañante deben llevar casco.</p>
+        <p style="font-size:0.9rem;line-height:1.5;color:#ccc"><strong style="color:#fff">Importante:</strong> El Track Day es exclusivamente para autos de competición, autos de calle no están permitidos. Jaula, butacas y cintos de competición son obligatorios. El conductor debe llevar casco.</p>
       </div>
 
       <button type="submit" class="submit-btn" id="submitBtn">Enviar inscripción</button>
@@ -284,8 +272,6 @@
         cedula_conductor: document.getElementById('cedula_conductor').value.trim() || null,
         celular_conductor: document.getElementById('celular_conductor').value.trim() || null,
         fecha_nacimiento_conductor: document.getElementById('fecha_nacimiento_conductor').value || null,
-        nombre_acompanante: document.getElementById('nombre_acompanante').value.trim() || null,
-        fecha_nacimiento_acompanante: document.getElementById('fecha_nacimiento_acompanante').value || null,
         marca: document.getElementById('marca').value.trim() || null,
         modelo: document.getElementById('modelo').value.trim() || null,
         anio: isNaN(anioVal) ? null : anioVal,

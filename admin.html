@@ -359,10 +359,6 @@
       <input type="text" id="eTD_cedula_conductor">
       <label>Fecha de nacimiento (conductor)</label>
       <input type="date" id="eTD_fecha_nacimiento_conductor">
-      <label>Nombre del acompañante</label>
-      <input type="text" id="eTD_nombre_acompanante">
-      <label>Fecha de nacimiento (acompañante)</label>
-      <input type="date" id="eTD_fecha_nacimiento_acompanante">
       <label>Marca</label>
       <input type="text" id="eTD_marca">
       <label>Modelo</label>
@@ -561,8 +557,8 @@
   <div class="section-block" id="secTrackDay">
     <div class="section-header"><h2>Track Day</h2><button class="btn-export" onclick="exportarTrackDay()">↓ Exportar TXT</button></div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Conductor</th><th>CI</th><th>Acompañante</th><th>Fecha</th><th>Vehículo</th><th>Nº Auto</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Transponder</th><th>Acciones</th></tr></thead>
-      <tbody id="tbodyTrackDay"><tr><td colspan="12" class="loading">Cargando...</td></tr></tbody>
+      <thead><tr><th>Conductor</th><th>CI</th><th>Fecha</th><th>Vehículo</th><th>Nº Auto</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Transponder</th><th>Acciones</th></tr></thead>
+      <tbody id="tbodyTrackDay"><tr><td colspan="11" class="loading">Cargando...</td></tr></tbody>
     </table></div>
   </div>
 
@@ -891,8 +887,6 @@
       document.getElementById('eTD_nombre_conductor').value = r.nombre_conductor || '';
       document.getElementById('eTD_cedula_conductor').value = r.cedula_conductor || '';
       document.getElementById('eTD_fecha_nacimiento_conductor').value = r.fecha_nacimiento_conductor || '';
-      document.getElementById('eTD_nombre_acompanante').value = r.nombre_acompanante || '';
-      document.getElementById('eTD_fecha_nacimiento_acompanante').value = r.fecha_nacimiento_acompanante || '';
       document.getElementById('eTD_marca').value = r.marca || '';
       document.getElementById('eTD_modelo').value = r.modelo || '';
       document.getElementById('eTD_anio').value = r.anio || '';
@@ -980,8 +974,6 @@
         nombre_conductor: document.getElementById('eTD_nombre_conductor').value.trim() || null,
         cedula_conductor: document.getElementById('eTD_cedula_conductor').value.trim() || null,
         fecha_nacimiento_conductor: document.getElementById('eTD_fecha_nacimiento_conductor').value || null,
-        nombre_acompanante: document.getElementById('eTD_nombre_acompanante').value.trim() || null,
-        fecha_nacimiento_acompanante: document.getElementById('eTD_fecha_nacimiento_acompanante').value || null,
         marca: document.getElementById('eTD_marca').value.trim() || null,
         modelo: document.getElementById('eTD_modelo').value.trim() || null,
         anio: document.getElementById('eTD_anio').value.trim() || null,
@@ -1152,11 +1144,10 @@
 
     // Track Day
     document.getElementById('tbodyTrackDay').innerHTML = tdData.length === 0
-      ? '<tr><td colspan="12" class="empty">Sin inscripciones</td></tr>'
+      ? '<tr><td colspan="11" class="empty">Sin inscripciones</td></tr>'
       : tdData.map(r => `<tr class="${r.baja ? 'baja-row' : ''}">
           <td>${val(r.nombre_conductor)}</td>
           <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtCI(r.cedula_conductor)}</td>
-          <td>${val(r.nombre_acompanante)}</td>
           <td>${fmtFecha(r.fecha_carrera)}</td>
           <td>${[r.marca, r.modelo, r.anio].filter(Boolean).join(' ') || '—'}</td>
           <td>${val(r.numero_auto)}</td>
@@ -1349,7 +1340,6 @@
     exportarTXT(_tdData, 'TRACK DAY', r => [
       `Conductor:   ${r.nombre_conductor || '—'}`,
       ...(r.cedula_conductor ? [`CI:          ${fmtCI(r.cedula_conductor)}`] : []),
-      ...(r.nombre_acompanante ? [`Acompañante: ${r.nombre_acompanante}`] : []),
       `Fecha:       ${fmtFecha(r.fecha_carrera)}`,
       `Vehículo:    ${[r.marca, r.modelo, r.anio].filter(Boolean).join(' ') || '—'}   ·   Nº Auto: ${r.numero_auto || '—'}`,
       ...(r.transponder ? [`Transponder: ${r.transponder}`] : []),
