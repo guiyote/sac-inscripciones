@@ -183,18 +183,14 @@
 
       <div class="form-section">
         <div class="section-title">Vehículo</div>
-        <div class="three-col">
+        <div class="two-col">
           <div class="field">
             <label for="marca">Marca <span class="req">*</span></label>
-            <input type="text" id="marca" placeholder="Ej: Ford" required>
+            <input type="text" id="marca" placeholder="Ej: VW" required>
           </div>
           <div class="field">
             <label for="modelo">Modelo <span class="req">*</span></label>
-            <input type="text" id="modelo" placeholder="Ej: Falcon" required>
-          </div>
-          <div class="field">
-            <label for="anio">Año</label>
-            <input type="number" id="anio" placeholder="Ej: 1985" min="1950" max="2026">
+            <input type="text" id="modelo" placeholder="Ej: Gol" required>
           </div>
         </div>
         <div class="field" style="max-width: 50%;">
@@ -270,8 +266,6 @@
 
       btn.textContent = 'Enviando...';
 
-      const anioVal = parseInt(document.getElementById('anio').value);
-
       const payload = {
         fecha_carrera,
         nombre_conductor,
@@ -280,7 +274,6 @@
         fecha_nacimiento_conductor: document.getElementById('fecha_nacimiento_conductor').value || null,
         marca: document.getElementById('marca').value.trim() || null,
         modelo: document.getElementById('modelo').value.trim() || null,
-        anio: isNaN(anioVal) ? null : anioVal,
         numero_auto,
       };
 
