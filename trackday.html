@@ -133,7 +133,13 @@
       <hr class="costo-divider">
       <div class="costo-info-title" style="margin-top:0.25rem">Depósito bancario</div>
       <div class="costo-note">BROU · Salto Automóvil Club<br>CA 001540985-00003</div>
+      <hr class="costo-divider">
+      <div class="costo-note" style="display:flex;align-items:flex-start;gap:0.5rem;color:#e0a458">
+        <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" fill="none" stroke-width="1.8" style="flex-shrink:0;margin-top:0.15rem"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>
+        <span><strong>Cupo mínimo: 5 autos.</strong> Inscripciones cierran el <strong>jueves previo</strong> a cada fecha.</span>
+      </div>
     </div>
+    <div class="msg" id="avisoCierre" style="display:none;background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.4);color:#fde047;margin-bottom:1.5rem"></div>
     <form id="formTrackDay">
 
       <div class="form-section">
@@ -199,7 +205,7 @@
 
       <div style="display:flex;align-items:flex-start;gap:0.75rem;background:#2d2d2d;border:1px solid #3a3a3a;border-left:4px solid #CC0000;border-radius:2px;padding:0.9rem 1.1rem;margin-top:1.5rem;margin-bottom:0.5rem">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CC0000" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <p style="font-size:0.9rem;line-height:1.5;color:#ccc"><strong style="color:#fff">Importante:</strong> El Track Day es exclusivamente para autos de competición, autos de calle no están permitidos. Jaula, butacas y cintos de competición son obligatorios. El conductor debe llevar casco.</p>
+        <p style="font-size:0.9rem;line-height:1.5;color:#ccc"><strong style="color:#fff">Importante:</strong> El Track Day es exclusivamente para autos de Turismo (competición), autos de calle no están permitidos. Jaula, butacas y cintos de competición son obligatorios. El conductor debe llevar casco.</p>
       </div>
 
       <button type="submit" class="submit-btn" id="submitBtn">Enviar inscripción</button>
@@ -295,33 +301,52 @@
     });
   </script>
   <script>
-    // Selección dinámica de fecha — disponible 30 días antes de la carrera
+    // Selección dinámica de fecha — disponible 30 días antes de la carrera,
+    // y cierra el jueves previo a cada fecha (cupo mínimo de 5 autos)
     (function() {
       const hoy = new Date();
       hoy.setHours(0, 0, 0, 0);
       const limite = new Date(hoy);
       limite.setDate(limite.getDate() + 30);
       const select = document.getElementById('fecha_carrera');
+
+      function cierrePasado(fechaCarreraStr) {
+        const carrera = new Date(fechaCarreraStr + 'T00:00:00');
+        const diasDesdeJueves = (carrera.getDay() - 4 + 7) % 7;
+        const jueves = new Date(carrera);
+        jueves.setDate(jueves.getDate() - diasDesdeJueves);
+        jueves.setHours(23, 59, 59, 999);
+        return new Date() > jueves;
+      }
+
       let primeraHabilitada = null;
+      let hayFechaCerradaPorJueves = false;
       Array.from(select.options).forEach(opt => {
         if (!opt.value) return;
         const fecha = new Date(opt.value + 'T00:00:00');
-        if (fecha >= hoy && fecha <= limite) {
+        const enVentana = fecha >= hoy && fecha <= limite;
+        if (enVentana && !cierrePasado(opt.value)) {
           opt.disabled = false;
           if (!primeraHabilitada) primeraHabilitada = opt;
         } else {
           opt.disabled = true;
           opt.style.color = '#555';
+          if (enVentana) hayFechaCerradaPorJueves = true;
         }
       });
       if (primeraHabilitada) {
         primeraHabilitada.selected = true;
       } else {
         const placeholder = select.options[0];
-        placeholder.textContent = 'Sin fecha próxima';
+        placeholder.textContent = hayFechaCerradaPorJueves ? 'Inscripciones cerradas' : 'Sin fecha próxima';
         placeholder.selected = true;
         select.disabled = true;
         document.getElementById('submitBtn').disabled = true;
+        if (hayFechaCerradaPorJueves) {
+          const aviso = document.getElementById('avisoCierre');
+          aviso.style.display = 'block';
+          aviso.textContent = 'Las inscripciones para la próxima fecha cerraron el jueves previo. Contactate con la organización para más información.';
+        }
       }
     })();
   </script>
