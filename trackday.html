@@ -136,10 +136,9 @@
       <hr class="costo-divider">
       <div class="costo-note" style="display:flex;align-items:flex-start;gap:0.5rem;color:#e0a458">
         <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" fill="none" stroke-width="1.8" style="flex-shrink:0;margin-top:0.15rem"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>
-        <span><strong>Cupo mínimo: 5 autos.</strong> Inscripciones cierran el <strong>jueves previo</strong> a cada fecha.</span>
+        <span><strong>Cupo mínimo: 5 autos.</strong> Si no se alcanza, la organización puede cerrar la inscripción de forma anticipada.</span>
       </div>
     </div>
-    <div class="msg" id="avisoCierre" style="display:none;background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.4);color:#fde047;margin-bottom:1.5rem"></div>
     <form id="formTrackDay">
 
       <div class="form-section">
@@ -294,8 +293,8 @@
     });
   </script>
   <script>
-    // Selección dinámica de fecha — disponible 30 días antes de la carrera,
-    // y cierra el jueves previo a cada fecha (cupo mínimo de 5 autos)
+    // Selección dinámica de fecha — disponible 30 días antes de la carrera.
+    // El cierre de inscripciones (por cupo mínimo u otro motivo) es manual, vía admin.
     (function() {
       const hoy = new Date();
       hoy.setHours(0, 0, 0, 0);
@@ -303,43 +302,27 @@
       limite.setDate(limite.getDate() + 30);
       const select = document.getElementById('fecha_carrera');
 
-      function cierrePasado(fechaCarreraStr) {
-        const carrera = new Date(fechaCarreraStr + 'T00:00:00');
-        const diasDesdeJueves = (carrera.getDay() - 4 + 7) % 7;
-        const jueves = new Date(carrera);
-        jueves.setDate(jueves.getDate() - diasDesdeJueves);
-        jueves.setHours(23, 59, 59, 999);
-        return new Date() > jueves;
-      }
-
       let primeraHabilitada = null;
-      let hayFechaCerradaPorJueves = false;
       Array.from(select.options).forEach(opt => {
         if (!opt.value) return;
         const fecha = new Date(opt.value + 'T00:00:00');
         const enVentana = fecha >= hoy && fecha <= limite;
-        if (enVentana && !cierrePasado(opt.value)) {
+        if (enVentana) {
           opt.disabled = false;
           if (!primeraHabilitada) primeraHabilitada = opt;
         } else {
           opt.disabled = true;
           opt.style.color = '#555';
-          if (enVentana) hayFechaCerradaPorJueves = true;
         }
       });
       if (primeraHabilitada) {
         primeraHabilitada.selected = true;
       } else {
         const placeholder = select.options[0];
-        placeholder.textContent = hayFechaCerradaPorJueves ? 'Inscripciones cerradas' : 'Sin fecha próxima';
+        placeholder.textContent = 'Sin fecha próxima';
         placeholder.selected = true;
         select.disabled = true;
         document.getElementById('submitBtn').disabled = true;
-        if (hayFechaCerradaPorJueves) {
-          const aviso = document.getElementById('avisoCierre');
-          aviso.style.display = 'block';
-          aviso.textContent = 'Las inscripciones para la próxima fecha cerraron el jueves previo. Contactate con la organización para más información.';
-        }
       }
     })();
   </script>
