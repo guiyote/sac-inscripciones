@@ -66,9 +66,11 @@
     .summary-card { background: var(--gris-medio); border: 1px solid var(--borde); border-top: 3px solid var(--rojo); border-radius: 2px; padding: 1.1rem 1.25rem; display: flex; flex-direction: column; justify-content: flex-end; }
     .summary-card.s-verde { border-top-color: var(--verde); }
     .summary-card.s-ambar { border-top-color: #fb923c; }
+    .summary-card.s-teal { border-top-color: #2dd4bf; }
     .summary-card .num { font-family: 'Barlow Condensed', sans-serif; font-size: 1.5rem; font-weight: 800; line-height: 1; }
     .summary-card .num.verde { color: #4ade80; }
     .summary-card .num.ambar { color: #fb923c; }
+    .summary-card .num.teal { color: #2dd4bf; }
     .summary-card .lbl { font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--texto-muted); margin-top: 0.3rem; }
 
     .section-block { margin-bottom: 2.5rem; }
@@ -94,6 +96,7 @@
     .badge-pendiente { background: rgba(234,179,8,0.12); color: #fde047; border: 1px solid rgba(234,179,8,0.25); }
     .badge-recargo { background: rgba(236,72,153,0.15); color: #f472b6; border: 1px solid rgba(236,72,153,0.3); }
     .badge-diferido { background: rgba(251,146,60,0.15); color: #fb923c; border: 1px solid rgba(251,146,60,0.3); }
+    .badge-bonificado { background: rgba(45,212,191,0.15); color: #2dd4bf; border: 1px solid rgba(45,212,191,0.3); }
     .badge-baja { background: rgba(100,100,100,0.15); color: #999; border: 1px solid #444; }
     .badge-trackday { background: rgba(234,179,8,0.12); color: #fde047; border: 1px solid rgba(234,179,8,0.25); }
 
@@ -200,6 +203,7 @@
       <option value="">Seleccioná...</option>
       <option value="efectivo">Efectivo</option>
       <option value="transferencia">Transferencia</option>
+      <option value="bonificado">Bonificado</option>
     </select>
     <div class="modal-btns">
       <button class="btn-cancelar" onclick="cerrarModal('modalPago')">Cancelar</button>
@@ -436,6 +440,7 @@
         <option value="">Sin especificar</option>
         <option value="efectivo">Efectivo</option>
         <option value="transferencia">Transferencia</option>
+        <option value="bonificado">Bonificado</option>
       </select>
     </div>
 
@@ -498,6 +503,7 @@
         <option value="">Todos</option>
         <option value="pagado">Pagos</option>
         <option value="diferido">Pago diferido</option>
+        <option value="bonificado">Bonificados</option>
         <option value="pendiente">Pendientes</option>
         <option value="recargo">Pendientes c/recargo</option>
       </select>
@@ -525,6 +531,7 @@
   <div class="summary-cards money">
     <div class="summary-card s-verde"><div class="num verde" id="totalPagados">—</div><div class="lbl">Pagos</div></div>
     <div class="summary-card s-ambar"><div class="num ambar" id="totalDiferidos">—</div><div class="lbl">Pago diferido</div></div>
+    <div class="summary-card s-teal"><div class="num teal" id="totalBonificados">—</div><div class="lbl">Bonificados</div></div>
     <div class="summary-card s-verde"><div class="num verde" id="totalRecaudado">—</div><div class="lbl">Recaudado</div></div>
     <div class="summary-card" style="visibility:hidden" aria-hidden="true"></div>
     <div class="summary-card" style="visibility:hidden" aria-hidden="true"></div>
@@ -795,8 +802,12 @@
     else alert(error.message && error.message.includes('Cupo lleno') ? 'No hay cupo para ese día.' : 'Error al dar de alta. Intentá nuevamente.');
   }
 
+  function esBonificado(r) {
+    return !!r.pago_confirmado && r.pago_medio === 'bonificado';
+  }
+
   function esDiferido(r) {
-    return !!r.pago_confirmado && (r.pago_monto === null || r.pago_monto === undefined || parseFloat(r.pago_monto) === 0);
+    return !!r.pago_confirmado && !esBonificado(r) && (r.pago_monto === null || r.pago_monto === undefined || parseFloat(r.pago_monto) === 0);
   }
 
   function badgePago(r) {
@@ -804,6 +815,7 @@
       if (r.con_recargo) return { cls: 'badge-recargo', label: 'Pendiente c/recargo' };
       return { cls: 'badge-pendiente', label: 'Pendiente' };
     }
+    if (esBonificado(r)) return { cls: 'badge-bonificado', label: 'Bonificado' };
     if (esDiferido(r)) return { cls: 'badge-diferido', label: 'Pago diferido' };
     return { cls: 'badge-pagado', label: 'Pagado' };
   }
@@ -1011,7 +1023,8 @@
     let q = sb.from(tabla).select('*').order('created_at', { ascending: false });
     if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
     if (filtroPago === 'pagado') q = q.eq('pago_confirmado', true);
-    if (filtroPago === 'diferido') q = q.eq('pago_confirmado', true).or('pago_monto.eq.0,pago_monto.is.null');
+    if (filtroPago === 'diferido') q = q.eq('pago_confirmado', true).or('pago_medio.neq.bonificado,pago_medio.is.null').or('pago_monto.eq.0,pago_monto.is.null');
+    if (filtroPago === 'bonificado') q = q.eq('pago_confirmado', true).eq('pago_medio', 'bonificado');
     if (filtroPago === 'pendiente') q = q.eq('pago_confirmado', false);
     if (filtroPago === 'recargo') q = q.eq('pago_confirmado', false).eq('con_recargo', true);
     if (filtroBaja === 'activos') q = q.eq('baja', false);
@@ -1060,7 +1073,8 @@
     const todos = [...kData, ...tData, ...rData, ...tdData, ...picData, ...cpData];
     const confirmados = todos.filter(r => r.pago_confirmado && !r.baja);
     const diferidos = confirmados.filter(r => esDiferido(r));
-    const pagados = confirmados.filter(r => !esDiferido(r));
+    const bonificados = confirmados.filter(r => esBonificado(r));
+    const pagados = confirmados.filter(r => !esDiferido(r) && !esBonificado(r));
     const recaudado = confirmados.reduce((s, r) => s + (parseFloat(r.pago_monto) || 0), 0);
 
     document.getElementById('totalKarting').textContent      = kData.length;
@@ -1072,6 +1086,7 @@
     document.getElementById('totalGeneral').textContent      = todos.length;
     document.getElementById('totalPagados').textContent      = pagados.length;
     document.getElementById('totalDiferidos').textContent    = diferidos.length;
+    document.getElementById('totalBonificados').textContent  = bonificados.length;
     document.getElementById('totalRecaudado').textContent    = `$ ${recaudado.toLocaleString('es-UY')}`;
 
     // Karting
