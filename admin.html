@@ -300,6 +300,7 @@
         <option value="SHIFTER 200cc standard">SHIFTER 200cc standard</option>
         <option value="2 Tiempos 125cc">2 Tiempos 125cc</option>
         <option value="Estacionarios, Shifter 200 preparados">Estacionarios, Shifter 200 preparados</option>
+        <option value="LIBRE (2T, Estacionarios, Shifter 200 preparados)">LIBRE (2T, Estacionarios, Shifter 200 preparados)</option>
       </select>
       <label>Número de kart</label>
       <input type="text" id="eK_numero_kart">
@@ -506,6 +507,7 @@
         <option value="SHIFTER 200cc standard">SHIFTER 200cc standard</option>
         <option value="2 Tiempos 125cc">2 Tiempos 125cc</option>
         <option value="Estacionarios, Shifter 200 preparados">Estacionarios, Shifter 200 preparados</option>
+        <option value="LIBRE (2T, Estacionarios, Shifter 200 preparados)">LIBRE (2T, Estacionarios, Shifter 200 preparados)</option>
       </select>
     </div>
     <div class="filter-group">
@@ -813,7 +815,7 @@
     else alert(error.message && error.message.includes('Cupo lleno') ? 'No hay cupo para ese día.' : 'Error al dar de alta. Intentá nuevamente.');
   }
 
-  const KART_CAT_ORDEN = ['SHIFTER 200cc standard', '2 Tiempos 125cc', 'Estacionarios, Shifter 200 preparados'];
+  const KART_CAT_ORDEN = ['SHIFTER 200cc standard', '2 Tiempos 125cc', 'Estacionarios, Shifter 200 preparados', 'LIBRE (2T, Estacionarios, Shifter 200 preparados)'];
   function kartCatIndex(cat) {
     const i = KART_CAT_ORDEN.indexOf(cat);
     return i === -1 ? KART_CAT_ORDEN.length : i;
@@ -821,6 +823,7 @@
   function kartBadgeClass(cilindrada) {
     if (cilindrada === '2 Tiempos 125cc') return 'badge-k-125';
     if (cilindrada === 'Estacionarios, Shifter 200 preparados') return 'badge-k-preparados';
+    if (cilindrada === 'LIBRE (2T, Estacionarios, Shifter 200 preparados)') return 'badge-baja';
     return 'badge-karting';
   }
 
