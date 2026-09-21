@@ -426,9 +426,9 @@
           <input type="text" id="celular" placeholder="Ej: 099 123 456">
         </div>
         <div class="field">
-          <label for="departamento">Departamento</label>
+          <label for="departamento">Departamento <span class="req">*</span></label>
           <div class="select-wrap">
-            <select id="departamento">
+            <select id="departamento" required>
               <option value="">Seleccioná...</option>
               <option value="Artigas">Artigas</option>
               <option value="Canelones">Canelones</option>
@@ -449,8 +449,11 @@
               <option value="Soriano">Soriano</option>
               <option value="Tacuarembó">Tacuarembó</option>
               <option value="Treinta y Tres">Treinta y Tres</option>
+              <option value="Entre Ríos - ARG">Entre Ríos - ARG</option>
+              <option value="Rio Grande - BR">Rio Grande - BR</option>
             </select>
           </div>
+          <span class="hint-doc">Ej: Departamento, provincia, estado</span>
         </div>
         <div class="field">
           <label for="fecha_nacimiento">Fecha de nacimiento</label>

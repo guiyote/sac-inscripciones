@@ -291,6 +291,7 @@
         <option>Maldonado</option><option>Montevideo</option><option>Paysandú</option><option>Río Negro</option>
         <option>Rivera</option><option>Rocha</option><option>Salto</option><option>San José</option>
         <option>Soriano</option><option>Tacuarembó</option><option>Treinta y Tres</option>
+        <option>Entre Ríos - ARG</option><option>Rio Grande - BR</option>
       </select>
       <label>Fecha de nacimiento</label>
       <input type="date" id="eK_fecha_nacimiento">
@@ -554,16 +555,16 @@
   <div class="section-block" id="secKarting">
     <div class="section-header"><h2>Karting</h2><button class="btn-export" onclick="exportarKarting()">↓ Exportar TXT</button></div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Piloto</th><th>CI</th><th>Pago</th><th>Fecha</th><th>F. Inscripción</th><th>Cilindrada</th><th>Nº Kart</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Transponder</th><th>Acciones</th></tr></thead>
-      <tbody id="tbodyKarting"><tr><td colspan="12" class="loading">Cargando...</td></tr></tbody>
+      <thead><tr><th>Piloto</th><th>CI</th><th>Pago</th><th>Fecha</th><th>F. Inscripción</th><th>Cilindrada</th><th>Nº Kart</th><th>Depto</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Transponder</th><th>Acciones</th></tr></thead>
+      <tbody id="tbodyKarting"><tr><td colspan="13" class="loading">Cargando...</td></tr></tbody>
     </table></div>
   </div>
 
   <div class="section-block" id="secTurismo">
     <div class="section-header"><h2>Turismo — TNS / TMZ</h2><button class="btn-export" onclick="exportarTurismo()">↓ Exportar TXT</button></div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Piloto</th><th>CI</th><th>Pago</th><th>Fecha</th><th>F. Inscripción</th><th>Cat.</th><th>Nº Auto</th><th>Marca/Modelo</th><th>Equipo</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Transponder</th><th>Acciones</th></tr></thead>
-      <tbody id="tbodyTurismo"><tr><td colspan="14" class="loading">Cargando...</td></tr></tbody>
+      <thead><tr><th>Piloto</th><th>CI</th><th>Pago</th><th>Fecha</th><th>F. Inscripción</th><th>Nº Auto</th><th>Marca/Modelo</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Transponder</th><th>Acciones</th></tr></thead>
+      <tbody id="tbodyTurismo"><tr><td colspan="12" class="loading">Cargando...</td></tr></tbody>
     </table></div>
   </div>
 
@@ -1129,7 +1130,7 @@
 
     // Karting
     document.getElementById('tbodyKarting').innerHTML = kData.length === 0
-      ? '<tr><td colspan="12" class="empty">Sin inscripciones</td></tr>'
+      ? '<tr><td colspan="13" class="empty">Sin inscripciones</td></tr>'
       : kData.map(r => `<tr class="${r.baja ? 'baja-row' : ''}">
           <td>${val(r.nombre)}</td>
           <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtCI(r.cedula)}</td>
@@ -1138,6 +1139,7 @@
           <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtDateTime(r.created_at)}</td>
           <td><span class="badge ${kartBadgeClass(r.cilindrada)}">${val(r.cilindrada)}</span></td>
           <td>${val(r.numero_kart)}</td>
+          <td>${val(r.departamento)}</td>
           <td>${fmtMonto(r.pago_monto)}</td>
           <td>${capFirst(r.pago_medio)}</td>
           <td>${fmtDate(r.pago_fecha)}</td>
@@ -1152,17 +1154,15 @@
 
     // Turismo
     document.getElementById('tbodyTurismo').innerHTML = tData.length === 0
-      ? '<tr><td colspan="14" class="empty">Sin inscripciones</td></tr>'
+      ? '<tr><td colspan="12" class="empty">Sin inscripciones</td></tr>'
       : tData.map(r => `<tr class="${r.baja ? 'baja-row' : ''}">
           <td>${val(r.nombre)}</td>
           <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtCI(r.cedula)}</td>
           <td><span class="badge ${badgePago(r).cls}">${badgePago(r).label}</span></td>
           <td>${fmtFecha(r.fecha_carrera)}</td>
           <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtDateTime(r.created_at)}</td>
-          <td><span class="badge ${r.categoria === 'TNS' ? 'badge-tns' : 'badge-tmz'}">${val(r.categoria)}</span></td>
           <td>${val(r.numero_auto)}</td>
           <td>${val(r.marca_modelo)}</td>
-          <td>${val(r.nombre_equipo)}</td>
           <td>${fmtMonto(r.pago_monto)}</td>
           <td>${capFirst(r.pago_medio)}</td>
           <td>${fmtDate(r.pago_fecha)}</td>
