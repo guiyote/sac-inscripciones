@@ -52,6 +52,7 @@
     .field { margin-bottom: 1.25rem; }
     label { display: block; font-size: 0.8rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; margin-bottom: 0.5rem; }
     label .req { color: var(--rojo); margin-left: 2px; }
+    label .opt { color: var(--texto-muted); font-weight: 400; font-size: 0.7rem; letter-spacing: 1px; margin-left: 4px; text-transform: none; }
     .hint-doc { display: block; font-size: 0.75rem; color: #E67E22; margin-top: 0.35rem; text-transform: none; letter-spacing: normal; }
 
     input[type="text"], input[type="date"], input[type="number"], select {
@@ -219,6 +220,36 @@
         <div class="field">
           <label for="celular">Celular <span class="opt">(opcional)</span></label>
           <input type="text" id="celular" placeholder="Ej: 099 123 456">
+        </div>
+        <div class="field">
+          <label for="departamento">Departamento <span class="req">*</span></label>
+          <div class="select-wrap">
+            <select id="departamento" required>
+              <option value="">Seleccioná...</option>
+              <option value="Artigas">Artigas</option>
+              <option value="Canelones">Canelones</option>
+              <option value="Cerro Largo">Cerro Largo</option>
+              <option value="Colonia">Colonia</option>
+              <option value="Durazno">Durazno</option>
+              <option value="Flores">Flores</option>
+              <option value="Florida">Florida</option>
+              <option value="Lavalleja">Lavalleja</option>
+              <option value="Maldonado">Maldonado</option>
+              <option value="Montevideo">Montevideo</option>
+              <option value="Paysandú">Paysandú</option>
+              <option value="Río Negro">Río Negro</option>
+              <option value="Rivera">Rivera</option>
+              <option value="Rocha">Rocha</option>
+              <option value="Salto">Salto</option>
+              <option value="San José">San José</option>
+              <option value="Soriano">Soriano</option>
+              <option value="Tacuarembó">Tacuarembó</option>
+              <option value="Treinta y Tres">Treinta y Tres</option>
+              <option value="Entre Ríos - ARG">Entre Ríos - ARG</option>
+              <option value="Rio Grande - BR">Rio Grande - BR</option>
+            </select>
+          </div>
+          <span class="hint-doc">Ej: Departamento, provincia, estado</span>
         </div>
         <div class="field">
           <label for="fecha_nacimiento">Fecha de nacimiento</label>
@@ -406,6 +437,7 @@
         nombre,
         cedula: document.getElementById('cedula').value.trim() || null,
         celular: document.getElementById('celular').value.trim() || null,
+        departamento: document.getElementById('departamento').value || null,
         fecha_nacimiento: document.getElementById('fecha_nacimiento').value || null,
         categoria,
         numero_auto,

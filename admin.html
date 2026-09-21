@@ -315,6 +315,16 @@
       <input type="text" id="eT_cedula">
       <label>Celular</label>
       <input type="text" id="eT_celular">
+      <label>Departamento</label>
+      <select id="eT_departamento">
+        <option value="">Seleccioná...</option>
+        <option>Artigas</option><option>Canelones</option><option>Cerro Largo</option><option>Colonia</option>
+        <option>Durazno</option><option>Flores</option><option>Florida</option><option>Lavalleja</option>
+        <option>Maldonado</option><option>Montevideo</option><option>Paysandú</option><option>Río Negro</option>
+        <option>Rivera</option><option>Rocha</option><option>Salto</option><option>San José</option>
+        <option>Soriano</option><option>Tacuarembó</option><option>Treinta y Tres</option>
+        <option>Entre Ríos - ARG</option><option>Rio Grande - BR</option>
+      </select>
       <label>Fecha de nacimiento</label>
       <input type="date" id="eT_fecha_nacimiento">
       <label>Categoría</label>
@@ -344,6 +354,16 @@
       <input type="text" id="eR_nombre_piloto">
       <label>Documento del piloto</label>
       <input type="text" id="eR_cedula_piloto">
+      <label>Departamento</label>
+      <select id="eR_departamento_piloto">
+        <option value="">Seleccioná...</option>
+        <option>Artigas</option><option>Canelones</option><option>Cerro Largo</option><option>Colonia</option>
+        <option>Durazno</option><option>Flores</option><option>Florida</option><option>Lavalleja</option>
+        <option>Maldonado</option><option>Montevideo</option><option>Paysandú</option><option>Río Negro</option>
+        <option>Rivera</option><option>Rocha</option><option>Salto</option><option>San José</option>
+        <option>Soriano</option><option>Tacuarembó</option><option>Treinta y Tres</option>
+        <option>Entre Ríos - ARG</option><option>Rio Grande - BR</option>
+      </select>
       <label>Fecha de nacimiento (piloto)</label>
       <input type="date" id="eR_fecha_nacimiento_piloto">
       <label>Nombre del navegante</label>
@@ -366,6 +386,16 @@
       <input type="text" id="eTD_nombre_conductor">
       <label>Documento del conductor</label>
       <input type="text" id="eTD_cedula_conductor">
+      <label>Departamento</label>
+      <select id="eTD_departamento_conductor">
+        <option value="">Seleccioná...</option>
+        <option>Artigas</option><option>Canelones</option><option>Cerro Largo</option><option>Colonia</option>
+        <option>Durazno</option><option>Flores</option><option>Florida</option><option>Lavalleja</option>
+        <option>Maldonado</option><option>Montevideo</option><option>Paysandú</option><option>Río Negro</option>
+        <option>Rivera</option><option>Rocha</option><option>Salto</option><option>San José</option>
+        <option>Soriano</option><option>Tacuarembó</option><option>Treinta y Tres</option>
+        <option>Entre Ríos - ARG</option><option>Rio Grande - BR</option>
+      </select>
       <label>Fecha de nacimiento (conductor)</label>
       <input type="date" id="eTD_fecha_nacimiento_conductor">
       <label>Marca</label>
@@ -591,24 +621,24 @@
   <div class="section-block" id="secTurismo">
     <div class="section-header"><h2>Turismo — TNS / TMZ</h2><button class="btn-export" onclick="exportarTurismo()">↓ Exportar TXT</button></div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Piloto</th><th>CI</th><th>Pago</th><th>Fecha</th><th>F. Inscripción</th><th>Nº Auto</th><th>Marca/Modelo</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Transponder</th><th>Acciones</th></tr></thead>
-      <tbody id="tbodyTurismo"><tr><td colspan="12" class="loading">Cargando...</td></tr></tbody>
+      <thead><tr><th>Piloto</th><th>CI</th><th>Pago</th><th>Fecha</th><th>F. Inscripción</th><th>Nº Auto</th><th>Marca/Modelo</th><th>Depto</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Transponder</th><th>Acciones</th></tr></thead>
+      <tbody id="tbodyTurismo"><tr><td colspan="13" class="loading">Cargando...</td></tr></tbody>
     </table></div>
   </div>
 
   <div class="section-block" id="secRegularidad">
     <div class="section-header"><h2>Regularidad</h2><button class="btn-export" onclick="exportarRegularidad()">↓ Exportar TXT</button></div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Piloto</th><th>CI</th><th>Pago</th><th>Navegante</th><th>Fecha</th><th>F. Inscripción</th><th>Vehículo</th><th>Nº Auto</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Transponder</th><th>Acciones</th></tr></thead>
-      <tbody id="tbodyRegularidad"><tr><td colspan="13" class="loading">Cargando...</td></tr></tbody>
+      <thead><tr><th>Piloto</th><th>CI</th><th>Pago</th><th>Navegante</th><th>Fecha</th><th>F. Inscripción</th><th>Vehículo</th><th>Nº Auto</th><th>Depto</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Transponder</th><th>Acciones</th></tr></thead>
+      <tbody id="tbodyRegularidad"><tr><td colspan="14" class="loading">Cargando...</td></tr></tbody>
     </table></div>
   </div>
 
   <div class="section-block" id="secTrackDay">
     <div class="section-header"><h2>Track Day</h2><button class="btn-export" onclick="exportarTrackDay()">↓ Exportar TXT</button></div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Conductor</th><th>CI</th><th>Pago</th><th>Fecha</th><th>F. Inscripción</th><th>Vehículo</th><th>Nº Auto</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Transponder</th><th>Acciones</th></tr></thead>
-      <tbody id="tbodyTrackDay"><tr><td colspan="12" class="loading">Cargando...</td></tr></tbody>
+      <thead><tr><th>Conductor</th><th>CI</th><th>Pago</th><th>Fecha</th><th>F. Inscripción</th><th>Vehículo</th><th>Nº Auto</th><th>Depto</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Transponder</th><th>Acciones</th></tr></thead>
+      <tbody id="tbodyTrackDay"><tr><td colspan="13" class="loading">Cargando...</td></tr></tbody>
     </table></div>
   </div>
 
@@ -935,6 +965,7 @@
       document.getElementById('eT_nombre').value = r.nombre || '';
       document.getElementById('eT_cedula').value = r.cedula || '';
       document.getElementById('eT_celular').value = r.celular || '';
+      document.getElementById('eT_departamento').value = r.departamento || '';
       document.getElementById('eT_fecha_nacimiento').value = r.fecha_nacimiento || '';
       document.getElementById('eT_categoria').value = r.categoria || '';
       document.getElementById('eT_numero_auto').value = r.numero_auto || '';
@@ -949,6 +980,7 @@
       document.getElementById('editSectionRegularidad').style.display = '';
       document.getElementById('eR_nombre_piloto').value = r.nombre_piloto || '';
       document.getElementById('eR_cedula_piloto').value = r.cedula_piloto || '';
+      document.getElementById('eR_departamento_piloto').value = r.departamento_piloto || '';
       document.getElementById('eR_fecha_nacimiento_piloto').value = r.fecha_nacimiento_piloto || '';
       document.getElementById('eR_nombre_navegante').value = r.nombre_navegante || '';
       document.getElementById('eR_fecha_nacimiento_navegante').value = r.fecha_nacimiento_navegante || '';
@@ -961,6 +993,7 @@
       document.getElementById('editSectionTrackDay').style.display = '';
       document.getElementById('eTD_nombre_conductor').value = r.nombre_conductor || '';
       document.getElementById('eTD_cedula_conductor').value = r.cedula_conductor || '';
+      document.getElementById('eTD_departamento_conductor').value = r.departamento_conductor || '';
       document.getElementById('eTD_fecha_nacimiento_conductor').value = r.fecha_nacimiento_conductor || '';
       document.getElementById('eTD_marca').value = r.marca || '';
       document.getElementById('eTD_modelo').value = r.modelo || '';
@@ -1022,6 +1055,7 @@
         nombre: document.getElementById('eT_nombre').value.trim() || null,
         cedula: document.getElementById('eT_cedula').value.trim() || null,
         celular: document.getElementById('eT_celular').value.trim() || null,
+        departamento: document.getElementById('eT_departamento').value || null,
         fecha_nacimiento: document.getElementById('eT_fecha_nacimiento').value || null,
         categoria: document.getElementById('eT_categoria').value || null,
         numero_auto: document.getElementById('eT_numero_auto').value.trim() || null,
@@ -1036,6 +1070,7 @@
       Object.assign(updates, {
         nombre_piloto: document.getElementById('eR_nombre_piloto').value.trim() || null,
         cedula_piloto: document.getElementById('eR_cedula_piloto').value.trim() || null,
+        departamento_piloto: document.getElementById('eR_departamento_piloto').value || null,
         fecha_nacimiento_piloto: document.getElementById('eR_fecha_nacimiento_piloto').value || null,
         nombre_navegante: document.getElementById('eR_nombre_navegante').value.trim() || null,
         fecha_nacimiento_navegante: document.getElementById('eR_fecha_nacimiento_navegante').value || null,
@@ -1048,6 +1083,7 @@
       Object.assign(updates, {
         nombre_conductor: document.getElementById('eTD_nombre_conductor').value.trim() || null,
         cedula_conductor: document.getElementById('eTD_cedula_conductor').value.trim() || null,
+        departamento_conductor: document.getElementById('eTD_departamento_conductor').value || null,
         fecha_nacimiento_conductor: document.getElementById('eTD_fecha_nacimiento_conductor').value || null,
         marca: document.getElementById('eTD_marca').value.trim() || null,
         modelo: document.getElementById('eTD_modelo').value.trim() || null,
@@ -1081,8 +1117,13 @@
   // DATOS
   document.getElementById('btnCargar').addEventListener('click', cargarDatos);
 
-  // Tablas que tienen columna departamento (sumar las demás cuando se migren)
-  const TABLAS_CON_DEPTO = ['inscripciones_karting'];
+  // Columna de departamento por tabla (Picadas y Copiloto no la tienen)
+  const COL_DEPTO = {
+    inscripciones_karting: 'departamento',
+    inscripciones_turismo: 'departamento',
+    inscripciones_regularidad: 'departamento_piloto',
+    inscripciones_trackday: 'departamento_conductor',
+  };
 
   async function queryTabla(tabla, filtroFecha, filtroPago, filtroBaja, filtroKartCat, filtroDepto) {
     let q = sb.from(tabla).select('*').order('created_at', { ascending: false });
@@ -1095,8 +1136,8 @@
     if (filtroBaja === 'activos') q = q.eq('baja', false);
     if (filtroBaja === 'bajas') q = q.eq('baja', true);
     if (filtroKartCat && tabla === 'inscripciones_karting') q = q.eq('cilindrada', filtroKartCat);
-    if (filtroDepto && TABLAS_CON_DEPTO.includes(tabla)) {
-      q = filtroDepto === '__fuera_salto' ? q.neq('departamento', 'Salto') : q.eq('departamento', filtroDepto);
+    if (filtroDepto && COL_DEPTO[tabla]) {
+      q = filtroDepto === '__fuera_salto' ? q.neq(COL_DEPTO[tabla], 'Salto') : q.eq(COL_DEPTO[tabla], filtroDepto);
     }
     const { data } = await q;
     if (tabla === 'inscripciones_karting') {
@@ -1113,7 +1154,7 @@
     const filtroKartCat = document.getElementById('filtroKartCat').value;
     const filtroDepto = document.getElementById('filtroDepto').value;
     // Con filtro de departamento se ocultan las tablas que todavía no tienen esa columna
-    const conDepto = t => !filtroDepto || TABLAS_CON_DEPTO.includes(t);
+    const conDepto = t => !filtroDepto || t in COL_DEPTO;
 
     // Cuando se elige una fecha específica, campeonato y picadas son excluyentes
     const esFechaPicadas = filtroFecha !== '' && filtroFecha in FECHAS_PICADAS;
@@ -1138,9 +1179,9 @@
 
     const [kData, tData, rData, tdData, picData, cpData] = await Promise.all([
       mostrarK   ? queryTabla('inscripciones_karting',    filtroFecha, filtroPago, filtroBaja, filtroKartCat, filtroDepto) : Promise.resolve([]),
-      mostrarT   ? queryTabla('inscripciones_turismo',    filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
-      mostrarR   ? queryTabla('inscripciones_regularidad',filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
-      mostrarTD  ? queryTabla('inscripciones_trackday',   filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
+      mostrarT   ? queryTabla('inscripciones_turismo',    filtroFecha, filtroPago, filtroBaja, null, filtroDepto) : Promise.resolve([]),
+      mostrarR   ? queryTabla('inscripciones_regularidad',filtroFecha, filtroPago, filtroBaja, null, filtroDepto) : Promise.resolve([]),
+      mostrarTD  ? queryTabla('inscripciones_trackday',   filtroFecha, filtroPago, filtroBaja, null, filtroDepto) : Promise.resolve([]),
       mostrarPic ? queryTabla('inscripciones_picadas',    filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
       mostrarCP  ? queryTabla('inscripciones_copiloto',   filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
     ]);
@@ -1191,7 +1232,7 @@
 
     // Turismo
     document.getElementById('tbodyTurismo').innerHTML = tData.length === 0
-      ? '<tr><td colspan="12" class="empty">Sin inscripciones</td></tr>'
+      ? '<tr><td colspan="13" class="empty">Sin inscripciones</td></tr>'
       : tData.map(r => `<tr class="${r.baja ? 'baja-row' : ''}">
           <td>${val(r.nombre)}</td>
           <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtCI(r.cedula)}</td>
@@ -1200,6 +1241,7 @@
           <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtDateTime(r.created_at)}</td>
           <td>${val(r.numero_auto)}</td>
           <td>${val(r.marca_modelo)}</td>
+          <td>${val(r.departamento)}</td>
           <td>${fmtMonto(r.pago_monto)}</td>
           <td>${capFirst(r.pago_medio)}</td>
           <td>${fmtDate(r.pago_fecha)}</td>
@@ -1214,7 +1256,7 @@
 
     // Regularidad
     document.getElementById('tbodyRegularidad').innerHTML = rData.length === 0
-      ? '<tr><td colspan="13" class="empty">Sin inscripciones</td></tr>'
+      ? '<tr><td colspan="14" class="empty">Sin inscripciones</td></tr>'
       : rData.map(r => `<tr class="${r.baja ? 'baja-row' : ''}">
           <td>${val(r.nombre_piloto)}</td>
           <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtCI(r.cedula_piloto)}</td>
@@ -1224,6 +1266,7 @@
           <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtDateTime(r.created_at)}</td>
           <td>${[r.marca, r.modelo, r.anio].filter(Boolean).join(' ') || '—'}</td>
           <td>${val(r.numero_auto)}</td>
+          <td>${val(r.departamento_piloto)}</td>
           <td>${fmtMonto(r.pago_monto)}</td>
           <td>${capFirst(r.pago_medio)}</td>
           <td>${fmtDate(r.pago_fecha)}</td>
@@ -1238,7 +1281,7 @@
 
     // Track Day
     document.getElementById('tbodyTrackDay').innerHTML = tdData.length === 0
-      ? '<tr><td colspan="12" class="empty">Sin inscripciones</td></tr>'
+      ? '<tr><td colspan="13" class="empty">Sin inscripciones</td></tr>'
       : tdData.map(r => `<tr class="${r.baja ? 'baja-row' : ''}">
           <td>${val(r.nombre_conductor)}</td>
           <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtCI(r.cedula_conductor)}</td>
@@ -1247,6 +1290,7 @@
           <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtDateTime(r.created_at)}</td>
           <td>${[r.marca, r.modelo, r.anio].filter(Boolean).join(' ') || '—'}</td>
           <td>${val(r.numero_auto)}</td>
+          <td>${val(r.departamento_conductor)}</td>
           <td>${fmtMonto(r.pago_monto)}</td>
           <td>${capFirst(r.pago_medio)}</td>
           <td>${fmtDate(r.pago_fecha)}</td>

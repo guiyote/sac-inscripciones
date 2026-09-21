@@ -175,6 +175,36 @@
           <input type="text" id="celular_conductor" placeholder="Ej: 099 123 456">
         </div>
         <div class="field">
+          <label for="departamento_conductor">Departamento <span class="req">*</span></label>
+          <div class="select-wrap">
+            <select id="departamento_conductor" required>
+              <option value="">Seleccioná...</option>
+              <option value="Artigas">Artigas</option>
+              <option value="Canelones">Canelones</option>
+              <option value="Cerro Largo">Cerro Largo</option>
+              <option value="Colonia">Colonia</option>
+              <option value="Durazno">Durazno</option>
+              <option value="Flores">Flores</option>
+              <option value="Florida">Florida</option>
+              <option value="Lavalleja">Lavalleja</option>
+              <option value="Maldonado">Maldonado</option>
+              <option value="Montevideo">Montevideo</option>
+              <option value="Paysandú">Paysandú</option>
+              <option value="Río Negro">Río Negro</option>
+              <option value="Rivera">Rivera</option>
+              <option value="Rocha">Rocha</option>
+              <option value="Salto">Salto</option>
+              <option value="San José">San José</option>
+              <option value="Soriano">Soriano</option>
+              <option value="Tacuarembó">Tacuarembó</option>
+              <option value="Treinta y Tres">Treinta y Tres</option>
+              <option value="Entre Ríos - ARG">Entre Ríos - ARG</option>
+              <option value="Rio Grande - BR">Rio Grande - BR</option>
+            </select>
+          </div>
+          <span class="hint-doc">Ej: Departamento, provincia, estado</span>
+        </div>
+        <div class="field">
           <label for="fecha_nacimiento_conductor">Fecha de nacimiento <span class="opt">(opcional)</span></label>
           <input type="date" id="fecha_nacimiento_conductor">
         </div>
@@ -270,6 +300,7 @@
         nombre_conductor,
         cedula_conductor: document.getElementById('cedula_conductor').value.trim() || null,
         celular_conductor: document.getElementById('celular_conductor').value.trim() || null,
+        departamento_conductor: document.getElementById('departamento_conductor').value || null,
         fecha_nacimiento_conductor: document.getElementById('fecha_nacimiento_conductor').value || null,
         marca: document.getElementById('marca').value.trim() || null,
         modelo: document.getElementById('modelo').value.trim() || null,
