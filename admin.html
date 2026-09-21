@@ -512,6 +512,34 @@
       </select>
     </div>
     <div class="filter-group">
+      <label>Departamento</label>
+      <select id="filtroDepto">
+        <option value="">Todos</option>
+        <option value="__fuera_salto">Fuera de Salto</option>
+        <option value="Artigas">Artigas</option>
+        <option value="Canelones">Canelones</option>
+        <option value="Cerro Largo">Cerro Largo</option>
+        <option value="Colonia">Colonia</option>
+        <option value="Durazno">Durazno</option>
+        <option value="Flores">Flores</option>
+        <option value="Florida">Florida</option>
+        <option value="Lavalleja">Lavalleja</option>
+        <option value="Maldonado">Maldonado</option>
+        <option value="Montevideo">Montevideo</option>
+        <option value="Paysandú">Paysandú</option>
+        <option value="Río Negro">Río Negro</option>
+        <option value="Rivera">Rivera</option>
+        <option value="Rocha">Rocha</option>
+        <option value="Salto">Salto</option>
+        <option value="San José">San José</option>
+        <option value="Soriano">Soriano</option>
+        <option value="Tacuarembó">Tacuarembó</option>
+        <option value="Treinta y Tres">Treinta y Tres</option>
+        <option value="Entre Ríos - ARG">Entre Ríos - ARG</option>
+        <option value="Rio Grande - BR">Rio Grande - BR</option>
+      </select>
+    </div>
+    <div class="filter-group">
       <label>Estado pago</label>
       <select id="filtroPago">
         <option value="">Todos</option>
@@ -1053,7 +1081,10 @@
   // DATOS
   document.getElementById('btnCargar').addEventListener('click', cargarDatos);
 
-  async function queryTabla(tabla, filtroFecha, filtroPago, filtroBaja, filtroKartCat) {
+  // Tablas que tienen columna departamento (sumar las demás cuando se migren)
+  const TABLAS_CON_DEPTO = ['inscripciones_karting'];
+
+  async function queryTabla(tabla, filtroFecha, filtroPago, filtroBaja, filtroKartCat, filtroDepto) {
     let q = sb.from(tabla).select('*').order('created_at', { ascending: false });
     if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
     if (filtroPago === 'pagado') q = q.eq('pago_confirmado', true);
@@ -1064,6 +1095,9 @@
     if (filtroBaja === 'activos') q = q.eq('baja', false);
     if (filtroBaja === 'bajas') q = q.eq('baja', true);
     if (filtroKartCat && tabla === 'inscripciones_karting') q = q.eq('cilindrada', filtroKartCat);
+    if (filtroDepto && TABLAS_CON_DEPTO.includes(tabla)) {
+      q = filtroDepto === '__fuera_salto' ? q.neq('departamento', 'Salto') : q.eq('departamento', filtroDepto);
+    }
     const { data } = await q;
     if (tabla === 'inscripciones_karting') {
       data && data.sort((a, b) => kartCatIndex(a.cilindrada) - kartCatIndex(b.cilindrada));
@@ -1077,17 +1111,20 @@
     const filtroPago = document.getElementById('filtroPago').value;
     const filtroBaja = document.getElementById('filtroBaja').value;
     const filtroKartCat = document.getElementById('filtroKartCat').value;
+    const filtroDepto = document.getElementById('filtroDepto').value;
+    // Con filtro de departamento se ocultan las tablas que todavía no tienen esa columna
+    const conDepto = t => !filtroDepto || TABLAS_CON_DEPTO.includes(t);
 
     // Cuando se elige una fecha específica, campeonato y picadas son excluyentes
     const esFechaPicadas = filtroFecha !== '' && filtroFecha in FECHAS_PICADAS;
     const esFechaCamp    = filtroFecha !== '' && filtroFecha in FECHAS;
 
-    const mostrarK   = !esFechaPicadas && (!filtroCat || filtroCat === 'karting');
-    const mostrarT   = !esFechaPicadas && (!filtroCat || filtroCat === 'turismo');
-    const mostrarR   = !esFechaPicadas && (!filtroCat || filtroCat === 'regularidad');
-    const mostrarTD  = !esFechaPicadas && (!filtroCat || filtroCat === 'trackday');
-    const mostrarPic = !esFechaCamp    && (!filtroCat || filtroCat === 'picadas');
-    const mostrarCP  = !esFechaPicadas && (!filtroCat || filtroCat === 'copiloto');
+    const mostrarK   = !esFechaPicadas && (!filtroCat || filtroCat === 'karting') && conDepto('inscripciones_karting');
+    const mostrarT   = !esFechaPicadas && (!filtroCat || filtroCat === 'turismo') && conDepto('inscripciones_turismo');
+    const mostrarR   = !esFechaPicadas && (!filtroCat || filtroCat === 'regularidad') && conDepto('inscripciones_regularidad');
+    const mostrarTD  = !esFechaPicadas && (!filtroCat || filtroCat === 'trackday') && conDepto('inscripciones_trackday');
+    const mostrarPic = !esFechaCamp    && (!filtroCat || filtroCat === 'picadas') && conDepto('inscripciones_picadas');
+    const mostrarCP  = !esFechaPicadas && (!filtroCat || filtroCat === 'copiloto') && conDepto('inscripciones_copiloto');
     const mostrarCamp = !esFechaPicadas && (!filtroCat || filtroCat !== 'picadas');
 
     document.getElementById('secKarting').style.display        = mostrarK    ? '' : 'none';
@@ -1100,7 +1137,7 @@
     document.getElementById('secCopiloto').style.display       = mostrarCP   ? '' : 'none';
 
     const [kData, tData, rData, tdData, picData, cpData] = await Promise.all([
-      mostrarK   ? queryTabla('inscripciones_karting',    filtroFecha, filtroPago, filtroBaja, filtroKartCat) : Promise.resolve([]),
+      mostrarK   ? queryTabla('inscripciones_karting',    filtroFecha, filtroPago, filtroBaja, filtroKartCat, filtroDepto) : Promise.resolve([]),
       mostrarT   ? queryTabla('inscripciones_turismo',    filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
       mostrarR   ? queryTabla('inscripciones_regularidad',filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
       mostrarTD  ? queryTabla('inscripciones_trackday',   filtroFecha, filtroPago, filtroBaja) : Promise.resolve([]),
