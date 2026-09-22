@@ -364,8 +364,25 @@
     .badge-proxima { background: rgba(204,0,0,0.15); color: #f87171; border: 1px solid rgba(204,0,0,0.4); }
     .badge-realizada { background: rgba(22,163,74,0.15); color: #4ade80; border: 1px solid rgba(22,163,74,0.3); }
     .badge-pendiente { background: rgba(234,179,8,0.12); color: #fde047; border: 1px solid rgba(234,179,8,0.25); }
+    .link-resultados { margin-left: 0.6rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.78rem; letter-spacing: 1px; text-transform: uppercase; color: #f87171; text-decoration: none; white-space: nowrap; }
+    .link-resultados:hover { color: var(--blanco); }
     @media (max-width: 600px) {
       .fechas-section { padding: 0 1rem 2rem; }
+      .link-resultados { display: block; margin: 0.35rem 0 0; }
+    }
+
+    /* RESULTADOS */
+    .resultados-section { max-width: 960px; margin: 0 auto; padding: 0 1.5rem 1.75rem; }
+    .card-resultados { flex-direction: row; align-items: center; gap: 1rem; }
+    .card-resultados .card-body { flex: 1; min-width: 0; }
+    .card-resultados .card-cta { margin-top: 0; flex-shrink: 0; }
+    .card-lider { font-size: 0.9rem; color: var(--texto-muted); margin-top: 0.25rem; }
+    .card-lider strong { color: var(--blanco); }
+    .card-lider .pts { color: var(--rojo); font-weight: 700; }
+    @media (max-width: 600px) {
+      .resultados-section { padding: 0 1rem 1.5rem; }
+      .card-resultados { flex-wrap: wrap; }
+      .card-resultados .card-cta { width: 100%; }
     }
   </style>
 </head>
@@ -515,6 +532,23 @@
     </div>
   </div>
 
+  <div class="resultados-section">
+    <p class="section-label">Resultados 2026</p>
+    <a class="card card-resultados" href="resultados.html#campeonato">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/></svg>
+      </div>
+      <div class="card-body">
+        <h2>Campeonato Turismo Nacional SAC</h2>
+        <p class="card-lider" id="liderCampeonato">Posiciones y resultados fecha a fecha</p>
+      </div>
+      <div class="card-cta">
+        Ver resultados
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+    </a>
+  </div>
+
   <div class="fechas-section">
     <p class="section-label">Calendario 2026</p>
     <div class="table-wrap-fechas">
@@ -577,13 +611,47 @@
         });
       }
 
-      const filas = campConEstado.map(f => `<tr${f.isProxima ? ' class="proxima-row"' : ''}>
+      const filas = campConEstado.map((f, i) => `<tr${f.isProxima ? ' class="proxima-row"' : ''}>
           <td class="col-n">${f.n}</td>
           <td class="col-fecha">${f.label}</td>
-          <td>${estadoBadge(f.iso, f.isProxima)}</td>
+          <td id="estadoFecha-${i + 1}">${estadoBadge(f.iso, f.isProxima)}</td>
         </tr>`);
 
       document.getElementById('tbodyFechas').innerHTML = filas.join('');
+    })();
+
+    // Resultados: líder del campeonato y links "Resultados" en las fechas publicadas
+    (async () => {
+      try {
+        const res = await fetch('resultados/2026/index.json', { cache: 'no-cache' });
+        if (!res.ok) return;
+        const { fechas } = await res.json();
+        if (!fechas || !fechas.length) return;
+
+        fechas.forEach(n => {
+          const td = document.getElementById('estadoFecha-' + n);
+          if (!td) return;
+          const a = document.createElement('a');
+          a.className = 'link-resultados';
+          a.href = 'resultados.html#fecha-' + n;
+          a.textContent = 'Resultados →';
+          td.appendChild(a);
+        });
+
+        const ultimaN = Math.max(...fechas);
+        const resF = await fetch(`resultados/2026/fecha-${ultimaN}.json`, { cache: 'no-cache' });
+        if (!resF.ok) return;
+        const ultima = await resF.json();
+        const tns = ultima.categorias.find(c => c.id === 'TNS');
+        const lider = tns && tns.pilotos.find(p => p.pos === 1);
+        if (!lider) return;
+        const el = document.getElementById('liderCampeonato');
+        el.innerHTML = 'Líder: <strong></strong> · <span class="pts"></span> · tras la ' + ultima.fecha + 'ª fecha';
+        el.querySelector('strong').textContent = `#${lider.n} ${lider.piloto}`;
+        el.querySelector('.pts').textContent = `${lider.total} pts`;
+      } catch (e) {
+        console.error(e);
+      }
     })();
 
     (async () => {

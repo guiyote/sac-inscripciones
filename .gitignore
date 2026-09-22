@@ -2,3 +2,4 @@ sql/supabase_asignar_roles.sql
 .claude/
 backups/
 backup.sh
+pdfs/

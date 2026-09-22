@@ -1,0 +1,28 @@
+{
+  "fecha": 4,
+  "label": "20 de Setiembre",
+  "lugar": "Salto",
+  "categorias": [
+    {
+      "id": "TNS",
+      "nombre": "Turismo Nacional SAC",
+      "campeonato": true,
+      "nota": "De acuerdo al Reglamento, los pilotos que participaron en el evento del sábado 19/09 reciben 5 puntos extra de presentación para el Campeonato.",
+      "pilotos": [
+        { "n": 333, "piloto": "PARENTINI, J.",  "pres": 10,    "clasif": ["1", 3],     "s1": ["1", 6],     "s2": ["-", 0],     "carrera": ["1", 25],             "etapa": 44, "total": 110, "pos": 1,  "lastre": 25 },
+        { "n": 134, "piloto": "ZORRILLA, M.",   "pres": 10,    "clasif": ["4", 0],     "s1": ["-", 0],     "s2": ["4", 3],     "carrera": ["8", 4],              "etapa": 17, "total": 104, "pos": 2,  "lastre": 0 },
+        { "n": 113, "piloto": "PEREZ, F.",      "pres": 10,    "clasif": ["3", 1],     "s1": ["2", 5],     "s2": ["-", 0],     "carrera": ["3", 17],             "etapa": 33, "total": 92,  "pos": 3,  "lastre": 20 },
+        { "n": 144, "piloto": "PARENTINI, A.",  "pres": 10,    "clasif": ["2", 2],     "s1": ["-", 0],     "s2": ["1", 6],     "carrera": ["2", 20],    "vr": 1, "etapa": 39, "total": 77,  "pos": 4,  "lastre": 30 },
+        { "n": 999, "piloto": "SEVERO, A.",     "pres": 10,    "clasif": ["10", 0],    "s1": ["3", 4],     "s2": ["-", 0],     "carrera": ["99", 0],             "etapa": 14, "total": 69,  "pos": 5,  "lastre": 0 },
+        { "n": 434, "piloto": "BORBA, L.",      "pres": 5,     "clasif": ["DES", 0],   "s1": ["-", 0],     "s2": ["3", 4],     "carrera": ["7", 6],              "etapa": 15, "total": 67,  "pos": 6,  "lastre": 10 },
+        { "n": 1,   "piloto": "FREITAS, F.",    "pres": 10,    "clasif": ["5", 0],     "s1": ["99", 0],    "s2": ["-", 0],     "carrera": ["6", 8],              "etapa": 18, "total": 63,  "pos": 7,  "lastre": 15 },
+        { "n": 261, "piloto": "BISIO, R.",      "pres": 5,     "clasif": ["9", 0],     "s1": ["4", 3],     "s2": ["-", 0],     "carrera": ["99", 0],             "etapa": 8,  "total": 62,  "pos": 8,  "lastre": 0 },
+        { "n": 289, "piloto": "GALLINO, E.",    "pres": 10,    "clasif": ["6", 0],     "s1": ["-", 0],     "s2": ["DES", 0],   "carrera": ["99", 0],             "etapa": 10, "total": 44,  "pos": 9,  "lastre": 0 },
+        { "n": 222, "piloto": "SILVA, C.",      "pres": null,  "clasif": ["N/P", 0],   "s1": ["N/P", 0],   "s2": ["N/P", 0],   "carrera": ["N/P", 0],            "etapa": 0,  "total": 40,  "pos": 10, "lastre": 0 },
+        { "n": 110, "piloto": "NOBILE, L.",     "pres": 5,     "clasif": ["8", 0],     "s1": ["-", 0],     "s2": ["2", 5],     "carrera": ["4", 14],             "etapa": 24, "total": 39,  "pos": 11, "lastre": 0 },
+        { "n": 101, "piloto": "LIBONATTI, L.",  "pres": 10,    "clasif": ["7", 0],     "s1": ["DES", 0],   "s2": ["-", 0],     "carrera": ["5", 11],             "etapa": 21, "total": 21,  "pos": 12, "lastre": 0 },
+        { "n": 195, "piloto": "RODRIGUEZ, R.",  "pres": "INV", "clasif": ["INV", 0],   "s1": ["INV", 0],   "s2": ["INV", 0],   "carrera": ["INV", 0],            "etapa": 0,  "total": 0,   "pos": 13, "lastre": 0, "invitado": true }
+      ]
+    }
+  ]
+}

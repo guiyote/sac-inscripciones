@@ -1,0 +1,25 @@
+{
+  "fecha": 3,
+  "label": "9 de Agosto",
+  "lugar": "Salto",
+  "categorias": [
+    {
+      "id": "TNS",
+      "nombre": "Turismo Nacional SAC",
+      "campeonato": true,
+      "pilotos": [
+        { "n": 134, "piloto": "ZORRILLA, M.",   "pres": 5,    "clasif": ["1", 3],   "s1": ["4", 3],   "s2": ["-", 0],   "carrera": ["9", 2],            "etapa": 13, "total": 87, "pos": 1,  "lastre": 15 },
+        { "n": 333, "piloto": "PARENTINI, J.",  "pres": 5,    "clasif": ["7", 0],   "s1": ["5", 2],   "s2": ["-", 0],   "carrera": ["6", 8],            "etapa": 15, "total": 66, "pos": 2,  "lastre": 0 },
+        { "n": 113, "piloto": "PEREZ, F.",      "pres": 5,    "clasif": ["6", 0],   "s1": ["-", 0],   "s2": ["2", 5],   "carrera": ["3", 17],           "etapa": 27, "total": 59, "pos": 3,  "lastre": 10 },
+        { "n": 999, "piloto": "SEVERO, A.",     "pres": 5,    "clasif": ["8", 0],   "s1": ["-", 0],   "s2": ["99", 0],  "carrera": ["8", 4],            "etapa": 9,  "total": 55, "pos": 4,  "lastre": 0 },
+        { "n": 261, "piloto": "BISIO, R.",      "pres": 5,    "clasif": ["4", 0],   "s1": ["-", 0],   "s2": ["DES", 0], "carrera": ["10", 1],           "etapa": 6,  "total": 54, "pos": 5,  "lastre": 0 },
+        { "n": 434, "piloto": "BORBA, L.",      "pres": null, "clasif": ["N/P", 0], "s1": ["N/P", 0], "s2": ["N/P", 0], "carrera": ["N/P", 0],          "etapa": 0,  "total": 52, "pos": 6,  "lastre": 25 },
+        { "n": 1,   "piloto": "FREITAS, F.",    "pres": 5,    "clasif": ["3", 1],   "s1": ["2", 5],   "s2": ["-", 0],   "carrera": ["1", 25],  "vr": 1, "etapa": 37, "total": 45, "pos": 7,  "lastre": 25 },
+        { "n": 222, "piloto": "SILVA, C.",      "pres": 5,    "clasif": ["9", 0],   "s1": ["3", 4],   "s2": ["-", 0],   "carrera": ["5", 11],           "etapa": 20, "total": 40, "pos": 8,  "lastre": 0 },
+        { "n": 144, "piloto": "PARENTINI, A.",  "pres": 5,    "clasif": ["2", 2],   "s1": ["-", 0],   "s2": ["1", 6],   "carrera": ["2", 20],           "etapa": 33, "total": 38, "pos": 9,  "lastre": 15 },
+        { "n": 289, "piloto": "GALLINO, E.",    "pres": 5,    "clasif": ["5", 0],   "s1": ["1", 6],   "s2": ["-", 0],   "carrera": ["4", 14],           "etapa": 25, "total": 34, "pos": 10, "lastre": 0 },
+        { "n": 110, "piloto": "NOBILE, L.",     "pres": 5,    "clasif": ["10", 0],  "s1": ["-", 0],   "s2": ["3", 4],   "carrera": ["7", 6],            "etapa": 15, "total": 15, "pos": 11, "lastre": 0 }
+      ]
+    }
+  ]
+}

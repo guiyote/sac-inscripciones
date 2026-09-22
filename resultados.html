@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-S35C30JVN2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-S35C30JVN2');
+  </script>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/jpeg" href="logo.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAC - Resultados 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --rojo: #CC0000;
+      --rojo-oscuro: #990000;
+      --gris: #1a1a1a;
+      --gris-medio: #2d2d2d;
+      --blanco: #ffffff;
+      --texto-muted: #888;
+      --verde: #4ade80;
+    }
+
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: var(--gris);
+      color: var(--blanco);
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+      background: var(--gris);
+      border-bottom: 3px solid var(--rojo);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 70px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-logo { display: flex; align-items: center; gap: 1rem; text-decoration: none; color: inherit; }
+    .logo-circle { width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0; overflow: hidden; }
+    .logo-circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .header-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase; line-height: 1.2; }
+    .header-title span { display: block; font-size: 0.7rem; font-weight: 400; letter-spacing: 3px; color: var(--texto-muted); }
+    .btn-volver {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--texto-muted);
+      text-decoration: none;
+      border: 1px solid #444;
+      padding: 0.4rem 0.8rem;
+      border-radius: 2px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .btn-volver:hover { color: var(--blanco); border-color: var(--rojo); }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, var(--gris) 0%, var(--gris-medio) 100%);
+      padding: 1.75rem 2rem 1.5rem;
+      text-align: center;
+      position: relative;
+    }
+    .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--rojo); }
+    .hero h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      text-transform: uppercase;
+      line-height: 0.95;
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+    }
+    .hero h1 em { font-style: normal; color: var(--rojo); }
+    .hero-sub { color: var(--texto-muted); font-size: 1rem; letter-spacing: 1px; }
+
+    .stripe {
+      height: 6px;
+      background: repeating-linear-gradient(90deg, var(--rojo) 0px, var(--rojo) 40px, var(--gris) 40px, var(--gris) 50px);
+    }
+
+    main { max-width: 960px; margin: 0 auto; padding: 1.25rem 1.5rem 2.5rem; }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      gap: 0.4rem;
+      overflow-x: auto;
+      padding-bottom: 0.25rem;
+      margin-bottom: 1.25rem;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      flex-shrink: 0;
+      background: var(--gris-medio);
+      border: 1px solid #333;
+      color: var(--texto-muted);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 0.5rem 1rem;
+      border-radius: 2px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab:hover { color: var(--blanco); border-color: #555; }
+    .tab.activa { background: var(--rojo); border-color: var(--rojo); color: var(--blanco); }
+
+    /* BLOQUE */
+    .bloque { margin-bottom: 2rem; }
+    .bloque-titulo {
+      background: var(--gris-medio);
+      border-left: 4px solid var(--rojo);
+      padding: 0.7rem 1rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .bloque-titulo h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .bloque-titulo .meta { font-size: 0.82rem; color: var(--texto-muted); }
+
+    .nota {
+      font-size: 0.8rem;
+      color: #fde047;
+      background: rgba(234,179,8,0.08);
+      border: 1px solid rgba(234,179,8,0.25);
+      border-radius: 2px;
+      padding: 0.55rem 0.8rem;
+      margin-top: 0.75rem;
+      line-height: 1.45;
+    }
+
+    /* TABLAS */
+    .table-wrap { border: 1px solid #333; border-radius: 2px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    thead th {
+      background: #222;
+      padding: 0.6rem 0.6rem;
+      text-align: center;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #777;
+      border-bottom: 1px solid #333;
+      white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid #252525; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody td { padding: 0.6rem 0.6rem; text-align: center; vertical-align: middle; white-space: nowrap; }
+    th.izq, td.izq { text-align: left; }
+
+    /* Columnas fijas (pos + piloto) para scroll horizontal en celular */
+    .fija { position: sticky; background: var(--gris); z-index: 1; }
+    thead .fija { background: #222; }
+    .fija-1 { left: 0; width: 2.8rem; min-width: 2.8rem; }
+    .fija-2 { left: 2.8rem; box-shadow: 1px 0 0 #333; }
+
+    .col-pos {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+    tr.podio-1 .col-pos { color: #facc15; }
+    tr.podio-2 .col-pos { color: #d4d4d8; }
+    tr.podio-3 .col-pos { color: #d97706; }
+    tr.lider { background: rgba(204,0,0,0.06); }
+    tr.lider .fija { background: #221a1a; }
+
+    .piloto { font-weight: 600; }
+    .num {
+      display: inline-block;
+      min-width: 2.2rem;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--texto-muted);
+      margin-right: 0.35rem;
+    }
+    .p-pos { font-family: 'Barlow Condensed', sans-serif; font-size: 0.95rem; }
+    .p-pts { font-size: 0.72rem; color: var(--texto-muted); margin-left: 0.2rem; }
+    .p-pts.suma { color: var(--verde); }
+    .p-esp { font-family: 'Barlow Condensed', sans-serif; font-size: 0.78rem; letter-spacing: 1px; color: #777; }
+    .p-esp.des { color: #f87171; }
+    .p-nulo { color: #444; }
+    .vr {
+      display: inline-block;
+      background: #facc15;
+      color: #1a1a1a;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 0.05rem 0.35rem;
+      border-radius: 2px;
+    }
+    .col-pts { font-family: 'Barlow Condensed', sans-serif; font-size: 1.05rem; font-weight: 700; }
+    .col-total { font-family: 'Barlow Condensed', sans-serif; font-size: 1.15rem; font-weight: 800; color: var(--blanco); }
+    .col-camp { font-size: 0.82rem; color: var(--texto-muted); }
+    .col-camp strong { color: var(--blanco); font-family: 'Barlow Condensed', sans-serif; font-size: 0.95rem; }
+    .col-fecha { font-family: 'Barlow Condensed', sans-serif; font-size: 0.95rem; color: #bbb; }
+    .col-dif { font-size: 0.8rem; color: var(--texto-muted); }
+    .col-lastre { font-size: 0.85rem; color: #bbb; }
+    .mov { font-size: 0.68rem; margin-left: 0.25rem; }
+    .mov.sube { color: var(--verde); }
+    .mov.baja { color: #f87171; }
+    .inv-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.62rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #999;
+      border: 1px solid #555;
+      border-radius: 2px;
+      padding: 0 0.3rem;
+      margin-left: 0.35rem;
+    }
+
+    .referencias {
+      font-size: 0.75rem;
+      color: #777;
+      line-height: 1.7;
+      margin-top: 0.75rem;
+    }
+    .referencias strong { color: #aaa; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.5px; }
+
+    .estado { text-align: center; color: var(--texto-muted); padding: 3rem 1rem; }
+
+    footer {
+      border-top: 1px solid #333;
+      padding: 0.85rem 2rem;
+      text-align: center;
+      color: var(--texto-muted);
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+    }
+    footer strong { color: var(--rojo); }
+
+    @media (max-width: 600px) {
+      header { padding: 0 1rem; }
+      .header-title span { display: none; }
+      .hero { padding: 1.5rem 1rem 1.25rem; }
+      main { padding: 1rem 1rem 2rem; }
+      footer { padding: 1rem; }
+      table { font-size: 0.85rem; }
+      tbody td, thead th { padding: 0.55rem 0.45rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a class="header-logo" href="index.html">
+      <div class="logo-circle"><img src="logo.jpeg" alt="SAC"></div>
+      <div class="header-title">
+        Salto Automóvil Club
+        <span>Autódromo de Salto</span>
+      </div>
+    </a>
+    <a class="btn-volver" href="index.html">← Inicio</a>
+  </header>
+
+  <div class="hero">
+    <h1>Resultados <em>2026</em></h1>
+    <p class="hero-sub">Campeonato Turismo Nacional SAC (TNS)</p>
+  </div>
+
+  <div class="stripe"></div>
+
+  <main>
+    <nav class="tabs" id="tabs"></nav>
+    <div id="contenido"><p class="estado">Cargando resultados…</p></div>
+  </main>
+
+  <footer>
+    <strong>Salto Automóvil Club</strong> &mdash; Fundado el 18 de Julio de 1938
+  </footer>
+
+  <script>
+    const BASE = 'resultados/2026/';
+    let FECHAS = [];   // [{ fecha, label, lugar, categorias }]
+
+    const ESPECIALES = {
+      '99':  'Sin mín. vtas.',
+      'N/P': 'N/P',
+      'N/L': 'N/L',
+      'DES': 'DES',
+      'INV': 'Invit.',
+    };
+    // Orden para los que no tienen posición numérica en la carrera
+    const ORDEN_ESPECIAL = ['99', 'N/L', 'DES', 'N/P', 'INV', '-'];
+
+    function esNum(v) { return /^\d+$/.test(v); }
+
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    function ordinal(n) { return `${n}ª`; }
+
+    async function cargarJSON(path) {
+      const res = await fetch(BASE + path, { cache: 'no-cache' });
+      if (!res.ok) throw new Error(`${path}: ${res.status}`);
+      return res.json();
+    }
+
+    // Celda de una instancia (clasif / serie / carrera): posición + puntos obtenidos
+    function celdaInstancia([pos, pts]) {
+      if (pos === '-') return '<span class="p-nulo">–</span>';
+      if (!esNum(pos)) {
+        return `<span class="p-esp${pos === 'DES' ? ' des' : ''}">${esc(ESPECIALES[pos] || pos)}</span>`;
+      }
+      return `<span class="p-pos">${pos}º</span>` +
+        (pts > 0 ? `<span class="p-pts suma">+${pts}</span>` : '');
+    }
+
+    function ordenarPorCarrera(pilotos) {
+      const rango = p => {
+        const pos = p.carrera[0];
+        if (esNum(pos)) return parseInt(pos, 10);
+        const i = ORDEN_ESPECIAL.indexOf(pos);
+        return 1000 + (i === -1 ? ORDEN_ESPECIAL.length : i);
+      };
+      return [...pilotos].sort((a, b) => rango(a) - rango(b) || b.etapa - a.etapa);
+    }
+
+    function referencias() {
+      return `<p class="referencias">
+        <strong>Sin mín. vtas.</strong> no completó el mínimo de vueltas ·
+        <strong>N/P</strong> no participó ·
+        <strong>N/L</strong> no largó ·
+        <strong>DES</strong> descalificado ·
+        <span class="vr">VR</span> vuelta rápida (+1) ·
+        <strong>Pres.</strong> puntos por presentación
+      </p>`;
+    }
+
+    // ---------- Vista: una fecha ----------
+    function renderFecha(f) {
+      const bloques = f.categorias.map(cat => {
+        const pilotos = ordenarPorCarrera(cat.pilotos);
+        const filas = pilotos.map(p => {
+          const pos = p.carrera[0];
+          const posTxt = esNum(pos) ? `${pos}º` : '–';
+          const podio = esNum(pos) && +pos <= 3 ? ` class="podio-${pos}"` : '';
+          const pres = p.pres === null ? '<span class="p-nulo">–</span>'
+            : p.pres === 'INV' ? '<span class="p-esp">Invit.</span>'
+            : `<span class="p-pts suma">+${p.pres}</span>`;
+          const camp = cat.campeonato
+            ? `<td class="col-camp">${p.invitado ? '–' : `<strong>${p.total}</strong> · ${p.pos}º`}</td>`
+            : '';
+          return `<tr${podio}>
+            <td class="fija fija-1 col-pos">${posTxt}</td>
+            <td class="fija fija-2 izq"><span class="num">#${p.n}</span><span class="piloto">${esc(p.piloto)}</span>${p.invitado ? '<span class="inv-tag">Invitado</span>' : ''}</td>
+            <td>${celdaInstancia(p.clasif)}</td>
+            <td>${celdaInstancia(p.s1)}</td>
+            <td>${celdaInstancia(p.s2)}</td>
+            <td>${celdaInstancia(p.carrera)}</td>
+            <td>${p.vr ? '<span class="vr">VR</span>' : ''}</td>
+            <td>${pres}</td>
+            <td class="col-pts">${p.etapa}</td>
+            ${camp}
+          </tr>`;
+        }).join('');
+
+        return `<section class="bloque">
+          <div class="bloque-titulo">
+            <h2>${esc(cat.nombre)} (${esc(cat.id)})</h2>
+            <span class="meta">${ordinal(f.fecha)} Fecha · ${esc(f.label)} · ${esc(f.lugar)}</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th class="fija fija-1">Pos</th>
+                <th class="fija fija-2 izq">Piloto</th>
+                <th>Clasif.</th>
+                <th>Serie 1</th>
+                <th>Serie 2</th>
+                <th>Carrera</th>
+                <th>VR</th>
+                <th>Pres.</th>
+                <th>Pts</th>
+                ${cat.campeonato ? '<th>Campeonato</th>' : ''}
+              </tr></thead>
+              <tbody>${filas}</tbody>
+            </table>
+          </div>
+          ${cat.nota ? `<p class="nota">${esc(cat.nota)}</p>` : ''}
+        </section>`;
+      }).join('');
+
+      return bloques + referencias();
+    }
+
+    // ---------- Vista: campeonato ----------
+    // Posiciones, totales y lastre se toman tal cual de la última fecha (como el PDF oficial);
+    // la página solo muestra la etapa de cada fecha y el movimiento respecto a la anterior.
+    function tns(f) { return f.categorias.find(c => c.id === 'TNS'); }
+
+    function renderCampeonato() {
+      const ultima = FECHAS[FECHAS.length - 1];
+      const anterior = FECHAS.length > 1 ? FECHAS[FECHAS.length - 2] : null;
+      const posAnterior = {};
+      if (anterior) tns(anterior).pilotos.forEach(p => { posAnterior[p.n] = p.pos; });
+
+      const porFecha = FECHAS.map(f => {
+        const m = {};
+        tns(f).pilotos.forEach(p => { m[p.n] = p; });
+        return m;
+      });
+
+      const tabla = tns(ultima).pilotos.filter(p => !p.invitado);
+      const lider = tabla[0];
+
+      const filas = tabla.map((p, i) => {
+        const podio = p.pos <= 3 ? `podio-${p.pos}` : '';
+        const clases = [podio, i === 0 ? 'lider' : ''].filter(Boolean).join(' ');
+
+        let mov = '';
+        const prev = posAnterior[p.n];
+        if (prev && prev !== p.pos) {
+          const d = prev - p.pos;
+          mov = `<span class="mov ${d > 0 ? 'sube' : 'baja'}">${d > 0 ? '▲' : '▼'}${Math.abs(d)}</span>`;
+        }
+
+        const celdasFechas = porFecha.map(m => {
+          const r = m[p.n];
+          if (!r || r.carrera[0] === 'N/P') return '<td class="col-fecha"><span class="p-nulo">–</span></td>';
+          return `<td class="col-fecha">${r.etapa}</td>`;
+        }).join('');
+
+        const dif = i === 0 ? '' : `−${lider.total - p.total}`;
+
+        return `<tr${clases ? ` class="${clases}"` : ''}>
+          <td class="fija fija-1 col-pos">${p.pos}º${mov}</td>
+          <td class="fija fija-2 izq"><span class="num">#${p.n}</span><span class="piloto">${esc(p.piloto)}</span></td>
+          ${celdasFechas}
+          <td class="col-total">${p.total}</td>
+          <td class="col-dif">${dif}</td>
+          <td class="col-lastre">${p.lastre ? `${p.lastre} kg` : '<span class="p-nulo">–</span>'}</td>
+        </tr>`;
+      }).join('');
+
+      const thFechas = FECHAS.map(f => `<th title="${esc(f.label)}">F${f.fecha}</th>`).join('');
+
+      return `<section class="bloque">
+        <div class="bloque-titulo">
+          <h2>Campeonato TNS 2026</h2>
+          <span class="meta">Tras la ${ordinal(ultima.fecha)} Fecha · ${esc(ultima.label)}</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th class="fija fija-1">Pos</th>
+              <th class="fija fija-2 izq">Piloto</th>
+              ${thFechas}
+              <th>Total</th>
+              <th>Dif.</th>
+              <th title="Lastre para la próxima fecha">Lastre próx.</th>
+            </tr></thead>
+            <tbody>${filas}</tbody>
+          </table>
+        </div>
+        <p class="referencias">
+          <strong>F1…F${ultima.fecha}</strong> puntos obtenidos en cada fecha ·
+          <strong>Dif.</strong> puntos detrás del líder ·
+          <strong>▲▼</strong> cambio de posición respecto a la fecha anterior ·
+          <strong>Lastre próx.</strong> kg de lastre para la próxima fecha
+        </p>
+      </section>`;
+    }
+
+    // ---------- Navegación ----------
+    function vistaActual() {
+      const h = location.hash.replace('#', '');
+      const m = h.match(/^fecha-(\d+)$/);
+      if (m && FECHAS.some(f => f.fecha === +m[1])) return h;
+      return 'campeonato';
+    }
+
+    function render() {
+      const vista = vistaActual();
+      const tabs = [{ id: 'campeonato', label: 'Campeonato' },
+        ...FECHAS.map(f => ({ id: `fecha-${f.fecha}`, label: `${ordinal(f.fecha)} Fecha` }))];
+      document.getElementById('tabs').innerHTML = tabs.map(t =>
+        `<a class="tab${t.id === vista ? ' activa' : ''}" href="#${t.id}">${t.label}</a>`).join('');
+
+      const cont = document.getElementById('contenido');
+      if (vista === 'campeonato') {
+        cont.innerHTML = renderCampeonato();
+      } else {
+        const n = +vista.split('-')[1];
+        cont.innerHTML = renderFecha(FECHAS.find(f => f.fecha === n));
+      }
+      document.querySelector('.tab.activa')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
+
+    window.addEventListener('hashchange', render);
+
+    (async () => {
+      try {
+        const idx = await cargarJSON('index.json');
+        FECHAS = await Promise.all(idx.fechas.map(n => cargarJSON(`fecha-${n}.json`)));
+        FECHAS.sort((a, b) => a.fecha - b.fecha);
+        if (!FECHAS.length) throw new Error('sin fechas');
+        render();
+      } catch (e) {
+        console.error(e);
+        document.getElementById('contenido').innerHTML =
+          '<p class="estado">No se pudieron cargar los resultados. Intentá de nuevo más tarde.</p>';
+      }
+    })();
+  </script>
+
+</body>
+</html>

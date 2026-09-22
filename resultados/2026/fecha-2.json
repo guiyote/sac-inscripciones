@@ -1,0 +1,24 @@
+{
+  "fecha": 2,
+  "label": "14 de Junio",
+  "lugar": "Salto",
+  "categorias": [
+    {
+      "id": "TNS",
+      "nombre": "Turismo Nacional SAC",
+      "campeonato": true,
+      "pilotos": [
+        { "n": 134, "piloto": "ZORRILLA, M.",   "pres": 5,    "clasif": ["1", 3],   "s1": ["1", 6],   "s2": ["-", 0],   "carrera": ["2", 20],   "vr": 1, "etapa": 35, "total": 74, "pos": 1,  "lastre": 40 },
+        { "n": 434, "piloto": "BORBA, L.",      "pres": 5,    "clasif": ["2", 2],   "s1": ["-", 0],   "s2": ["1", 6],   "carrera": ["1", 25],            "etapa": 38, "total": 52, "pos": 2,  "lastre": 25 },
+        { "n": 333, "piloto": "PARENTINI, J.",  "pres": 5,    "clasif": ["3", 1],   "s1": ["2", 5],   "s2": ["-", 0],   "carrera": ["3", 17],            "etapa": 28, "total": 51, "pos": 3,  "lastre": 10 },
+        { "n": 261, "piloto": "BISIO, R.",      "pres": 5,    "clasif": ["4", 0],   "s1": ["-", 0],   "s2": ["3", 4],   "carrera": ["5", 11],            "etapa": 20, "total": 48, "pos": 4,  "lastre": 10 },
+        { "n": 999, "piloto": "SEVERO, A.",     "pres": 5,    "clasif": ["7", 0],   "s1": ["4", 3],   "s2": ["-", 0],   "carrera": ["6", 8],             "etapa": 16, "total": 46, "pos": 5,  "lastre": 5 },
+        { "n": 113, "piloto": "PEREZ, F.",      "pres": 5,    "clasif": ["6", 0],   "s1": ["-", 0],   "s2": ["2", 5],   "carrera": ["4", 14],            "etapa": 24, "total": 32, "pos": 6,  "lastre": 0 },
+        { "n": 222, "piloto": "SILVA, C.",      "pres": null, "clasif": ["N/P", 0], "s1": ["N/P", 0], "s2": ["N/P", 0], "carrera": ["N/P", 0],           "etapa": 0,  "total": 20, "pos": 7,  "lastre": 0 },
+        { "n": 289, "piloto": "GALLINO, E.",    "pres": 5,    "clasif": ["5", 0],   "s1": ["3", 4],   "s2": ["-", 0],   "carrera": ["99", 0],            "etapa": 9,  "total": 9,  "pos": 8,  "lastre": 0 },
+        { "n": 1,   "piloto": "FREITAS, F.",    "pres": 5,    "clasif": ["8", 0],   "s1": ["-", 0],   "s2": ["4", 3],   "carrera": ["99", 0],            "etapa": 8,  "total": 8,  "pos": 9,  "lastre": 0 },
+        { "n": 144, "piloto": "PARENTINI, A.",  "pres": null, "clasif": ["N/P", 0], "s1": ["N/P", 0], "s2": ["N/P", 0], "carrera": ["N/P", 0],           "etapa": 0,  "total": 5,  "pos": 10, "lastre": 0 }
+      ]
+    }
+  ]
+}

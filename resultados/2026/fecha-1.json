@@ -1,0 +1,33 @@
+{
+  "fecha": 1,
+  "label": "26 de Abril",
+  "lugar": "Salto",
+  "categorias": [
+    {
+      "id": "TNS",
+      "nombre": "Turismo Nacional SAC",
+      "campeonato": true,
+      "pilotos": [
+        { "n": 134, "piloto": "ZORRILLA, M.",   "pres": 5, "clasif": ["2", 2],   "s1": ["-", 0], "s2": ["1", 6],  "carrera": ["1", 25],   "vr": 1, "etapa": 39, "total": 39, "pos": 1, "lastre": 25 },
+        { "n": 999, "piloto": "SEVERO, A.",     "pres": 5, "clasif": ["6", 0],   "s1": ["-", 0], "s2": ["2", 5],  "carrera": ["2", 20],            "etapa": 30, "total": 30, "pos": 2, "lastre": 15 },
+        { "n": 261, "piloto": "BISIO, R.",      "pres": 5, "clasif": ["3", 1],   "s1": ["2", 5], "s2": ["-", 0],  "carrera": ["3", 17],            "etapa": 28, "total": 28, "pos": 3, "lastre": 10 },
+        { "n": 333, "piloto": "PARENTINI, J.",  "pres": 5, "clasif": ["5", 0],   "s1": ["3", 4], "s2": ["-", 0],  "carrera": ["4", 14],            "etapa": 23, "total": 23, "pos": 4, "lastre": 0 },
+        { "n": 222, "piloto": "SILVA, C.",      "pres": 5, "clasif": ["4", 0],   "s1": ["-", 0], "s2": ["3", 4],  "carrera": ["5", 11],            "etapa": 20, "total": 20, "pos": 5, "lastre": 0 },
+        { "n": 434, "piloto": "BORBA, L.",      "pres": 5, "clasif": ["1", 3],   "s1": ["1", 6], "s2": ["-", 0],  "carrera": ["99", 0],            "etapa": 14, "total": 14, "pos": 6, "lastre": 0 },
+        { "n": 113, "piloto": "PEREZ, F.",      "pres": 5, "clasif": ["DES", 0], "s1": ["4", 3], "s2": ["-", 0],  "carrera": ["99", 0],            "etapa": 8,  "total": 8,  "pos": 7, "lastre": 0 },
+        { "n": 144, "piloto": "PARENTINI, A.",  "pres": 5, "clasif": ["99", 0],  "s1": ["-", 0], "s2": ["99", 0], "carrera": ["N/L", 0],           "etapa": 5,  "total": 5,  "pos": 8, "lastre": 0 }
+      ]
+    },
+    {
+      "id": "TMZ",
+      "nombre": "Turismo Multimarcas Zonal SAC",
+      "campeonato": false,
+      "nota": "Por no completar el mínimo de participantes para ser Campeonato Regional, esta fecha no es puntuable para el Campeonato 2026. La categoría se discontinuó tras la 1ª fecha.",
+      "pilotos": [
+        { "n": 95, "piloto": "RODRIGUEZ, R.",    "pres": 5, "clasif": ["1", 3], "s1": ["1", 6], "s2": ["-", 0], "carrera": ["1", 25],         "etapa": 39 },
+        { "n": 29, "piloto": "RODRIGUEZ, R.(P)", "pres": 5, "clasif": ["3", 1], "s1": ["2", 5], "s2": ["-", 0], "carrera": ["2", 20], "vr": 1, "etapa": 32 },
+        { "n": 78, "piloto": "RAMIREZ, E.",      "pres": 5, "clasif": ["2", 2], "s1": ["-", 0], "s2": ["1", 6], "carrera": ["3", 17],         "etapa": 30 }
+      ]
+    }
+  ]
+}

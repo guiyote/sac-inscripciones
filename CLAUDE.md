@@ -70,3 +70,7 @@ The current month's date is pre-selected dynamically in JS.
 ## Duplicate prevention
 
 Each inscription form checks for duplicates before INSERT by querying for matching `nombre` + `numero_kart`/`numero_auto` + `fecha_carrera` (case-insensitive via `.ilike()`).
+
+## Resultados del campeonato
+
+`resultados.html` muestra el Campeonato TNS y los resultados de cada fecha a partir de JSON estáticos en `resultados/2026/` (sin Supabase). Para publicar una fecha nueva: crear `fecha-N.json` a partir del PDF oficial (mismo formato que las anteriores) y agregar `N` en `index.json`. El home toma de ahí el líder y los links "Resultados →" del calendario. Totales, posiciones y lastre se copian del PDF, no se calculan. Los PDFs fuente van en `pdfs/` (ignorado por git).
