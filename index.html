@@ -364,11 +364,8 @@
     .badge-proxima { background: rgba(204,0,0,0.15); color: #f87171; border: 1px solid rgba(204,0,0,0.4); }
     .badge-realizada { background: rgba(22,163,74,0.15); color: #4ade80; border: 1px solid rgba(22,163,74,0.3); }
     .badge-pendiente { background: rgba(234,179,8,0.12); color: #fde047; border: 1px solid rgba(234,179,8,0.25); }
-    .link-resultados { margin-left: 0.6rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.78rem; letter-spacing: 1px; text-transform: uppercase; color: #f87171; text-decoration: none; white-space: nowrap; }
-    .link-resultados:hover { color: var(--blanco); }
     @media (max-width: 600px) {
       .fechas-section { padding: 0 1rem 2rem; }
-      .link-resultados { display: block; margin: 0.35rem 0 0; }
     }
 
     /* RESULTADOS */
@@ -614,29 +611,19 @@
       const filas = campConEstado.map((f, i) => `<tr${f.isProxima ? ' class="proxima-row"' : ''}>
           <td class="col-n">${f.n}</td>
           <td class="col-fecha">${f.label}</td>
-          <td id="estadoFecha-${i + 1}">${estadoBadge(f.iso, f.isProxima)}</td>
+          <td>${estadoBadge(f.iso, f.isProxima)}</td>
         </tr>`);
 
       document.getElementById('tbodyFechas').innerHTML = filas.join('');
     })();
 
-    // Resultados: líder del campeonato y links "Resultados" en las fechas publicadas
+    // Resultados: líder del campeonato
     (async () => {
       try {
         const res = await fetch('resultados/2026/index.json', { cache: 'no-cache' });
         if (!res.ok) return;
         const { fechas } = await res.json();
         if (!fechas || !fechas.length) return;
-
-        fechas.forEach(n => {
-          const td = document.getElementById('estadoFecha-' + n);
-          if (!td) return;
-          const a = document.createElement('a');
-          a.className = 'link-resultados';
-          a.href = 'resultados.html#fecha-' + n;
-          a.textContent = 'Resultados →';
-          td.appendChild(a);
-        });
 
         const ultimaN = Math.max(...fechas);
         const resF = await fetch(`resultados/2026/fecha-${ultimaN}.json`, { cache: 'no-cache' });
