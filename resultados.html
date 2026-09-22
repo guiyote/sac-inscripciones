@@ -222,8 +222,6 @@
     }
     .col-pts { font-family: 'Barlow Condensed', sans-serif; font-size: 1.05rem; font-weight: 700; }
     .col-total { font-family: 'Barlow Condensed', sans-serif; font-size: 1.15rem; font-weight: 800; color: var(--blanco); }
-    .col-camp { font-size: 0.82rem; color: var(--texto-muted); }
-    .col-camp strong { color: var(--blanco); font-family: 'Barlow Condensed', sans-serif; font-size: 0.95rem; }
     .col-fecha { font-family: 'Barlow Condensed', sans-serif; font-size: 0.95rem; color: #bbb; }
     .col-dif { font-size: 0.8rem; color: var(--texto-muted); }
     .col-lastre { font-size: 0.85rem; color: #bbb; }
@@ -313,10 +311,9 @@
       'DES': 'DES',
       'INV': 'Invit.',
     };
-    // Orden para los que no tienen posición numérica en la carrera
-    const ORDEN_ESPECIAL = ['99', 'N/L', 'DES', 'N/P', 'INV', '-'];
 
-    function esNum(v) { return /^\d+$/.test(v); }
+    // Posición numérica real ('99' es el código de "no completó el mínimo de vueltas", no un puesto)
+    function esNum(v) { return /^\d+$/.test(v) && v !== '99'; }
 
     function esc(s) {
       return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -340,16 +337,6 @@
         (pts > 0 ? `<span class="p-pts suma">+${pts}</span>` : '');
     }
 
-    function ordenarPorCarrera(pilotos) {
-      const rango = p => {
-        const pos = p.carrera[0];
-        if (esNum(pos)) return parseInt(pos, 10);
-        const i = ORDEN_ESPECIAL.indexOf(pos);
-        return 1000 + (i === -1 ? ORDEN_ESPECIAL.length : i);
-      };
-      return [...pilotos].sort((a, b) => rango(a) - rango(b) || b.etapa - a.etapa);
-    }
-
     function referencias() {
       return `<p class="referencias">
         <strong>Sin mín. vtas.</strong> no completó el mínimo de vueltas ·
@@ -362,28 +349,30 @@
     }
 
     // ---------- Vista: una fecha ----------
+    // Mismo orden y columnas que el PDF oficial: en categorías de campeonato los pilotos van
+    // por posición en el campeonato (no por resultado de la carrera).
     function renderFecha(f) {
       const bloques = f.categorias.map(cat => {
-        const pilotos = ordenarPorCarrera(cat.pilotos);
-        const filas = pilotos.map(p => {
-          const pos = p.carrera[0];
-          const posTxt = esNum(pos) ? `${pos}º` : '–';
-          const podio = esNum(pos) && +pos <= 3 ? ` class="podio-${pos}"` : '';
+        const filas = cat.pilotos.map(p => {
+          const pos = cat.campeonato ? String(p.pos) : p.carrera[0];
+          const posTxt = p.invitado || !esNum(pos) ? '–' : `${pos}º`;
+          const podio = !p.invitado && esNum(pos) && +pos <= 3 ? ` class="podio-${pos}"` : '';
           const pres = p.pres === null ? '<span class="p-nulo">–</span>'
             : p.pres === 'INV' ? '<span class="p-esp">Invit.</span>'
             : `<span class="p-pts suma">+${p.pres}</span>`;
           const camp = cat.campeonato
-            ? `<td class="col-camp">${p.invitado ? '–' : `<strong>${p.total}</strong> · ${p.pos}º`}</td>`
+            ? `<td class="col-total">${p.invitado ? '–' : p.total}</td>
+            <td class="col-lastre">${p.lastre ? `${p.lastre} kg` : '<span class="p-nulo">–</span>'}</td>`
             : '';
           return `<tr${podio}>
             <td class="fija fija-1 col-pos">${posTxt}</td>
             <td class="fija fija-2 izq"><span class="num">#${p.n}</span><span class="piloto">${esc(p.piloto)}</span>${p.invitado ? '<span class="inv-tag">Invitado</span>' : ''}</td>
+            <td>${pres}</td>
             <td>${celdaInstancia(p.clasif)}</td>
             <td>${celdaInstancia(p.s1)}</td>
             <td>${celdaInstancia(p.s2)}</td>
             <td>${celdaInstancia(p.carrera)}</td>
             <td>${p.vr ? '<span class="vr">VR</span>' : ''}</td>
-            <td>${pres}</td>
             <td class="col-pts">${p.etapa}</td>
             ${camp}
           </tr>`;
@@ -397,16 +386,16 @@
           <div class="table-wrap">
             <table>
               <thead><tr>
-                <th class="fija fija-1">Pos</th>
+                <th class="fija fija-1" title="${cat.campeonato ? 'Posición en el campeonato' : 'Posición en la carrera'}">Pos</th>
                 <th class="fija fija-2 izq">Piloto</th>
+                <th>Pres.</th>
                 <th>Clasif.</th>
                 <th>Serie 1</th>
                 <th>Serie 2</th>
                 <th>Carrera</th>
                 <th>VR</th>
-                <th>Pres.</th>
-                <th>Pts</th>
-                ${cat.campeonato ? '<th>Campeonato</th>' : ''}
+                <th title="Puntos obtenidos en la fecha">Pts fecha</th>
+                ${cat.campeonato ? '<th title="Puntos acumulados en el campeonato">Total</th><th title="Lastre para la próxima fecha">Lastre próx.</th>' : ''}
               </tr></thead>
               <tbody>${filas}</tbody>
             </table>
