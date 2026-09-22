@@ -1442,7 +1442,7 @@
 
   checkSession();
 
-  function exportarTXT(rows, titulo, fmtLineas, nombre) {
+  function exportarTXT(rows, titulo, fmtLineas, nombre, opciones = {}) {
     if (!rows || rows.length === 0) { alert('No hay datos para exportar con los filtros actuales.'); return; }
     const pagados = rows.filter(r => r.pago_confirmado && !r.baja).length;
     const hoy = new Date().toLocaleDateString('es-UY', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -1452,7 +1452,7 @@
       `  ${titulo}`,
       `  Salto Automóvil Club`,
       `  Exportado: ${hoy}`,
-      `  Total: ${rows.length} inscriptos · ${pagados} pagados`,
+      ...(opciones.sinTotalPagos ? [] : [`  Total: ${rows.length} inscriptos · ${pagados} pagados`]),
       '════════════════════════════════════════════════',
       '',
     ];
@@ -1525,15 +1525,14 @@
   }
 
   function exportarFueraSalto() {
-    exportarTXT(_fsData, 'FUERA DE SALTO — BONIFICACIONES', r => [
+    exportarTXT(_fsData, 'FUERA DE SALTO — BONIFICACIONES ENTRADAS', r => [
       `Tipo:         ${r.tipo}`,
       `Piloto:       ${r.nombre || '—'}`,
       `Nº:           ${r.numero || '—'}`,
       `Fecha:        ${fmtFecha(r.fecha_carrera)}`,
       `Departamento: ${r.departamento || '—'}`,
-      `Pago:         ${fmtPago(r)}`,
       `Entradas:     ${ENTRADAS_POR_PILOTO}`,
-    ], 'fuera_de_salto');
+    ], 'fuera_de_salto', { sinTotalPagos: true });
   }
 
   function exportarPicadas() {
