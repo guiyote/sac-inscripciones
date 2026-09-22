@@ -86,6 +86,8 @@
     tbody tr:last-child { border-bottom: none; }
     tbody tr:hover { background: rgba(255,255,255,0.02); }
     tbody tr.baja-row { opacity: 0.4; }
+    tbody tr.fila-total { background: rgba(255,255,255,0.03); border-top: 2px solid var(--borde); }
+    tbody tr.fila-total td { padding-top: 0.75rem; padding-bottom: 0.75rem; }
     tbody td { padding: 0.6rem 0.75rem; color: var(--blanco); vertical-align: middle; }
 
     .badge { display: inline-block; padding: 0.18rem 0.5rem; border-radius: 2px; font-size: 0.7rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
@@ -661,8 +663,8 @@
   <div class="section-block" id="secFueraSalto">
     <div class="section-header"><h2>Pilotos fuera de Salto</h2><button class="btn-export" onclick="exportarFueraSalto()">↓ Exportar TXT</button></div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Tipo</th><th>Piloto</th><th>Fecha</th><th>Departamento</th><th>Pago</th></tr></thead>
-      <tbody id="tbodyFueraSalto"><tr><td colspan="5" class="loading">Cargando...</td></tr></tbody>
+      <thead><tr><th>Tipo</th><th>Piloto</th><th>Fecha</th><th>Departamento</th><th>Pago</th><th>Entradas</th><th>Total</th></tr></thead>
+      <tbody id="tbodyFueraSalto"><tr><td colspan="7" class="loading">Cargando...</td></tr></tbody>
     </table></div>
   </div>
 
@@ -702,6 +704,7 @@
   let _kData = [], _tData = [], _rData = [], _tdData = [], _picData = [], _cpData = [], _fsData = [];
 
   const TIPO_BADGE = { 'Karting': 'badge-karting', 'Turismo': 'badge-tns', 'Regularidad': 'badge-tmz', 'Track Day': 'badge-trackday' };
+  const ENTRADAS_POR_PILOTO = 2;
 
   function fmtFecha(iso) { return TODAS_FECHAS[iso] || iso || '—'; }
   function fmtCI(v) {
@@ -944,20 +947,39 @@
       (a.nombre || '').localeCompare(b.nombre || '')
     );
 
+    const grupoKey = r => r.fecha_carrera + '|' + r.departamento;
     const counts = {};
-    rows.forEach(r => { const k = r.fecha_carrera + '|' + r.departamento; counts[k] = (counts[k] || 0) + 1; });
+    rows.forEach(r => { const k = grupoKey(r); counts[k] = (counts[k] || 0) + 1; });
 
     _fsData = rows;
 
-    document.getElementById('tbodyFueraSalto').innerHTML = rows.length === 0
-      ? '<tr><td colspan="5" class="empty">Sin inscriptos fuera de Salto</td></tr>'
-      : rows.map(r => `<tr>
+    if (rows.length === 0) {
+      document.getElementById('tbodyFueraSalto').innerHTML = '<tr><td colspan="7" class="empty">Sin inscriptos fuera de Salto</td></tr>';
+      return;
+    }
+
+    const filas = rows.map((r, i) => {
+      const esUltimaDelGrupo = i === rows.length - 1 || grupoKey(rows[i + 1]) !== grupoKey(r);
+      return `<tr>
           <td><span class="badge ${TIPO_BADGE[r.tipo]}">${r.tipo}</span></td>
           <td>${val(r.nombre)}</td>
           <td>${fmtFecha(r.fecha_carrera)}</td>
-          <td>${val(r.departamento)} <span style="color:var(--texto-muted);font-size:0.8rem">(${counts[r.fecha_carrera + '|' + r.departamento]})</span></td>
+          <td>${val(r.departamento)}</td>
           <td><span class="badge ${badgePago(r).cls}">${badgePago(r).label}</span></td>
-        </tr>`).join('');
+          <td>${ENTRADAS_POR_PILOTO}</td>
+          <td>${esUltimaDelGrupo ? `<strong>${counts[grupoKey(r)]}</strong>` : ''}</td>
+        </tr>`;
+    });
+
+    const totalPilotos = rows.length;
+    const totalEntradas = totalPilotos * ENTRADAS_POR_PILOTO;
+    filas.push(`<tr class="fila-total">
+          <td colspan="5"><strong>Total general</strong></td>
+          <td><strong>${totalEntradas}</strong></td>
+          <td><strong>${totalPilotos}</strong></td>
+        </tr>`);
+
+    document.getElementById('tbodyFueraSalto').innerHTML = filas.join('');
   }
 
   function transponderCell(r) {
@@ -1507,6 +1529,7 @@
       `Fecha:        ${fmtFecha(r.fecha_carrera)}`,
       `Departamento: ${r.departamento || '—'}`,
       `Pago:         ${fmtPago(r)}`,
+      `Entradas:     ${ENTRADAS_POR_PILOTO}`,
     ], 'fuera_de_salto');
   }
 
