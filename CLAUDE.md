@@ -73,4 +73,4 @@ Each inscription form checks for duplicates before INSERT by querying for matchi
 
 ## Resultados del campeonato
 
-`resultados.html` muestra el Campeonato TNS y los resultados de cada fecha a partir de JSON estáticos en `resultados/2026/` (sin Supabase). Para publicar una fecha nueva: crear `fecha-N.json` a partir del PDF oficial (mismo formato que las anteriores) y agregar `N` en `index.json`. El home toma de ahí el líder del campeonato. Totales, posiciones y lastre se copian del PDF, no se calculan. Los PDFs fuente van en `pdfs/` (ignorado por git).
+`resultados.html` muestra el Campeonato TNS y los resultados de cada fecha a partir de JSON estáticos en `resultados/2026/` (sin Supabase). Para publicar una fecha nueva: crear `fecha-N.json` a partir del PDF oficial (mismo formato que las anteriores) y agregar `N` en `index.json`. El home toma de ahí el podio (top 3) del campeonato. Totales, posiciones y lastre se copian del PDF, no se calculan. Los PDFs fuente van en `pdfs/` (ignorado por git).

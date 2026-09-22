@@ -370,16 +370,45 @@
 
     /* RESULTADOS */
     .resultados-section { max-width: 960px; margin: 0 auto; padding: 0 1.5rem 1.75rem; }
-    .card-resultados { flex-direction: row; align-items: center; gap: 1rem; }
-    .card-resultados .card-body { flex: 1; min-width: 0; }
-    .card-resultados .card-cta { margin-top: 0; flex-shrink: 0; }
-    .card-lider { font-size: 0.9rem; color: var(--texto-muted); margin-top: 0.25rem; }
-    .card-lider strong { color: var(--blanco); }
-    .card-lider .pts { color: var(--rojo); font-weight: 700; }
-    @media (max-width: 600px) {
+    .card-resultados { gap: 1rem; padding: 1.2rem 1.2rem 1rem; }
+    .res-head { display: flex; align-items: center; gap: 0.85rem; }
+    .res-head .card-icon { flex-shrink: 0; }
+    .res-head .card-body { min-width: 0; }
+    .card-resultados .card-meta { font-size: 0.85rem; margin-top: 0.2rem; }
+    .card-resultados .card-cta { margin-top: 0; align-self: flex-end; }
+
+    .podio { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+    .podio[hidden] { display: none; }
+    .podio-item {
+      --medalla: #facc15;
+      display: flex; align-items: center; gap: 0.75rem;
+      background: #232323; border: 1px solid #383838; border-left: 3px solid var(--medalla);
+      border-radius: 2px; padding: 0.7rem 0.85rem; min-width: 0;
+    }
+    .podio-item.p1 { background: linear-gradient(90deg, rgba(250,204,21,0.10), #232323 70%); }
+    .podio-item.p2 { --medalla: #d4d4d8; }
+    .podio-item.p3 { --medalla: #d97706; }
+    .podio-pos {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 2rem; font-weight: 800;
+      line-height: 1; color: var(--medalla); min-width: 1.6rem;
+    }
+    .podio-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .podio-piloto {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 1.05rem; font-weight: 700;
+      letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .podio-num { font-size: 0.75rem; color: var(--texto-muted); }
+    .podio-pts {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 1.5rem; font-weight: 800;
+      line-height: 1; text-align: right; white-space: nowrap;
+    }
+    .podio-pts small { display: block; font-size: 0.62rem; font-weight: 600; letter-spacing: 1.5px; color: var(--texto-muted); text-transform: uppercase; }
+    @media (max-width: 700px) {
       .resultados-section { padding: 0 1rem 1.5rem; }
-      .card-resultados { flex-wrap: wrap; }
-      .card-resultados .card-cta { width: 100%; }
+      .podio { grid-template-columns: 1fr; gap: 0.45rem; }
+      .podio-item { padding: 0.55rem 0.75rem; }
+      .podio-pos { font-size: 1.6rem; }
+      .card-resultados .card-cta { align-self: stretch; }
     }
   </style>
 </head>
@@ -532,13 +561,16 @@
   <div class="resultados-section">
     <p class="section-label">Resultados 2026</p>
     <a class="card card-resultados" href="resultados.html#campeonato">
-      <div class="card-icon">
-        <svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/></svg>
+      <div class="res-head">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/></svg>
+        </div>
+        <div class="card-body">
+          <h2>Campeonato Turismo Nacional SAC</h2>
+          <p class="card-meta" id="metaCampeonato">Posiciones y resultados fecha a fecha</p>
+        </div>
       </div>
-      <div class="card-body">
-        <h2>Campeonato Turismo Nacional SAC</h2>
-        <p class="card-lider" id="liderCampeonato">Posiciones y resultados fecha a fecha</p>
-      </div>
+      <ol class="podio" id="podioCampeonato" hidden></ol>
       <div class="card-cta">
         Ver resultados
         <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -617,7 +649,7 @@
       document.getElementById('tbodyFechas').innerHTML = filas.join('');
     })();
 
-    // Resultados: líder del campeonato
+    // Resultados: podio del campeonato
     (async () => {
       try {
         const res = await fetch('resultados/2026/index.json', { cache: 'no-cache' });
@@ -630,12 +662,18 @@
         if (!resF.ok) return;
         const ultima = await resF.json();
         const tns = ultima.categorias.find(c => c.id === 'TNS');
-        const lider = tns && tns.pilotos.find(p => p.pos === 1);
-        if (!lider) return;
-        const el = document.getElementById('liderCampeonato');
-        el.innerHTML = 'Líder: <strong></strong> · <span class="pts"></span> · tras la ' + ultima.fecha + 'ª fecha';
-        el.querySelector('strong').textContent = `#${lider.n} ${lider.piloto}`;
-        el.querySelector('.pts').textContent = `${lider.total} pts`;
+        if (!tns) return;
+        const top = tns.pilotos.filter(p => !p.invitado && p.pos <= 3).sort((a, b) => a.pos - b.pos);
+        if (!top.length) return;
+        const ol = document.getElementById('podioCampeonato');
+        ol.innerHTML = top.map(p => `<li class="podio-item p${p.pos}">
+            <span class="podio-pos">${p.pos}</span>
+            <span class="podio-info"><span class="podio-piloto"></span><span class="podio-num">#${p.n}</span></span>
+            <span class="podio-pts">${p.total}<small>pts</small></span>
+          </li>`).join('');
+        ol.querySelectorAll('.podio-piloto').forEach((el, i) => { el.textContent = top[i].piloto; });
+        ol.hidden = false;
+        document.getElementById('metaCampeonato').textContent = `Tras la ${ultima.fecha}ª fecha · ${ultima.label}`;
       } catch (e) {
         console.error(e);
       }
