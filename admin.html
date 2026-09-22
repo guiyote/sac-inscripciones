@@ -663,8 +663,8 @@
   <div class="section-block" id="secFueraSalto">
     <div class="section-header"><h2>Pilotos fuera de Salto</h2><button class="btn-export" onclick="exportarFueraSalto()">↓ Exportar TXT</button></div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Tipo</th><th>Piloto</th><th>Fecha</th><th>Departamento</th><th>Pago</th><th>Entradas</th><th>Total</th></tr></thead>
-      <tbody id="tbodyFueraSalto"><tr><td colspan="7" class="loading">Cargando...</td></tr></tbody>
+      <thead><tr><th>Tipo</th><th>Piloto</th><th>Nº</th><th>Fecha</th><th>Departamento</th><th>Pago</th><th>Total</th><th>Entradas</th></tr></thead>
+      <tbody id="tbodyFueraSalto"><tr><td colspan="8" class="loading">Cargando...</td></tr></tbody>
     </table></div>
   </div>
 
@@ -917,12 +917,13 @@
     return { cls: 'badge-pagado', label: 'Pagado' };
   }
 
-  function normFueraSalto(arr, tipo, campoNombre, campoDepto) {
+  function normFueraSalto(arr, tipo, campoNombre, campoDepto, campoNumero) {
     return arr
       .filter(r => !r.baja && r[campoDepto] && r[campoDepto] !== 'Salto')
       .map(r => ({
         tipo,
         nombre: r[campoNombre],
+        numero: r[campoNumero],
         departamento: r[campoDepto],
         fecha_carrera: r.fecha_carrera,
         pago_confirmado: r.pago_confirmado,
@@ -935,10 +936,10 @@
 
   function renderFueraSalto(kData, tData, rData, tdData) {
     const rows = [
-      ...normFueraSalto(kData, 'Karting', 'nombre', 'departamento'),
-      ...normFueraSalto(tData, 'Turismo', 'nombre', 'departamento'),
-      ...normFueraSalto(rData, 'Regularidad', 'nombre_piloto', 'departamento_piloto'),
-      ...normFueraSalto(tdData, 'Track Day', 'nombre_conductor', 'departamento_conductor'),
+      ...normFueraSalto(kData, 'Karting', 'nombre', 'departamento', 'numero_kart'),
+      ...normFueraSalto(tData, 'Turismo', 'nombre', 'departamento', 'numero_auto'),
+      ...normFueraSalto(rData, 'Regularidad', 'nombre_piloto', 'departamento_piloto', 'numero_auto'),
+      ...normFueraSalto(tdData, 'Track Day', 'nombre_conductor', 'departamento_conductor', 'numero_auto'),
     ];
 
     rows.sort((a, b) =>
@@ -954,7 +955,7 @@
     _fsData = rows;
 
     if (rows.length === 0) {
-      document.getElementById('tbodyFueraSalto').innerHTML = '<tr><td colspan="7" class="empty">Sin inscriptos fuera de Salto</td></tr>';
+      document.getElementById('tbodyFueraSalto').innerHTML = '<tr><td colspan="8" class="empty">Sin inscriptos fuera de Salto</td></tr>';
       return;
     }
 
@@ -963,20 +964,21 @@
       return `<tr>
           <td><span class="badge ${TIPO_BADGE[r.tipo]}">${r.tipo}</span></td>
           <td>${val(r.nombre)}</td>
+          <td>${val(r.numero)}</td>
           <td>${fmtFecha(r.fecha_carrera)}</td>
           <td>${val(r.departamento)}</td>
           <td><span class="badge ${badgePago(r).cls}">${badgePago(r).label}</span></td>
+          <td>${esUltimaDelGrupo ? `<strong>${counts[grupoKey(r)]}</strong>` : '—'}</td>
           <td>${ENTRADAS_POR_PILOTO}</td>
-          <td>${esUltimaDelGrupo ? `<strong>${counts[grupoKey(r)]}</strong>` : ''}</td>
         </tr>`;
     });
 
     const totalPilotos = rows.length;
     const totalEntradas = totalPilotos * ENTRADAS_POR_PILOTO;
     filas.push(`<tr class="fila-total">
-          <td colspan="5"><strong>Total general</strong></td>
-          <td><strong>${totalEntradas}</strong></td>
+          <td colspan="6"><strong>Total general</strong></td>
           <td><strong>${totalPilotos}</strong></td>
+          <td><strong>${totalEntradas}</strong></td>
         </tr>`);
 
     document.getElementById('tbodyFueraSalto').innerHTML = filas.join('');
@@ -1526,6 +1528,7 @@
     exportarTXT(_fsData, 'FUERA DE SALTO — BONIFICACIONES', r => [
       `Tipo:         ${r.tipo}`,
       `Piloto:       ${r.nombre || '—'}`,
+      `Nº:           ${r.numero || '—'}`,
       `Fecha:        ${fmtFecha(r.fecha_carrera)}`,
       `Departamento: ${r.departamento || '—'}`,
       `Pago:         ${fmtPago(r)}`,
