@@ -658,11 +658,11 @@
     </table></div>
   </div>
 
-  <div class="section-block" id="secResumenCamp">
-    <h2>Resumen por fecha — Campeonato</h2>
+  <div class="section-block" id="secFueraSalto">
+    <div class="section-header"><h2>Pilotos fuera de Salto</h2><button class="btn-export" onclick="exportarFueraSalto()">↓ Exportar TXT</button></div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Fecha</th><th>Karting</th><th>TNS</th><th>TMZ</th><th>Regularidad</th><th>Track Day</th><th>Copiloto</th><th>Total</th><th>Pagos</th><th>Recaudado (UYU)</th></tr></thead>
-      <tbody id="tbodyPorFecha"><tr><td colspan="10" class="loading">Cargando...</td></tr></tbody>
+      <thead><tr><th>Tipo</th><th>Piloto</th><th>Fecha</th><th>Departamento</th><th>Pago</th></tr></thead>
+      <tbody id="tbodyFueraSalto"><tr><td colspan="5" class="loading">Cargando...</td></tr></tbody>
     </table></div>
   </div>
 
@@ -699,7 +699,9 @@
 
   const TODAS_FECHAS = { ...FECHAS, ...FECHAS_PICADAS };
 
-  let _kData = [], _tData = [], _rData = [], _tdData = [], _picData = [], _cpData = [];
+  let _kData = [], _tData = [], _rData = [], _tdData = [], _picData = [], _cpData = [], _fsData = [];
+
+  const TIPO_BADGE = { 'Karting': 'badge-karting', 'Turismo': 'badge-tns', 'Regularidad': 'badge-tmz', 'Track Day': 'badge-trackday' };
 
   function fmtFecha(iso) { return TODAS_FECHAS[iso] || iso || '—'; }
   function fmtCI(v) {
@@ -910,6 +912,52 @@
     if (esBonificado(r)) return { cls: 'badge-bonificado', label: 'Bonificado' };
     if (esDiferido(r)) return { cls: 'badge-diferido', label: 'Pago diferido' };
     return { cls: 'badge-pagado', label: 'Pagado' };
+  }
+
+  function normFueraSalto(arr, tipo, campoNombre, campoDepto) {
+    return arr
+      .filter(r => !r.baja && r[campoDepto] && r[campoDepto] !== 'Salto')
+      .map(r => ({
+        tipo,
+        nombre: r[campoNombre],
+        departamento: r[campoDepto],
+        fecha_carrera: r.fecha_carrera,
+        pago_confirmado: r.pago_confirmado,
+        pago_monto: r.pago_monto,
+        pago_medio: r.pago_medio,
+        pago_fecha: r.pago_fecha,
+        con_recargo: r.con_recargo,
+      }));
+  }
+
+  function renderFueraSalto(kData, tData, rData, tdData) {
+    const rows = [
+      ...normFueraSalto(kData, 'Karting', 'nombre', 'departamento'),
+      ...normFueraSalto(tData, 'Turismo', 'nombre', 'departamento'),
+      ...normFueraSalto(rData, 'Regularidad', 'nombre_piloto', 'departamento_piloto'),
+      ...normFueraSalto(tdData, 'Track Day', 'nombre_conductor', 'departamento_conductor'),
+    ];
+
+    rows.sort((a, b) =>
+      (a.fecha_carrera || '').localeCompare(b.fecha_carrera || '') ||
+      (a.departamento || '').localeCompare(b.departamento || '') ||
+      (a.nombre || '').localeCompare(b.nombre || '')
+    );
+
+    const counts = {};
+    rows.forEach(r => { const k = r.fecha_carrera + '|' + r.departamento; counts[k] = (counts[k] || 0) + 1; });
+
+    _fsData = rows;
+
+    document.getElementById('tbodyFueraSalto').innerHTML = rows.length === 0
+      ? '<tr><td colspan="5" class="empty">Sin inscriptos fuera de Salto</td></tr>'
+      : rows.map(r => `<tr>
+          <td><span class="badge ${TIPO_BADGE[r.tipo]}">${r.tipo}</span></td>
+          <td>${val(r.nombre)}</td>
+          <td>${fmtFecha(r.fecha_carrera)}</td>
+          <td>${val(r.departamento)} <span style="color:var(--texto-muted);font-size:0.8rem">(${counts[r.fecha_carrera + '|' + r.departamento]})</span></td>
+          <td><span class="badge ${badgePago(r).cls}">${badgePago(r).label}</span></td>
+        </tr>`).join('');
   }
 
   function transponderCell(r) {
@@ -1166,13 +1214,11 @@
     const mostrarTD  = !esFechaPicadas && (!filtroCat || filtroCat === 'trackday') && conDepto('inscripciones_trackday');
     const mostrarPic = !esFechaCamp    && (!filtroCat || filtroCat === 'picadas') && conDepto('inscripciones_picadas');
     const mostrarCP  = !esFechaPicadas && (!filtroCat || filtroCat === 'copiloto') && conDepto('inscripciones_copiloto');
-    const mostrarCamp = !esFechaPicadas && (!filtroCat || filtroCat !== 'picadas');
 
     document.getElementById('secKarting').style.display        = mostrarK    ? '' : 'none';
     document.getElementById('secTurismo').style.display        = mostrarT    ? '' : 'none';
     document.getElementById('secRegularidad').style.display    = mostrarR    ? '' : 'none';
     document.getElementById('secTrackDay').style.display       = mostrarTD   ? '' : 'none';
-    document.getElementById('secResumenCamp').style.display    = mostrarCamp ? '' : 'none';
     document.getElementById('secPicadas').style.display        = mostrarPic  ? '' : 'none';
     document.getElementById('secResumenPicadas').style.display = mostrarPic  ? '' : 'none';
     document.getElementById('secCopiloto').style.display       = mostrarCP   ? '' : 'none';
@@ -1344,42 +1390,8 @@
           </div></td>
         </tr>`).join('');
 
-    await cargarPorFecha(filtroFecha);
+    renderFueraSalto(kData, tData, rData, tdData);
     await cargarResumenPicadas();
-  }
-
-  async function cargarPorFecha(filtroFecha) {
-    const [{ data: kAll }, { data: tAll }, { data: rAll }, { data: tdAll }, { data: cpAll }] = await Promise.all([
-      sb.from('inscripciones_karting').select('fecha_carrera, pago_confirmado, pago_monto, baja'),
-      sb.from('inscripciones_turismo').select('fecha_carrera, categoria, pago_confirmado, pago_monto, baja'),
-      sb.from('inscripciones_regularidad').select('fecha_carrera, pago_confirmado, pago_monto, baja'),
-      sb.from('inscripciones_trackday').select('fecha_carrera, pago_confirmado, pago_monto, baja'),
-      sb.from('inscripciones_copiloto').select('fecha_carrera, pago_confirmado, pago_monto, baja'),
-    ]);
-
-    const rows = Object.keys(FECHAS).map(f => {
-      const k   = (kAll  || []).filter(r => r.fecha_carrera === f && !r.baja);
-      const tns = (tAll  || []).filter(r => r.fecha_carrera === f && r.categoria === 'TNS' && !r.baja);
-      const tmz = (tAll  || []).filter(r => r.fecha_carrera === f && r.categoria === 'TMZ' && !r.baja);
-      const reg = (rAll  || []).filter(r => r.fecha_carrera === f && !r.baja);
-      const td  = (tdAll || []).filter(r => r.fecha_carrera === f && !r.baja);
-      const cp  = (cpAll || []).filter(r => r.fecha_carrera === f && !r.baja);
-      const todos = [...k, ...tns, ...tmz, ...reg, ...td, ...cp];
-      const pagados = todos.filter(r => r.pago_confirmado).length;
-      const recaudado = todos.filter(r => r.pago_confirmado).reduce((s, r) => s + (parseFloat(r.pago_monto) || 0), 0);
-      return { f, k: k.length, tns: tns.length, tmz: tmz.length, reg: reg.length, td: td.length, cp: cp.length, total: todos.length, pagados, recaudado };
-    }).filter(r => !filtroFecha || r.f === filtroFecha);
-
-    const hayDatos = rows.some(r => r.total > 0);
-    document.getElementById('tbodyPorFecha').innerHTML = !hayDatos
-      ? '<tr><td colspan="10" class="empty">Sin inscripciones</td></tr>'
-      : rows.map(r => `<tr>
-          <td>${FECHAS[r.f]}</td>
-          <td>${r.k || '—'}</td><td>${r.tns || '—'}</td><td>${r.tmz || '—'}</td><td>${r.reg || '—'}</td><td>${r.td || '—'}</td><td>${r.cp || '—'}</td>
-          <td><strong>${r.total || '—'}</strong></td>
-          <td>${r.pagados || '—'}</td>
-          <td>${r.recaudado ? `$ ${r.recaudado.toLocaleString('es-UY')}` : '—'}</td>
-        </tr>`).join('');
   }
 
   async function cargarResumenPicadas() {
@@ -1486,6 +1498,16 @@
       ...(r.transponder ? [`Transponder: ${r.transponder}`] : []),
       `Pago:        ${fmtPago(r)}`,
     ], 'trackday');
+  }
+
+  function exportarFueraSalto() {
+    exportarTXT(_fsData, 'FUERA DE SALTO — BONIFICACIONES', r => [
+      `Tipo:         ${r.tipo}`,
+      `Piloto:       ${r.nombre || '—'}`,
+      `Fecha:        ${fmtFecha(r.fecha_carrera)}`,
+      `Departamento: ${r.departamento || '—'}`,
+      `Pago:         ${fmtPago(r)}`,
+    ], 'fuera_de_salto');
   }
 
   function exportarPicadas() {
