@@ -410,6 +410,20 @@
       .podio-pos { font-size: 1.6rem; }
       .card-resultados .card-cta { align-self: stretch; }
     }
+
+    /* REGLAMENTOS */
+    .reglamentos {
+      display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+      gap: 0.4rem 1rem; margin-top: 0.85rem;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem;
+      letter-spacing: 1.5px; text-transform: uppercase; color: #666;
+    }
+    .reglamentos a {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      color: var(--texto-muted); text-decoration: none; transition: color 0.2s;
+    }
+    .reglamentos a:hover { color: var(--rojo); }
+    .reglamentos svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   </style>
 </head>
 <body>
@@ -576,6 +590,11 @@
         <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </div>
     </a>
+    <div class="reglamentos">
+      <span>Reglamentos TNS 2026</span>
+      <a href="reglamentos/2026/tns-reglamento-general.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>General</a>
+      <a href="reglamentos/2026/tns-reglamento-mecanico.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Mecánico</a>
+    </div>
   </div>
 
   <div class="fechas-section">
