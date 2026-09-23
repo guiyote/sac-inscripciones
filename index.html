@@ -341,6 +341,9 @@
     }
     .admin-link:hover { color: var(--rojo); }
     .admin-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    @media (max-width: 600px) {
+      .admin-link { position: static; display: flex; width: fit-content; margin: 0.6rem auto 0; }
+    }
 
     .redes {
       display: flex; justify-content: center; align-items: center; gap: 1.1rem;
