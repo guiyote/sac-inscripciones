@@ -533,10 +533,10 @@
     <div class="table-wrap">
       <table>
         <thead><tr>
-          <th>Fecha</th><th>Artículo</th><th>Tipo</th><th>Ubicación</th><th>Cantidad</th>
-          <th>Piloto / Proveedor</th><th>Carrera</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Notas</th><th>Acción</th>
+          <th>Fecha</th><th>Artículo</th><th>Tipo</th><th>Cantidad</th>
+          <th>Piloto / Proveedor</th><th>Carrera</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Acción</th>
         </tr></thead>
-        <tbody id="tbodyHistorial"><tr><td colspan="13" class="empty">Cargando...</td></tr></tbody>
+        <tbody id="tbodyHistorial"><tr><td colspan="11" class="empty">Cargando...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -836,10 +836,13 @@
     btn.disabled = false; btn.textContent = 'Confirmar salida';
   });
 
-  function abrirPagoMov(movId, piloto) {
+  function abrirPagoMov(movId) {
     modalCtx = { movId };
-    document.getElementById('modalPagoMovNombre').textContent = piloto;
-    document.getElementById('pagoMovMonto').value = '';
+    const mov = movimientosCache.find(m => m.id === movId);
+    document.getElementById('modalPagoMovNombre').textContent = mov?.piloto || '';
+    // Sugerir precio de lista × cantidad (editable)
+    const precio = mov?.stock_articulos?.precio_usd;
+    document.getElementById('pagoMovMonto').value = precio != null ? (precio * (mov.cantidad || 0)).toFixed(2) : '';
     document.getElementById('pagoMovMedio').value = '';
     document.getElementById('pagoMovFecha').value = new Date().toISOString().split('T')[0];
     document.getElementById('modalPagoMov').classList.add('open');
@@ -1150,7 +1153,7 @@
     const filtroFecha = document.getElementById('filtroHistorialFecha').value;
 
     let q = sb.from('stock_movimientos')
-      .select('*, origen_id, stock_articulos(nombre), stock_ubicaciones(nombre)')
+      .select('*, origen_id, stock_articulos(nombre, precio_usd), stock_ubicaciones(nombre)')
       .order('created_at', { ascending: false });
 
     if (filtroArt) q = q.eq('articulo_id', filtroArt);
@@ -1165,7 +1168,7 @@
 
     const tbody = document.getElementById('tbodyHistorial');
     if (movs.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="13" class="empty">Sin movimientos</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="11" class="empty">Sin movimientos</td></tr>';
       return;
     }
 
@@ -1182,7 +1185,7 @@
         accionBtns.push(`<button class="btn-editar-mov" onclick="abrirEditarMov('${m.id}')">Editar</button>`);
         if (esSalida) {
           const devuelta = salidasDevueltas.has(m.id);
-          if (!devuelta && !m.pago_confirmado) accionBtns.push(`<button class="btn-pago-mov" onclick="abrirPagoMov('${m.id}','${m.piloto}')">Pago</button>`);
+          if (!devuelta && !m.pago_confirmado) accionBtns.push(`<button class="btn-pago-mov" onclick="abrirPagoMov('${m.id}')">Pago</button>`);
           if (!devuelta) accionBtns.push(`<button class="btn-devolucion" onclick="abrirDevolucion('${m.id}')">Devolver</button>`);
         }
       }
@@ -1190,7 +1193,6 @@
         <td>${fmtDate(m.created_at)}</td>
         <td>${m.stock_articulos?.nombre || '—'}</td>
         <td><span class="badge ${badgeClass}">${badgeLabel}</span></td>
-        <td>${m.stock_ubicaciones?.nombre || '—'}</td>
         <td>${m.cantidad}</td>
         <td>${esTransferencia ? '—' : (esSalida || esDevolucion) ? val(m.piloto) : val(m.proveedor)}</td>
         <td>${m.fecha_carrera ? FECHAS_HIST[m.fecha_carrera] || m.fecha_carrera : '—'}</td>
@@ -1198,7 +1200,6 @@
         <td>${m.pago_monto != null ? `U$S ${Number(m.pago_monto).toFixed(2)}` : '—'}</td>
         <td>${capFirst(m.pago_medio)}</td>
         <td>${fmtDateSimple(m.pago_fecha)}</td>
-        <td>${val(m.notas)}</td>
         <td style="white-space:nowrap">${accionBtns.length ? accionBtns.join(' ') : '—'}</td>
       </tr>`;
     }).join('');
