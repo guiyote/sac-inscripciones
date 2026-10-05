@@ -302,19 +302,21 @@
       <label>Fecha de nacimiento</label>
       <input type="date" id="eK_fecha_nacimiento">
       <label>Cilindrada</label>
-      <select id="eK_cilindrada">
+      <select id="eK_cilindrada" onchange="actualizarPrecintoEdit()">
         <option value="">Seleccioná...</option>
         <option value="SHIFTER 200cc standard">SHIFTER 200cc standard</option>
         <option value="2 Tiempos 125cc">2 Tiempos 125cc</option>
         <option value="Estacionarios, Shifter 200 preparados">Estacionarios, Shifter 200 preparados</option>
         <option value="LIBRE (2T, Estacionarios, Shifter 200 preparados)">LIBRE (2T, Estacionarios, Shifter 200 preparados)</option>
       </select>
+      <div id="eK_precintoWrap">
       <label>Motor precintado</label>
-      <select id="eK_motor_precintado">
+      <select id="eK_motor_precintado" onchange="actualizarPrecintoEdit()">
         <option value="">—</option>
         <option value="true">Sí</option>
         <option value="false">No</option>
       </select>
+      <div id="eK_precintoDatos">
       <label>Número de motor</label>
       <input type="text" id="eK_numero_motor">
       <label>Precinto tapa válvula</label>
@@ -325,6 +327,8 @@
       <input type="text" id="eK_precinto_tapa_encendido">
       <label>Precinto carburador</label>
       <input type="text" id="eK_precinto_carburador">
+      </div>
+      </div>
       <label>Número de kart</label>
       <input type="text" id="eK_numero_kart">
     </div>
@@ -915,7 +919,21 @@
   function precintoInfo(r) {
     if (r.motor_precintado == null) return '';
     if (!r.motor_precintado) return 'Sin precinto';
-    return `Precintado · Motor ${r.numero_motor || '—'} · Válvula ${r.precinto_tapa_valvula || '—'} · Cilindro ${r.precinto_tapa_cilindro || '—'} · Encendido ${r.precinto_tapa_encendido || '—'} · Carburador ${r.precinto_carburador || '—'}`;
+    return `🔒 Precintado · Motor ${r.numero_motor || '—'}`;
+  }
+  function precintoDetalle(r) {
+    if (!r.motor_precintado) return [];
+    return [
+      `Precintos:   Válvula ${r.precinto_tapa_valvula || '—'}   ·   Cilindro ${r.precinto_tapa_cilindro || '—'}`,
+      `             Encendido ${r.precinto_tapa_encendido || '—'}   ·   Carburador ${r.precinto_carburador || '—'}`,
+    ];
+  }
+  // Modal de edición: los campos de precinto solo aplican a SHIFTER 200cc standard
+  function actualizarPrecintoEdit() {
+    const esShifter = document.getElementById('eK_cilindrada').value === 'SHIFTER 200cc standard';
+    const precintado = document.getElementById('eK_motor_precintado').value === 'true';
+    document.getElementById('eK_precintoWrap').style.display = esShifter ? '' : 'none';
+    document.getElementById('eK_precintoDatos').style.display = esShifter && precintado ? '' : 'none';
   }
 
   function kartBadgeClass(cilindrada) {
@@ -1062,6 +1080,7 @@
       document.getElementById('eK_precinto_tapa_cilindro').value = r.precinto_tapa_cilindro || '';
       document.getElementById('eK_precinto_tapa_encendido').value = r.precinto_tapa_encendido || '';
       document.getElementById('eK_precinto_carburador').value = r.precinto_carburador || '';
+      actualizarPrecintoEdit();
       document.getElementById('eK_numero_kart').value = r.numero_kart || '';
     } else if (tabla === 'inscripciones_turismo') {
       document.getElementById('modalEditarNombre').textContent = r.nombre || '';
@@ -1152,13 +1171,20 @@
         departamento: document.getElementById('eK_departamento').value || null,
         fecha_nacimiento: document.getElementById('eK_fecha_nacimiento').value || null,
         cilindrada: document.getElementById('eK_cilindrada').value || null,
-        motor_precintado: document.getElementById('eK_motor_precintado').value === '' ? null : document.getElementById('eK_motor_precintado').value === 'true',
-        numero_motor: document.getElementById('eK_numero_motor').value.trim() || null,
-        precinto_tapa_valvula: document.getElementById('eK_precinto_tapa_valvula').value.trim() || null,
-        precinto_tapa_cilindro: document.getElementById('eK_precinto_tapa_cilindro').value.trim() || null,
-        precinto_tapa_encendido: document.getElementById('eK_precinto_tapa_encendido').value.trim() || null,
-        precinto_carburador: document.getElementById('eK_precinto_carburador').value.trim() || null,
         numero_kart: document.getElementById('eK_numero_kart').value.trim() || null,
+      });
+      // Si no es SHIFTER 200cc standard o no está precintado, se limpian los datos que no aplican
+      const esShifter = updates.cilindrada === 'SHIFTER 200cc standard';
+      const precintadoVal = document.getElementById('eK_motor_precintado').value;
+      const precintado = esShifter && precintadoVal === 'true';
+      const campoPrecinto = id => precintado ? (document.getElementById(id).value.trim() || null) : null;
+      Object.assign(updates, {
+        motor_precintado: esShifter && precintadoVal !== '' ? precintadoVal === 'true' : null,
+        numero_motor: campoPrecinto('eK_numero_motor'),
+        precinto_tapa_valvula: campoPrecinto('eK_precinto_tapa_valvula'),
+        precinto_tapa_cilindro: campoPrecinto('eK_precinto_tapa_cilindro'),
+        precinto_tapa_encendido: campoPrecinto('eK_precinto_tapa_encendido'),
+        precinto_carburador: campoPrecinto('eK_precinto_carburador'),
       });
     } else if (tabla === 'inscripciones_turismo') {
       Object.assign(updates, {
@@ -1520,7 +1546,8 @@
       `CI:          ${fmtCI(r.cedula)}`,
       `Fecha:       ${fmtFecha(r.fecha_carrera)}`,
       `Cilindrada:  ${r.cilindrada || '—'}   ·   Nº Kart: ${r.numero_kart || '—'}`,
-      ...(precintoInfo(r) ? [`Motor:       ${precintoInfo(r)}`] : []),
+      ...(precintoInfo(r) ? [`Motor:       ${precintoInfo(r).replace('🔒 ', '')}`] : []),
+      ...precintoDetalle(r),
       ...(r.transponder ? [`Transponder: ${r.transponder}`] : []),
       `Pago:        ${fmtPago(r)}`,
     ], 'karting');
