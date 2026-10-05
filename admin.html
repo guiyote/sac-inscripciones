@@ -309,6 +309,16 @@
         <option value="Estacionarios, Shifter 200 preparados">Estacionarios, Shifter 200 preparados</option>
         <option value="LIBRE (2T, Estacionarios, Shifter 200 preparados)">LIBRE (2T, Estacionarios, Shifter 200 preparados)</option>
       </select>
+      <label>Motor precintado</label>
+      <select id="eK_motor_precintado">
+        <option value="">—</option>
+        <option value="true">Sí</option>
+        <option value="false">No</option>
+      </select>
+      <label>Número de motor</label>
+      <input type="text" id="eK_numero_motor">
+      <label>Número de precinto</label>
+      <input type="text" id="eK_numero_precinto">
       <label>Número de kart</label>
       <input type="text" id="eK_numero_kart">
     </div>
@@ -896,6 +906,12 @@
     const i = KART_CAT_ORDEN.indexOf(cat);
     return i === -1 ? KART_CAT_ORDEN.length : i;
   }
+  function precintoInfo(r) {
+    if (r.motor_precintado == null) return '';
+    if (!r.motor_precintado) return 'Sin precinto';
+    return `Precintado · Motor ${r.numero_motor || '—'} · Precinto ${r.numero_precinto || '—'}`;
+  }
+
   function kartBadgeClass(cilindrada) {
     if (cilindrada === '2 Tiempos 125cc') return 'badge-k-125';
     if (cilindrada === 'Estacionarios, Shifter 200 preparados') return 'badge-k-preparados';
@@ -1034,6 +1050,9 @@
       document.getElementById('eK_departamento').value = r.departamento || '';
       document.getElementById('eK_fecha_nacimiento').value = r.fecha_nacimiento || '';
       document.getElementById('eK_cilindrada').value = r.cilindrada || '';
+      document.getElementById('eK_motor_precintado').value = r.motor_precintado == null ? '' : String(r.motor_precintado);
+      document.getElementById('eK_numero_motor').value = r.numero_motor || '';
+      document.getElementById('eK_numero_precinto').value = r.numero_precinto || '';
       document.getElementById('eK_numero_kart').value = r.numero_kart || '';
     } else if (tabla === 'inscripciones_turismo') {
       document.getElementById('modalEditarNombre').textContent = r.nombre || '';
@@ -1124,6 +1143,9 @@
         departamento: document.getElementById('eK_departamento').value || null,
         fecha_nacimiento: document.getElementById('eK_fecha_nacimiento').value || null,
         cilindrada: document.getElementById('eK_cilindrada').value || null,
+        motor_precintado: document.getElementById('eK_motor_precintado').value === '' ? null : document.getElementById('eK_motor_precintado').value === 'true',
+        numero_motor: document.getElementById('eK_numero_motor').value.trim() || null,
+        numero_precinto: document.getElementById('eK_numero_precinto').value.trim() || null,
         numero_kart: document.getElementById('eK_numero_kart').value.trim() || null,
       });
     } else if (tabla === 'inscripciones_turismo') {
@@ -1289,7 +1311,7 @@
           <td><span class="badge ${badgePago(r).cls}">${badgePago(r).label}</span></td>
           <td>${fmtFecha(r.fecha_carrera)}</td>
           <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtDateTime(r.created_at)}</td>
-          <td><span class="badge ${kartBadgeClass(r.cilindrada)}">${val(r.cilindrada)}</span></td>
+          <td><span class="badge ${kartBadgeClass(r.cilindrada)}">${val(r.cilindrada)}</span>${precintoInfo(r) ? `<div style="font-size:0.75rem;color:var(--texto-muted);margin-top:0.3rem">${precintoInfo(r)}</div>` : ''}</td>
           <td>${val(r.numero_kart)}</td>
           <td>${val(r.departamento)}</td>
           <td>${fmtMonto(r.pago_monto)}</td>
@@ -1486,6 +1508,7 @@
       `CI:          ${fmtCI(r.cedula)}`,
       `Fecha:       ${fmtFecha(r.fecha_carrera)}`,
       `Cilindrada:  ${r.cilindrada || '—'}   ·   Nº Kart: ${r.numero_kart || '—'}`,
+      ...(precintoInfo(r) ? [`Motor:       ${precintoInfo(r)}`] : []),
       ...(r.transponder ? [`Transponder: ${r.transponder}`] : []),
       `Pago:        ${fmtPago(r)}`,
     ], 'karting');

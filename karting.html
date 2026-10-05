@@ -489,6 +489,31 @@
             </label>
           </div>
         </div>
+        <div id="precintoWrap" style="display:none">
+          <div class="field">
+            <label>¿Motor precintado? <span class="req">*</span></label>
+            <div class="radio-group" id="precintado_group">
+              <label class="radio-item" onclick="togglePrecintado(this)">
+                <input type="radio" name="motor_precintado" value="si">
+                <span class="radio-label">Sí</span>
+              </label>
+              <label class="radio-item" onclick="togglePrecintado(this)">
+                <input type="radio" name="motor_precintado" value="no">
+                <span class="radio-label">No</span>
+              </label>
+            </div>
+          </div>
+          <div id="precintoDatos" style="display:none">
+            <div class="field">
+              <label for="numero_motor">Número de motor <span class="req">*</span></label>
+              <input type="text" id="numero_motor">
+            </div>
+            <div class="field">
+              <label for="numero_precinto">Número de precinto <span class="req">*</span></label>
+              <input type="text" id="numero_precinto">
+            </div>
+          </div>
+        </div>
         <div class="field">
           <label for="numero_kart">Número de kart</label>
           <input type="text" id="numero_kart" placeholder="Ej: 7">
@@ -530,6 +555,15 @@
     function toggleRadio(label) {
       document.querySelectorAll('#cilindrada_group .radio-item').forEach(el => el.classList.remove('checked'));
       label.classList.add('checked');
+      const esShifter = label.querySelector('input').value === 'SHIFTER 200cc standard';
+      document.getElementById('precintoWrap').style.display = esShifter ? '' : 'none';
+    }
+
+    function togglePrecintado(label) {
+      document.querySelectorAll('#precintado_group .radio-item').forEach(el => el.classList.remove('checked'));
+      label.classList.add('checked');
+      const precintado = label.querySelector('input').value === 'si';
+      document.getElementById('precintoDatos').style.display = precintado ? '' : 'none';
     }
 
     // Recargo por inscripción tardía: rige el jueves previo a la fecha de carrera
@@ -567,6 +601,26 @@
         msgBox.className = 'msg error';
         msgBox.textContent = 'Por favor seleccioná una cilindrada.';
         return;
+      }
+
+      let motor_precintado = null, numero_motor = null, numero_precinto = null;
+      if (cilindrada === 'SHIFTER 200cc standard') {
+        const precintadoVal = document.querySelector('input[name="motor_precintado"]:checked')?.value;
+        if (!precintadoVal) {
+          msgBox.className = 'msg error';
+          msgBox.textContent = 'Por favor indicá si el motor está precintado.';
+          return;
+        }
+        motor_precintado = precintadoVal === 'si';
+        if (motor_precintado) {
+          numero_motor = document.getElementById('numero_motor').value.trim() || null;
+          numero_precinto = document.getElementById('numero_precinto').value.trim() || null;
+          if (!numero_motor || !numero_precinto) {
+            msgBox.className = 'msg error';
+            msgBox.textContent = 'Por favor ingresá el número de motor y el número de precinto.';
+            return;
+          }
+        }
       }
 
       const fecha_carrera = document.getElementById('fecha_carrera').value;
@@ -621,6 +675,9 @@
         departamento: document.getElementById('departamento').value || null,
         fecha_nacimiento: document.getElementById('fecha_nacimiento').value || null,
         cilindrada,
+        motor_precintado,
+        numero_motor,
+        numero_precinto,
         numero_kart,
         con_recargo: calcularRecargo(fecha_carrera),
       };
@@ -636,6 +693,8 @@
         msgBox.innerHTML = '¡Inscripción enviada! Éxitos y nos vemos el fin de semana.<br><br>Para confirmar tu pago transferí a:<br><strong>BROU · Salto Automóvil Club</strong><br>CA 001540985-00003';
         e.target.reset();
         document.querySelectorAll('.radio-item').forEach(el => el.classList.remove('checked'));
+        document.getElementById('precintoWrap').style.display = 'none';
+        document.getElementById('precintoDatos').style.display = 'none';
       }
 
       btn.disabled = false;
