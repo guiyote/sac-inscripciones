@@ -78,6 +78,9 @@
     .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--borde); }
     .section-header h2 { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
     .btn-export { background: transparent; border: 1px solid var(--borde); color: var(--texto-muted); border-radius: 3px; padding: 0.3rem 0.8rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.78rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: border-color 0.15s, color 0.15s; white-space: nowrap; }
+    .precinto-info { font-size: 0.75rem; color: var(--texto-muted); margin-top: 0.3rem; line-height: 1.5; }
+    .precinto-info summary { cursor: pointer; }
+    .precinto-info summary:hover { color: var(--blanco); }
     .btn-export:hover { border-color: #aaa; color: var(--blanco); }
     .table-wrap { overflow-x: auto; border-radius: 2px; border: 1px solid var(--borde); }
     table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
@@ -921,6 +924,18 @@
     if (!r.motor_precintado) return 'Sin precinto';
     return `🔒 Precintado · Motor ${r.numero_motor || '—'}`;
   }
+  // Tabla: si está precintado, la línea se despliega al tocarla y muestra los 4 precintos
+  function precintoHTML(r) {
+    const info = precintoInfo(r);
+    if (!info) return '';
+    if (!r.motor_precintado) return `<div class="precinto-info">${info}</div>`;
+    return `<details class="precinto-info"><summary>${info}</summary>
+      Válvula: ${val(r.precinto_tapa_valvula)}<br>
+      Cilindro: ${val(r.precinto_tapa_cilindro)}<br>
+      Encendido: ${val(r.precinto_tapa_encendido)}<br>
+      Carburador: ${val(r.precinto_carburador)}
+    </details>`;
+  }
   function precintoDetalle(r) {
     if (!r.motor_precintado) return [];
     return [
@@ -1349,7 +1364,7 @@
           <td><span class="badge ${badgePago(r).cls}">${badgePago(r).label}</span></td>
           <td>${fmtFecha(r.fecha_carrera)}</td>
           <td style="font-size:0.8rem;color:var(--texto-muted)">${fmtDateTime(r.created_at)}</td>
-          <td><span class="badge ${kartBadgeClass(r.cilindrada)}">${val(r.cilindrada)}</span>${precintoInfo(r) ? `<div style="font-size:0.75rem;color:var(--texto-muted);margin-top:0.3rem">${precintoInfo(r)}</div>` : ''}</td>
+          <td><span class="badge ${kartBadgeClass(r.cilindrada)}">${val(r.cilindrada)}</span>${precintoHTML(r)}</td>
           <td>${val(r.numero_kart)}</td>
           <td>${val(r.departamento)}</td>
           <td>${fmtMonto(r.pago_monto)}</td>
