@@ -509,8 +509,20 @@
               <input type="text" id="numero_motor">
             </div>
             <div class="field">
-              <label for="numero_precinto">Número de precinto <span class="req">*</span></label>
-              <input type="text" id="numero_precinto">
+              <label for="precinto_tapa_valvula">Precinto tapa válvula <span class="req">*</span></label>
+              <input type="text" id="precinto_tapa_valvula">
+            </div>
+            <div class="field">
+              <label for="precinto_tapa_cilindro">Precinto tapa cilindro <span class="req">*</span></label>
+              <input type="text" id="precinto_tapa_cilindro">
+            </div>
+            <div class="field">
+              <label for="precinto_tapa_encendido">Precinto tapa lateral encendido <span class="req">*</span></label>
+              <input type="text" id="precinto_tapa_encendido">
+            </div>
+            <div class="field">
+              <label for="precinto_carburador">Precinto carburador <span class="req">*</span></label>
+              <input type="text" id="precinto_carburador">
             </div>
           </div>
         </div>
@@ -603,7 +615,9 @@
         return;
       }
 
-      let motor_precintado = null, numero_motor = null, numero_precinto = null;
+      const PRECINTOS = ['precinto_tapa_valvula', 'precinto_tapa_cilindro', 'precinto_tapa_encendido', 'precinto_carburador'];
+      let motor_precintado = null, numero_motor = null;
+      const precintos = Object.fromEntries(PRECINTOS.map(k => [k, null]));
       if (cilindrada === 'SHIFTER 200cc standard') {
         const precintadoVal = document.querySelector('input[name="motor_precintado"]:checked')?.value;
         if (!precintadoVal) {
@@ -614,10 +628,10 @@
         motor_precintado = precintadoVal === 'si';
         if (motor_precintado) {
           numero_motor = document.getElementById('numero_motor').value.trim() || null;
-          numero_precinto = document.getElementById('numero_precinto').value.trim() || null;
-          if (!numero_motor || !numero_precinto) {
+          PRECINTOS.forEach(k => { precintos[k] = document.getElementById(k).value.trim() || null; });
+          if (!numero_motor || PRECINTOS.some(k => !precintos[k])) {
             msgBox.className = 'msg error';
-            msgBox.textContent = 'Por favor ingresá el número de motor y el número de precinto.';
+            msgBox.textContent = 'Por favor ingresá el número de motor y los 4 precintos.';
             return;
           }
         }
@@ -677,7 +691,7 @@
         cilindrada,
         motor_precintado,
         numero_motor,
-        numero_precinto,
+        ...precintos,
         numero_kart,
         con_recargo: calcularRecargo(fecha_carrera),
       };

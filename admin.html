@@ -317,8 +317,14 @@
       </select>
       <label>Número de motor</label>
       <input type="text" id="eK_numero_motor">
-      <label>Número de precinto</label>
-      <input type="text" id="eK_numero_precinto">
+      <label>Precinto tapa válvula</label>
+      <input type="text" id="eK_precinto_tapa_valvula">
+      <label>Precinto tapa cilindro</label>
+      <input type="text" id="eK_precinto_tapa_cilindro">
+      <label>Precinto tapa lateral encendido</label>
+      <input type="text" id="eK_precinto_tapa_encendido">
+      <label>Precinto carburador</label>
+      <input type="text" id="eK_precinto_carburador">
       <label>Número de kart</label>
       <input type="text" id="eK_numero_kart">
     </div>
@@ -909,7 +915,7 @@
   function precintoInfo(r) {
     if (r.motor_precintado == null) return '';
     if (!r.motor_precintado) return 'Sin precinto';
-    return `Precintado · Motor ${r.numero_motor || '—'} · Precinto ${r.numero_precinto || '—'}`;
+    return `Precintado · Motor ${r.numero_motor || '—'} · Válvula ${r.precinto_tapa_valvula || '—'} · Cilindro ${r.precinto_tapa_cilindro || '—'} · Encendido ${r.precinto_tapa_encendido || '—'} · Carburador ${r.precinto_carburador || '—'}`;
   }
 
   function kartBadgeClass(cilindrada) {
@@ -1052,7 +1058,10 @@
       document.getElementById('eK_cilindrada').value = r.cilindrada || '';
       document.getElementById('eK_motor_precintado').value = r.motor_precintado == null ? '' : String(r.motor_precintado);
       document.getElementById('eK_numero_motor').value = r.numero_motor || '';
-      document.getElementById('eK_numero_precinto').value = r.numero_precinto || '';
+      document.getElementById('eK_precinto_tapa_valvula').value = r.precinto_tapa_valvula || '';
+      document.getElementById('eK_precinto_tapa_cilindro').value = r.precinto_tapa_cilindro || '';
+      document.getElementById('eK_precinto_tapa_encendido').value = r.precinto_tapa_encendido || '';
+      document.getElementById('eK_precinto_carburador').value = r.precinto_carburador || '';
       document.getElementById('eK_numero_kart').value = r.numero_kart || '';
     } else if (tabla === 'inscripciones_turismo') {
       document.getElementById('modalEditarNombre').textContent = r.nombre || '';
@@ -1145,7 +1154,10 @@
         cilindrada: document.getElementById('eK_cilindrada').value || null,
         motor_precintado: document.getElementById('eK_motor_precintado').value === '' ? null : document.getElementById('eK_motor_precintado').value === 'true',
         numero_motor: document.getElementById('eK_numero_motor').value.trim() || null,
-        numero_precinto: document.getElementById('eK_numero_precinto').value.trim() || null,
+        precinto_tapa_valvula: document.getElementById('eK_precinto_tapa_valvula').value.trim() || null,
+        precinto_tapa_cilindro: document.getElementById('eK_precinto_tapa_cilindro').value.trim() || null,
+        precinto_tapa_encendido: document.getElementById('eK_precinto_tapa_encendido').value.trim() || null,
+        precinto_carburador: document.getElementById('eK_precinto_carburador').value.trim() || null,
         numero_kart: document.getElementById('eK_numero_kart').value.trim() || null,
       });
     } else if (tabla === 'inscripciones_turismo') {
