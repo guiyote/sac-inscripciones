@@ -35,7 +35,7 @@ The Supabase JS client is loaded from CDN via `<script>` tag.
 ## Database schema (Supabase / PostgreSQL)
 
 Inscription tables (public INSERT via anon key, SELECT only for authenticated):
-- `inscripciones_karting` — fecha_carrera, nombre, cedula, celular, departamento, fecha_nacimiento, cilindrada, numero_kart, pagado, monto_pago, fecha_pago, medio_pago, baja, motivo_baja
+- `inscripciones_karting` — fecha_carrera, nombre, cedula, celular, departamento, fecha_nacimiento, cilindrada, numero_kart, con_recargo, transponder, pago_confirmado, pago_monto, pago_fecha, pago_medio, baja, baja_motivo. Solo para SHIFTER 200cc standard: motor_precintado, numero_motor, precinto_tapa_valvula, precinto_tapa_cilindro, precinto_tapa_encendido, precinto_carburador
 - `inscripciones_turismo` — same base columns + categoria (TNS/TMZ), numero_auto, marca_modelo, nombre_concurrente, nombre_equipo, cantidad_gomas, cantidad_pastillas, cantidad_discos
 - `inscripciones_regularidad` — nombre_piloto, fecha_nacimiento_piloto, nombre_navegante, fecha_nacimiento_navegante, marca, modelo, anio, numero_auto
 
