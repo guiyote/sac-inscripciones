@@ -120,6 +120,14 @@
     .btn-ok-amarillo:hover { background: #a16207; }
     .badge-devolucion { background: rgba(202,138,4,0.15); color: #fde047; border: 1px solid rgba(202,138,4,0.3); }
 
+    .totales-bar { margin-top: 1rem; background: var(--gris-medio); border: 1px solid var(--borde); border-radius: 2px; padding: 1rem 1.5rem; display: flex; gap: 2.5rem; flex-wrap: wrap; }
+    .totales-bar .tot-lbl { font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--texto-muted); }
+    .totales-bar .tot-num { font-family: 'Barlow Condensed', sans-serif; font-size: 1.8rem; font-weight: 800; }
+    .totales-bar .tot-num.verde { color: #4ade80; }
+    .totales-bar .tot-num.amarillo { color: #fde047; }
+    .valor-unit { display: block; font-size: 0.72rem; color: var(--texto-muted); }
+    .deuda-item { display: block; font-size: 0.82rem; color: #ccc; }
+
     .empty { padding: 2rem; text-align: center; color: var(--texto-muted); font-size: 0.9rem; }
 
     /* Modales */
@@ -485,6 +493,41 @@
     </div>
   </div>
 
+  <!-- Deudas por piloto -->
+  <div class="section-block">
+    <div class="section-header">
+      <h2>Deudas pendientes por piloto</h2>
+      <button class="btn-export" onclick="exportarDeudas()">↓ Exportar TXT</button>
+    </div>
+    <div class="filter-row">
+      <div class="filter-group">
+        <label>Fecha de carrera</label>
+        <select id="filtroDeudasFecha">
+          <option value="">Todas las fechas</option>
+          <option value="sin-fecha">Fuera de fecha</option>
+          <option value="2026-04-26">1º — 25/26 Abril</option>
+          <option value="2026-06-14">2º — 13/14 Junio</option>
+          <option value="2026-08-09">3º — 8/9 Agosto</option>
+          <option value="2026-09-20">4º — 19/20 Setiembre</option>
+          <option value="2026-10-25">5º — 24/25 Octubre</option>
+          <option value="2026-11-21">6º — 20/21 Noviembre</option>
+        </select>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Piloto</th><th>Detalle</th><th style="text-align:right">Debe (U$S)</th>
+        </tr></thead>
+        <tbody id="tbodyDeudas"><tr><td colspan="3" class="empty">Cargando...</td></tr></tbody>
+      </table>
+    </div>
+    <div class="totales-bar">
+      <div><span class="tot-lbl">Pilotos con deuda</span><div class="tot-num" id="deudasPilotos">—</div></div>
+      <div><span class="tot-lbl">Total adeudado</span><div class="tot-num amarillo" id="deudasTotal">—</div></div>
+    </div>
+  </div>
+
   <!-- Historial -->
   <div class="section-block">
     <div class="section-header">
@@ -533,11 +576,16 @@
     <div class="table-wrap">
       <table>
         <thead><tr>
-          <th>Fecha</th><th>Artículo</th><th>Tipo</th><th>Cant.</th>
+          <th>Fecha</th><th>Artículo</th><th>Tipo</th><th>Cant.</th><th>Valor</th>
           <th>Piloto / Proveedor</th><th>Carrera</th><th>Pago</th><th>Monto</th><th>Medio</th><th>F. Pago</th><th>Acción</th>
         </tr></thead>
-        <tbody id="tbodyHistorial"><tr><td colspan="11" class="empty">Cargando...</td></tr></tbody>
+        <tbody id="tbodyHistorial"><tr><td colspan="12" class="empty">Cargando...</td></tr></tbody>
       </table>
+    </div>
+    <div class="totales-bar">
+      <div><span class="tot-lbl">Valor salidas</span><div class="tot-num" id="histTotalValor">—</div></div>
+      <div><span class="tot-lbl">Cobrado</span><div class="tot-num verde" id="histTotalCobrado">—</div></div>
+      <div><span class="tot-lbl">Pendiente</span><div class="tot-num amarillo" id="histTotalPendiente">—</div></div>
     </div>
   </div>
 </div>
@@ -1163,28 +1211,45 @@
     if (filtroFecha === 'sin-fecha') q = q.is('fecha_carrera', null);
     else if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
 
-    const { data } = await q;
+    const [{ data }, devueltoPorSalida] = await Promise.all([q, cargarDevueltoPorSalida()]);
     const movs = data || [];
+    cargarDeudas();
 
     const tbody = document.getElementById('tbodyHistorial');
+    movimientosCache = movs;
+
+    // Totales de las salidas visibles (netas de devoluciones)
+    let totValor = 0, totCobrado = 0, totPendiente = 0;
+    movs.filter(m => m.tipo === 'salida').forEach(m => {
+      const valor = (m.stock_articulos?.precio_usd || 0) * Math.max(0, m.cantidad - (devueltoPorSalida[m.id] || 0));
+      totValor += valor;
+      if (m.pago_confirmado) totCobrado += parseFloat(m.pago_monto) || 0;
+      else totPendiente += valor;
+    });
+    document.getElementById('histTotalValor').textContent = totValor ? fmtUsd(totValor) : '—';
+    document.getElementById('histTotalCobrado').textContent = totCobrado ? fmtUsd(totCobrado) : '—';
+    document.getElementById('histTotalPendiente').textContent = totPendiente ? fmtUsd(totPendiente) : '—';
+
     if (movs.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="11" class="empty">Sin movimientos</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="12" class="empty">Sin movimientos</td></tr>';
       return;
     }
 
-    movimientosCache = movs;
-    const salidasDevueltas = new Set(movs.filter(m => m.tipo === 'devolucion' && m.origen_id).map(m => m.origen_id));
     tbody.innerHTML = movs.map(m => {
       const esSalida = m.tipo === 'salida';
       const esTransferencia = m.tipo === 'transferencia';
       const esDevolucion = m.tipo === 'devolucion';
+      const precio = m.stock_articulos?.precio_usd;
+      const valorCell = (esSalida || esDevolucion) && precio != null
+        ? `${esDevolucion ? '−' : ''}${fmtUsd(precio * m.cantidad)}${m.cantidad > 1 ? `<span class="valor-unit">${fmtUsd(precio)} c/u</span>` : ''}`
+        : '—';
       const badgeClass = esTransferencia ? 'badge-transferencia' : esSalida ? 'badge-salida' : esDevolucion ? 'badge-devolucion' : 'badge-entrada';
       const badgeLabel = esTransferencia ? 'Traslado' : esSalida ? 'Salida' : esDevolucion ? 'Devolución' : 'Entrada';
       const accionBtns = [];
       if (esAdmin) {
         accionBtns.push(`<button class="btn-editar-mov" onclick="abrirEditarMov('${m.id}')">Editar</button>`);
         if (esSalida) {
-          const devuelta = salidasDevueltas.has(m.id);
+          const devuelta = devueltoPorSalida[m.id] != null;
           if (!devuelta && !m.pago_confirmado) accionBtns.push(`<button class="btn-pago-mov" onclick="abrirPagoMov('${m.id}')">Pago</button>`);
           if (!devuelta) accionBtns.push(`<button class="btn-devolucion" onclick="abrirDevolucion('${m.id}')">Devolver</button>`);
         }
@@ -1194,6 +1259,7 @@
         <td>${m.stock_articulos?.nombre || '—'}</td>
         <td><span class="badge ${badgeClass}">${badgeLabel}</span></td>
         <td>${m.cantidad}</td>
+        <td style="white-space:nowrap">${valorCell}</td>
         <td>${esTransferencia ? '—' : (esSalida || esDevolucion) ? val(m.piloto) : val(m.proveedor)}</td>
         <td>${m.fecha_carrera ? FECHAS_HIST[m.fecha_carrera] || m.fecha_carrera : '—'}</td>
         <td>${esSalida ? `<span class="badge ${m.pago_confirmado ? 'badge-pagado' : 'badge-pendiente'}">${m.pago_confirmado ? 'Pagado' : 'Pendiente'}</span>` : '—'}</td>
@@ -1239,6 +1305,7 @@
         `Fecha:       ${fmtDate(m.created_at)}`,
         `Artículo:    ${m.stock_articulos?.nombre || '—'}`,
         `Tipo:        ${TIPO_LABEL[m.tipo] || m.tipo}   ·   Cantidad: ${m.cantidad}`,
+        ...((esSalida || esDevolucion) && m.stock_articulos?.precio_usd != null ? [`Valor:       ${fmtUsd(m.stock_articulos.precio_usd * m.cantidad)}`] : []),
         `Ubicación:   ${m.stock_ubicaciones?.nombre || '—'}`,
         `${esTransferencia ? 'Piloto/Prov:' : (esSalida || esDevolucion) ? 'Piloto:     ' : 'Proveedor:  '} ${esTransferencia ? '—' : (esSalida || esDevolucion) ? val(m.piloto) : val(m.proveedor)}`,
         `Carrera:     ${m.fecha_carrera ? (FECHAS_HIST[m.fecha_carrera] || m.fecha_carrera) : '—'}`,
@@ -1246,6 +1313,83 @@
         ...(m.notas ? [`Notas:       ${m.notas}`] : []),
       ];
     }, 'historial_movimientos');
+  }
+
+  // DEUDAS POR PILOTO
+  function fmtUsd(n) { return `U$S ${Number(n).toFixed(2)}`; }
+
+  // { salidaId: cantidad devuelta } — sumando devoluciones parciales
+  async function cargarDevueltoPorSalida() {
+    const { data } = await sb.from('stock_movimientos')
+      .select('origen_id, cantidad').eq('tipo', 'devolucion').not('origen_id', 'is', null);
+    const map = {};
+    (data || []).forEach(d => { map[d.origen_id] = (map[d.origen_id] || 0) + d.cantidad; });
+    return map;
+  }
+
+  let deudasCache = [];
+
+  async function cargarDeudas() {
+    const filtroFecha = document.getElementById('filtroDeudasFecha').value;
+    let q = sb.from('stock_movimientos')
+      .select('id, piloto, cantidad, fecha_carrera, stock_articulos(nombre, precio_usd)')
+      .eq('tipo', 'salida').eq('pago_confirmado', false)
+      .order('fecha_carrera');
+    if (filtroFecha === 'sin-fecha') q = q.is('fecha_carrera', null);
+    else if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
+
+    const [{ data }, devueltoPorSalida] = await Promise.all([q, cargarDevueltoPorSalida()]);
+
+    const porPiloto = {};
+    (data || []).forEach(m => {
+      const cant = m.cantidad - (devueltoPorSalida[m.id] || 0);
+      if (cant <= 0) return;
+      const precio = m.stock_articulos?.precio_usd || 0;
+      const key = normalizeNombre(m.piloto || '—');
+      if (!porPiloto[key]) porPiloto[key] = { piloto: m.piloto || '—', items: [], total: 0 };
+      porPiloto[key].items.push({ cant, articulo: m.stock_articulos?.nombre || '—', fecha: m.fecha_carrera, monto: precio * cant });
+      porPiloto[key].total += precio * cant;
+    });
+    deudasCache = Object.values(porPiloto).sort((a, b) => b.total - a.total);
+
+    const total = deudasCache.reduce((s, d) => s + d.total, 0);
+    document.getElementById('deudasPilotos').textContent = deudasCache.length || '—';
+    document.getElementById('deudasTotal').textContent = total ? fmtUsd(total) : '—';
+
+    const tbody = document.getElementById('tbodyDeudas');
+    if (deudasCache.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="3" class="empty">Nadie debe nada 🎉</td></tr>';
+      return;
+    }
+    tbody.innerHTML = deudasCache.map(d => `<tr>
+      <td style="font-weight:600">${d.piloto}</td>
+      <td>${d.items.map(i => `<span class="deuda-item">${i.cant}× ${i.articulo} · ${i.fecha ? FECHAS_HIST[i.fecha] || i.fecha : 'Fuera de fecha'} · ${fmtUsd(i.monto)}</span>`).join('')}</td>
+      <td style="text-align:right;font-family:'Barlow Condensed',sans-serif;font-size:1.15rem;font-weight:700;color:#fde047;white-space:nowrap">${fmtUsd(d.total)}</td>
+    </tr>`).join('');
+  }
+
+  function exportarDeudas() {
+    if (deudasCache.length === 0) { alert('No hay deudas para exportar con los filtros actuales.'); return; }
+    const hoy = new Date().toLocaleDateString('es-UY', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const total = deudasCache.reduce((s, d) => s + d.total, 0);
+    const lineas = [
+      '════════════════════════════════════════════════',
+      '  DEUDAS PENDIENTES POR PILOTO',
+      '  Salto Automóvil Club',
+      `  Exportado: ${hoy}`,
+      `  ${deudasCache.length} pilotos — Total: ${fmtUsd(total)}`,
+      '════════════════════════════════════════════════',
+      '',
+      ...deudasCache.flatMap(d => [
+        `${d.piloto} — ${fmtUsd(d.total)}`,
+        ...d.items.map(i => `   ${i.cant}× ${i.articulo} (${i.fecha ? FECHAS_HIST[i.fecha] || i.fecha : 'Fuera de fecha'}) — ${fmtUsd(i.monto)}`),
+        '',
+      ]),
+    ];
+    const blob = new Blob(['﻿' + lineas.join('\r\n')], { type: 'text/plain;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'deudas_pilotos.txt'; a.click();
+    URL.revokeObjectURL(url);
   }
 
   // TRANSFERENCIA
@@ -1509,6 +1653,7 @@
   ['filtroArticulo','filtroTipo','filtroPagoMov','filtroHistorialFecha'].forEach(id => {
     document.getElementById(id).addEventListener('change', cargarHistorial);
   });
+  document.getElementById('filtroDeudasFecha').addEventListener('change', cargarDeudas);
 
   // Filtros pedidos
   ['filtroPedidoFecha','filtroPedidoCat'].forEach(id => {
