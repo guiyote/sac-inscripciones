@@ -77,4 +77,4 @@ Each inscription form checks for duplicates before INSERT by querying for matchi
 
 ## Reglamentos
 
-Los reglamentos TNS (General y Mecánico) están en `reglamentos/2026/` (sí versionados) y se linkean discretamente debajo de la tarjeta de Resultados en `index.html`. En la misma línea (rotulada "Documentos 2026") está también la **Guía de banderas** (`reglamentos/2026/guia-banderas.pdf`), que aplica a todo turismo (TNS y TMZ). Para actualizarlos, reemplazar el PDF manteniendo el nombre de archivo.
+Los reglamentos TNS (General y Mecánico) están en `reglamentos/2026/` (sí versionados) y se linkean discretamente debajo de la tarjeta de Resultados en `index.html`. En la misma línea, como botones discretos, está también la **Guía de banderas** (`reglamentos/2026/guia-banderas.pdf`), que aplica a todo turismo (TNS y TMZ). Para actualizarlos, reemplazar el PDF manteniendo el nombre de archivo.

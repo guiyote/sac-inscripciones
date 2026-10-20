@@ -446,16 +446,18 @@
     /* REGLAMENTOS */
     .reglamentos {
       display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
-      gap: 0.4rem 1rem; margin-top: 0.85rem;
-      font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem;
-      letter-spacing: 1.5px; text-transform: uppercase; color: #666;
+      gap: 0.5rem; margin-top: 0.85rem;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 0.85rem;
+      letter-spacing: 1.2px; text-transform: uppercase;
     }
     .reglamentos a {
-      display: inline-flex; align-items: center; gap: 0.3rem;
-      color: var(--texto-muted); text-decoration: none; transition: color 0.2s;
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.35rem 0.75rem; border-radius: 4px;
+      background: var(--gris-medio); border: 1px solid #3a3a3a;
+      color: #ccc; text-decoration: none; transition: color 0.2s, border-color 0.2s;
     }
-    .reglamentos a:hover { color: var(--rojo); }
-    .reglamentos svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .reglamentos a:hover { color: var(--blanco); border-color: var(--rojo); }
+    .reglamentos svg { width: 14px; height: 14px; stroke: var(--rojo); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   </style>
 </head>
 <body>
@@ -623,7 +625,6 @@
       </div>
     </a>
     <div class="reglamentos">
-      <span>Documentos 2026</span>
       <a href="reglamentos/2026/tns-reglamento-general.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Reglamento general TNS</a>
       <a href="reglamentos/2026/tns-reglamento-mecanico.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Reglamento mecánico TNS</a>
       <a href="reglamentos/2026/guia-banderas.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M5 21V4M5 4h12l-2 4 2 4H5"/></svg>Guía de banderas</a>
