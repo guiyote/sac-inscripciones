@@ -93,6 +93,8 @@
     .filter-group label { font-size: 0.68rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #bbb; }
     .filter-row select { background: var(--gris-campo); border: 1px solid var(--borde); border-radius: 3px; padding: 0.55rem 0.85rem; color: var(--blanco); font-family: 'Barlow', sans-serif; font-size: 0.88rem; outline: none; appearance: none; cursor: pointer; transition: border-color 0.15s; }
     .filter-row select:focus { border-color: var(--rojo); }
+    .filter-row input[type="search"] { background: var(--gris-campo); border: 1px solid var(--borde); border-radius: 3px; padding: 0.55rem 0.85rem; color: var(--blanco); font-family: 'Barlow', sans-serif; font-size: 0.88rem; outline: none; transition: border-color 0.15s; min-width: 200px; }
+    .filter-row input[type="search"]:focus { border-color: var(--rojo); }
 
     .table-wrap { overflow-x: auto; border-radius: 2px; border: 1px solid var(--borde); }
     table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
@@ -571,6 +573,10 @@
           <option value="2026-10-25">5º — 24/25 Octubre</option>
           <option value="2026-11-21">6º — 20/21 Noviembre</option>
         </select>
+      </div>
+      <div class="filter-group">
+        <label>Piloto / Proveedor</label>
+        <input type="search" id="filtroNombreMov" placeholder="Buscar por nombre..." autocomplete="off">
       </div>
     </div>
     <div class="table-wrap">
@@ -1199,6 +1205,7 @@
     const filtroTipo = document.getElementById('filtroTipo').value;
     const filtroPago = document.getElementById('filtroPagoMov').value;
     const filtroFecha = document.getElementById('filtroHistorialFecha').value;
+    const filtroNombre = normalizeNombre(document.getElementById('filtroNombreMov').value);
 
     let q = sb.from('stock_movimientos')
       .select('*, origen_id, stock_articulos(nombre, precio_usd), stock_ubicaciones(nombre)')
@@ -1212,7 +1219,10 @@
     else if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
 
     const [{ data }, devueltoPorSalida] = await Promise.all([q, cargarDevueltoPorSalida()]);
-    const movs = data || [];
+    // Búsqueda por nombre: parcial, sin distinguir mayúsculas ni tildes
+    const movs = (data || []).filter(m => !filtroNombre
+      || normalizeNombre(m.piloto).includes(filtroNombre)
+      || normalizeNombre(m.proveedor).includes(filtroNombre));
     cargarDeudas();
 
     const tbody = document.getElementById('tbodyHistorial');
@@ -1652,6 +1662,11 @@
   // Filtros historial
   ['filtroArticulo','filtroTipo','filtroPagoMov','filtroHistorialFecha'].forEach(id => {
     document.getElementById(id).addEventListener('change', cargarHistorial);
+  });
+  let filtroNombreTimer;
+  document.getElementById('filtroNombreMov').addEventListener('input', () => {
+    clearTimeout(filtroNombreTimer);
+    filtroNombreTimer = setTimeout(cargarHistorial, 300);
   });
   document.getElementById('filtroDeudasFecha').addEventListener('change', cargarDeudas);
 
