@@ -110,6 +110,7 @@
     .badge-pagado { background: rgba(22,163,74,0.15); color: #4ade80; border: 1px solid rgba(22,163,74,0.3); }
     .badge-pendiente { background: rgba(234,179,8,0.12); color: #fde047; border: 1px solid rgba(234,179,8,0.25); }
     .badge-sin-solicitar { background: rgba(136,136,136,0.12); color: var(--texto-muted); border: 1px solid rgba(136,136,136,0.25); }
+    .badge-cantidad { background: rgba(249,115,22,0.12); color: #fdba74; border: 1px solid rgba(249,115,22,0.3); }
     .pedido-item { display: flex; flex-direction: column; align-items: flex-start; gap: 0.25rem; }
 
     .btn-pago-mov { border: none; border-radius: 2px; padding: 0.25rem 0.5rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; background: rgba(22,163,74,0.2); color: #4ade80; border: 1px solid rgba(22,163,74,0.4); }
@@ -476,6 +477,16 @@
           <option value="">TNS y TMZ</option>
           <option value="TNS">Solo TNS</option>
           <option value="TMZ">Solo TMZ</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Estado</label>
+        <select id="filtroPedidoEstado">
+          <option value="">Todos los estados</option>
+          <option value="sin-solicitar">Sin solicitar</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="pagado">Pagado</option>
+          <option value="cantidad">Cantidad distinta</option>
         </select>
       </div>
     </div>
@@ -1074,27 +1085,34 @@
       .replace(/\s+/g, ' ');
   }
 
-  function estadoPedidoItem(nombrePiloto, fechaCarrera, articulo, cantidad, salidas) {
+  // Devuelve los badges de un ítem pedido: estado de pago y, si la cantidad entregada
+  // (neta de devoluciones) no coincide con la pedida, un aviso de cantidad
+  function estadoPedidoItem(nombrePiloto, fechaCarrera, articulo, cantidad, salidas, devueltoPorSalida) {
     if (!cantidad || !articulo) return null;
     const nombreNorm = normalizeNombre(nombrePiloto);
     const matches = salidas.filter(m => m.articulo_id === articulo.id
       && m.fecha_carrera === fechaCarrera
-      && normalizeNombre(m.piloto) === nombreNorm);
-    if (matches.length === 0) return { label: 'Sin solicitar', cls: 'badge-sin-solicitar' };
-    return matches.every(m => m.pago_confirmado)
-      ? { label: 'Pagado', cls: 'badge-pagado' }
-      : { label: 'Pendiente', cls: 'badge-pendiente' };
+      && normalizeNombre(m.piloto) === nombreNorm
+      && m.cantidad - (devueltoPorSalida[m.id] || 0) > 0);
+    if (matches.length === 0) return [{ key: 'sin-solicitar', label: 'Sin solicitar', cls: 'badge-sin-solicitar' }];
+    const entregado = matches.reduce((sum, m) => sum + m.cantidad - (devueltoPorSalida[m.id] || 0), 0);
+    const badges = [matches.every(m => m.pago_confirmado)
+      ? { key: 'pagado', label: 'Pagado', cls: 'badge-pagado' }
+      : { key: 'pendiente', label: 'Pendiente', cls: 'badge-pendiente' }];
+    if (entregado !== cantidad) badges.push({ key: 'cantidad', label: `Entregó ${entregado} de ${cantidad}`, cls: 'badge-cantidad' });
+    return badges;
   }
 
   function celdaPedido(cantidad, estado) {
     if (!cantidad) return '<td>—</td>';
     if (!estado) return `<td>${cantidad}</td>`;
-    return `<td><div class="pedido-item"><span>${cantidad}</span><span class="badge ${estado.cls}">${estado.label}</span></div></td>`;
+    return `<td><div class="pedido-item"><span>${cantidad}</span>${estado.map(e => `<span class="badge ${e.cls}">${e.label}</span>`).join('')}</div></td>`;
   }
 
   async function cargarPedidos() {
     const filtroFecha = document.getElementById('filtroPedidoFecha').value;
     const filtroCat = document.getElementById('filtroPedidoCat').value;
+    const filtroEstado = document.getElementById('filtroPedidoEstado').value;
 
     let q = sb.from('inscripciones_turismo')
       .select('nombre, categoria, fecha_carrera, created_at, cantidad_gomas, cantidad_pastillas, cantidad_discos')
@@ -1104,16 +1122,27 @@
     if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
     if (filtroCat) q = q.eq('categoria', filtroCat);
 
-    const [{ data }, { data: salidasData }] = await Promise.all([
+    const [{ data }, { data: salidasData }, devueltoPorSalida] = await Promise.all([
       q,
-      sb.from('stock_movimientos').select('piloto, fecha_carrera, articulo_id, pago_confirmado').eq('tipo', 'salida'),
+      sb.from('stock_movimientos').select('id, piloto, fecha_carrera, articulo_id, cantidad, pago_confirmado').eq('tipo', 'salida'),
+      cargarDevueltoPorSalida(),
     ]);
-    const rows = (data || []).filter(r => r.cantidad_gomas || r.cantidad_pastillas || r.cantidad_discos);
     const salidas = salidasData || [];
 
     const artGomas = articulos.find(a => /cubiert/i.test(a.nombre));
     const artPastillas = articulos.find(a => /pastilla/i.test(a.nombre));
     const artDiscos = articulos.find(a => /disco/i.test(a.nombre));
+
+    // Estado de cada ítem; con filtro de estado se muestran los pilotos con algún ítem en ese estado
+    const rows = (data || [])
+      .filter(r => r.cantidad_gomas || r.cantidad_pastillas || r.cantidad_discos)
+      .map(r => ({ ...r,
+        estGomas: estadoPedidoItem(r.nombre, r.fecha_carrera, artGomas, r.cantidad_gomas, salidas, devueltoPorSalida),
+        estPastillas: estadoPedidoItem(r.nombre, r.fecha_carrera, artPastillas, r.cantidad_pastillas, salidas, devueltoPorSalida),
+        estDiscos: estadoPedidoItem(r.nombre, r.fecha_carrera, artDiscos, r.cantidad_discos, salidas, devueltoPorSalida),
+      }))
+      .filter(r => !filtroEstado || [r.estGomas, r.estPastillas, r.estDiscos]
+        .some(est => est && est.some(e => e.key === filtroEstado)));
 
     const tbody = document.getElementById('tbodyPedidos');
     const FECHAS = {
@@ -1136,9 +1165,9 @@
       <td><span class="badge ${r.categoria === 'TNS' ? 'badge-tns' : 'badge-tmz'}">${r.categoria}</span></td>
       <td>${FECHAS[r.fecha_carrera] || r.fecha_carrera}</td>
       <td>${fmtDate(r.created_at)}</td>
-      ${celdaPedido(r.cantidad_gomas, estadoPedidoItem(r.nombre, r.fecha_carrera, artGomas, r.cantidad_gomas, salidas))}
-      ${celdaPedido(r.cantidad_pastillas, estadoPedidoItem(r.nombre, r.fecha_carrera, artPastillas, r.cantidad_pastillas, salidas))}
-      ${celdaPedido(r.cantidad_discos, estadoPedidoItem(r.nombre, r.fecha_carrera, artDiscos, r.cantidad_discos, salidas))}
+      ${celdaPedido(r.cantidad_gomas, r.estGomas)}
+      ${celdaPedido(r.cantidad_pastillas, r.estPastillas)}
+      ${celdaPedido(r.cantidad_discos, r.estDiscos)}
     </tr>`).join('');
 
     document.getElementById('pedidoTotalGomas').textContent = rows.reduce((s,r) => s + (r.cantidad_gomas || 0), 0) || '—';
@@ -1671,7 +1700,7 @@
   document.getElementById('filtroDeudasFecha').addEventListener('change', cargarDeudas);
 
   // Filtros pedidos
-  ['filtroPedidoFecha','filtroPedidoCat'].forEach(id => {
+  ['filtroPedidoFecha','filtroPedidoCat','filtroPedidoEstado'].forEach(id => {
     document.getElementById(id).addEventListener('change', cargarPedidos);
   });
 
