@@ -214,6 +214,7 @@
       <option value="">Seleccioná...</option>
       <option value="efectivo">Efectivo</option>
       <option value="transferencia">Transferencia</option>
+      <option value="diferido">Pago diferido</option>
       <option value="bonificado">Bonificado</option>
     </select>
     <div class="modal-btns">
@@ -503,6 +504,7 @@
         <option value="">Sin especificar</option>
         <option value="efectivo">Efectivo</option>
         <option value="transferencia">Transferencia</option>
+        <option value="diferido">Pago diferido</option>
         <option value="bonificado">Bonificado</option>
       </select>
     </div>
@@ -632,11 +634,11 @@
   <div class="summary-cards money">
     <div class="summary-card s-verde"><div class="num verde" id="totalPagados">—</div><div class="lbl">Pagos</div></div>
     <div class="summary-card s-ambar"><div class="num ambar" id="totalDiferidos">—</div><div class="lbl">Pago diferido</div></div>
+    <div class="summary-card s-ambar"><div class="num ambar" id="totalImporteDiferido">—</div><div class="lbl">Importe diferido</div></div>
     <div class="summary-card s-teal"><div class="num teal" id="totalBonificados">—</div><div class="lbl">Bonificados</div></div>
     <div class="summary-card s-verde"><div class="num verde" id="totalRecaudado">—</div><div class="lbl">Recaudado</div></div>
     <div class="summary-card"><div class="num" id="totalPendientes">—</div><div class="lbl">Pago pendiente</div></div>
     <div class="summary-card"><div class="num" id="totalACobrar">—</div><div class="lbl">A cobrar</div></div>
-    <div class="summary-card" style="visibility:hidden" aria-hidden="true"></div>
   </div>
 
   <div class="section-block" id="secKarting">
@@ -857,11 +859,18 @@
     document.getElementById('modalBaja').classList.add('open');
   }
 
+  // Bonificado siempre va con importe 0
+  [['pagoMedio', 'pagoMonto'], ['edit_pago_medio', 'edit_pago_monto']].forEach(([medioId, montoId]) => {
+    document.getElementById(medioId).addEventListener('change', e => {
+      if (e.target.value === 'bonificado') document.getElementById(montoId).value = 0;
+    });
+  });
+
   document.getElementById('btnConfirmarPago').addEventListener('click', async () => {
     if (!modalCtx) return;
     const medio = document.getElementById('pagoMedio').value;
     if (!medio) { alert('Seleccioná el medio de pago.'); return; }
-    const monto = parseFloat(document.getElementById('pagoMonto').value);
+    const monto = medio === 'bonificado' ? 0 : parseFloat(document.getElementById('pagoMonto').value);
     const fecha = document.getElementById('pagoFecha').value;
     const btn = document.getElementById('btnConfirmarPago');
     btn.disabled = true; btn.textContent = 'Guardando...';
@@ -962,7 +971,9 @@
     return !!r.pago_confirmado && r.pago_medio === 'bonificado';
   }
 
+  // Diferido: medio "diferido" (con importe) o, como antes, pago sin monto
   function esDiferido(r) {
+    if (r.pago_confirmado && r.pago_medio === 'diferido') return true;
     return !!r.pago_confirmado && !esBonificado(r) && (r.pago_monto === null || r.pago_monto === undefined || parseFloat(r.pago_monto) === 0);
   }
 
@@ -1180,7 +1191,7 @@
     const btn = document.getElementById('btnConfirmarEditar');
     btn.disabled = true; btn.textContent = 'Guardando...';
 
-    const pagoMonto = parseFloat(document.getElementById('edit_pago_monto').value);
+    const pagoMonto = document.getElementById('edit_pago_medio').value === 'bonificado' ? 0 : parseFloat(document.getElementById('edit_pago_monto').value);
     const updates = {
       fecha_carrera: document.getElementById('editFechaCarrera').value || null,
       pago_confirmado: document.getElementById('edit_pago_confirmado').value === 'true',
@@ -1291,7 +1302,7 @@
     let q = sb.from(tabla).select('*').order('created_at', { ascending: false });
     if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
     if (filtroPago === 'pagado') q = q.eq('pago_confirmado', true);
-    if (filtroPago === 'diferido') q = q.eq('pago_confirmado', true).or('pago_medio.neq.bonificado,pago_medio.is.null').or('pago_monto.eq.0,pago_monto.is.null');
+    if (filtroPago === 'diferido') q = q.eq('pago_confirmado', true).or('pago_medio.eq.diferido,and(or(pago_medio.neq.bonificado,pago_medio.is.null),or(pago_monto.eq.0,pago_monto.is.null))');
     if (filtroPago === 'bonificado') q = q.eq('pago_confirmado', true).eq('pago_medio', 'bonificado');
     if (filtroPago === 'pendiente') q = q.eq('pago_confirmado', false);
     if (filtroPago === 'recargo') q = q.eq('pago_confirmado', false).eq('con_recargo', true);
@@ -1352,7 +1363,8 @@
     const diferidos = confirmados.filter(r => esDiferido(r));
     const bonificados = confirmados.filter(r => esBonificado(r));
     const pagados = confirmados.filter(r => !esDiferido(r) && !esBonificado(r));
-    const recaudado = confirmados.reduce((s, r) => s + (parseFloat(r.pago_monto) || 0), 0);
+    const recaudado = confirmados.filter(r => !esDiferido(r)).reduce((s, r) => s + (parseFloat(r.pago_monto) || 0), 0);
+    const importeDiferido = diferidos.reduce((s, r) => s + (parseFloat(r.pago_monto) || 0), 0);
     const pendientes = [
       ['inscripciones_karting', kData], ['inscripciones_turismo', tData], ['inscripciones_regularidad', rData],
       ['inscripciones_trackday', tdData], ['inscripciones_picadas', picData], ['inscripciones_copiloto', cpData],
@@ -1368,6 +1380,7 @@
     document.getElementById('totalGeneral').textContent      = todos.length;
     document.getElementById('totalPagados').textContent      = pagados.length;
     document.getElementById('totalDiferidos').textContent    = diferidos.length;
+    document.getElementById('totalImporteDiferido').textContent = `$ ${importeDiferido.toLocaleString('es-UY')}`;
     document.getElementById('totalBonificados').textContent  = bonificados.length;
     document.getElementById('totalRecaudado').textContent    = `$ ${recaudado.toLocaleString('es-UY')}`;
     document.getElementById('totalPendientes').textContent   = pendientes.length;
