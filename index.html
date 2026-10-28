@@ -396,6 +396,8 @@
     .badge-proxima { background: rgba(204,0,0,0.15); color: #f87171; border: 1px solid rgba(204,0,0,0.4); }
     .badge-realizada { background: rgba(22,163,74,0.15); color: #4ade80; border: 1px solid rgba(22,163,74,0.3); }
     .badge-pendiente { background: rgba(234,179,8,0.12); color: #fde047; border: 1px solid rgba(234,179,8,0.25); }
+    .badge-cambio { display: inline-block; margin-left: 0.4rem; padding: 0.12rem 0.45rem; border-radius: 2px; font-size: 0.62rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; vertical-align: middle; background: rgba(59,130,246,0.15); color: #93c5fd; border: 1px solid rgba(59,130,246,0.35); }
+    .cambio-nota { display: block; font-family: 'Barlow', sans-serif; font-size: 0.72rem; font-weight: 400; color: var(--texto-muted); margin-top: 0.1rem; }
     @media (max-width: 600px) {
       .fechas-section { padding: 0 1rem 2rem; }
     }
@@ -673,7 +675,7 @@
         { n: '3º', evento: 'Campeonato', label: '8-9 Agosto',    iso: '2026-08-09' },
         { n: '4º', evento: 'Campeonato', label: '19-20 Setiembre', iso: '2026-09-20' },
         { n: '5º', evento: 'Campeonato', label: '24-25 Octubre',   iso: '2026-10-25' },
-        { n: '6º', evento: 'Campeonato', label: '20-21 Noviembre', iso: '2026-11-21' },
+        { n: '6º', evento: 'Campeonato', label: '27-28 Noviembre', iso: '2026-11-28', cambio: 'Antes: 20-21 Nov' },
       ];
 
       const today = new Date();
@@ -708,7 +710,7 @@
 
       const filas = campConEstado.map((f, i) => `<tr${f.isProxima ? ' class="proxima-row"' : ''}>
           <td class="col-n">${f.n}</td>
-          <td class="col-fecha">${f.label}</td>
+          <td class="col-fecha">${f.label}${f.cambio ? ` <span class="badge-cambio" title="${f.cambio}">Nueva fecha</span><span class="cambio-nota">${f.cambio}</span>` : ''}</td>
           <td>${estadoBadge(f.iso, f.isProxima)}</td>
         </tr>`);
 
