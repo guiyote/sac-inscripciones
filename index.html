@@ -683,7 +683,7 @@
         { n: '3º', evento: 'Campeonato', label: '8-9 Agosto',    iso: '2026-08-09' },
         { n: '4º', evento: 'Campeonato', label: '19-20 Setiembre', iso: '2026-09-20' },
         { n: '5º', evento: 'Campeonato', label: '24-25 Octubre',   iso: '2026-10-25' },
-        { n: '6º', evento: 'Campeonato', label: '27-28 Noviembre', iso: '2026-11-28', especial: 'Nocturna' },
+        { n: '6º', evento: 'Campeonato', label: '27-28 Noviembre', iso: '2026-11-28', especial: 'Nocturna', limite: '2026-11-25' },
       ];
 
       const today = new Date();
@@ -705,14 +705,20 @@
 
       const proxima = campConEstado.find(f => f.isProxima);
       if (proxima) {
-        const fechaCarrera = new Date(proxima.iso + 'T00:00:00');
-        const diasDesdeJueves = (fechaCarrera.getDay() - 4 + 7) % 7;
-        const jueves = new Date(fechaCarrera);
-        jueves.setDate(jueves.getDate() - diasDesdeJueves);
-        const dd = String(jueves.getDate()).padStart(2, '0');
-        const mm = String(jueves.getMonth() + 1).padStart(2, '0');
+        let limite;
+        if (proxima.limite) {
+          limite = new Date(proxima.limite + 'T00:00:00');
+        } else {
+          const fechaCarrera = new Date(proxima.iso + 'T00:00:00');
+          const diasDesdeJueves = (fechaCarrera.getDay() - 4 + 7) % 7;
+          limite = new Date(fechaCarrera);
+          limite.setDate(limite.getDate() - diasDesdeJueves);
+        }
+        const dia = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'][limite.getDay()];
+        const dd = String(limite.getDate()).padStart(2, '0');
+        const mm = String(limite.getMonth() + 1).padStart(2, '0');
         document.querySelectorAll('.limite-jueves').forEach(el => {
-          el.textContent = `Inscripción hasta el jueves ${dd}/${mm}`;
+          el.textContent = `Inscripción hasta el ${dia} ${dd}/${mm}`;
         });
       }
 
