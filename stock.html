@@ -623,6 +623,8 @@
   let articulos = [];
   let ubicaciones = [];
   let stockPorUbicacion = [];
+  // Depósitos que ya no se usan: no se ofrecen como opción (los movimientos viejos no se tocan)
+  const UBICACIONES_OCULTAS = ['Eduardo Ramirez'];
   let movimientosCache = [];
   let modalCtx = null;
   const FECHAS_HIST = {
@@ -718,7 +720,7 @@
 
   async function cargarUbicaciones() {
     const { data } = await sb.from('stock_ubicaciones').select('*').order('nombre');
-    ubicaciones = data || [];
+    ubicaciones = (data || []).filter(u => !UBICACIONES_OCULTAS.includes(u.nombre));
     // Poblar selects de ubicación en modales
     ['entradaUbicacion', 'salidaUbicacion'].forEach(id => {
       const sel = document.getElementById(id);
@@ -765,7 +767,7 @@
     const { data } = await sb.from('stock_por_ubicacion')
       .select('*, stock_ubicaciones(nombre, es_descarte)')
       .eq('articulo_id', artId);
-    stockPorUbicacion = (data || []).filter(s => !s.stock_ubicaciones.es_descarte);
+    stockPorUbicacion = (data || []).filter(s => !s.stock_ubicaciones.es_descarte && !UBICACIONES_OCULTAS.includes(s.stock_ubicaciones.nombre));
     // Actualizar opciones con stock disponible
     const sel = document.getElementById('salidaUbicacion');
     sel.innerHTML = '<option value="">Seleccioná...</option>';
@@ -1204,7 +1206,7 @@
       const descarteStock = stockUbs.filter(s => s.stock_ubicaciones.es_descarte).reduce((sum, s) => sum + s.stock_actual, 0);
       const colorClass = realStock < 4 ? 'rojo' : realStock <= 6 ? 'amarillo' : 'verde';
       const cardClass = realStock < 4 ? 'sin-stock' : realStock <= 6 ? 'bajo' : 'bien';
-      const desglose = stockUbs.filter(s => !s.stock_ubicaciones.es_descarte).map(s =>
+      const desglose = stockUbs.filter(s => !s.stock_ubicaciones.es_descarte && !UBICACIONES_OCULTAS.includes(s.stock_ubicaciones.nombre)).map(s =>
         `<div style="display:flex;justify-content:space-between;font-size:0.78rem;color:${s.stock_actual === 0 ? 'var(--texto-muted)' : 'var(--blanco)'};margin-top:0.2rem">
           <span>${s.stock_ubicaciones.nombre}</span>
           <span style="font-weight:600">${s.stock_actual}</span>
@@ -1443,7 +1445,7 @@
     const { data } = await sb.from('stock_por_ubicacion')
       .select('*, stock_ubicaciones(nombre, es_descarte)')
       .eq('articulo_id', artId);
-    stockPorUbicacion = data || [];
+    stockPorUbicacion = (data || []).filter(s => !UBICACIONES_OCULTAS.includes(s.stock_ubicaciones.nombre));
 
     const selOrigen = document.getElementById('transferenciaOrigen');
     const selDestino = document.getElementById('transferenciaDestino');
