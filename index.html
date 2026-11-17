@@ -410,28 +410,6 @@
       .fechas-section { padding: 0 1rem 2rem; }
     }
 
-    /* DATOS DE PAGO */
-    .pago-section { max-width: 960px; margin: 0 auto; padding: 0 1.5rem 1.75rem; }
-    .pago-cuentas { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-    .pago-cuenta {
-      display: flex; flex-direction: column; gap: 0.2rem;
-      background: var(--gris-medio); border: 1px solid #3a3a3a; border-left: 3px solid var(--rojo);
-      border-radius: 2px; padding: 0.85rem 1rem;
-    }
-    .pago-moneda {
-      font-family: 'Barlow Condensed', sans-serif; font-size: 0.72rem; font-weight: 700;
-      letter-spacing: 2px; text-transform: uppercase; color: var(--rojo);
-    }
-    .pago-banco { font-size: 0.9rem; color: #ccc; }
-    .pago-numero {
-      font-family: 'Barlow Condensed', sans-serif; font-size: 1.3rem; font-weight: 700;
-      letter-spacing: 0.5px; user-select: all;
-    }
-    @media (max-width: 600px) {
-      .pago-section { padding: 0 1rem 1.5rem; }
-      .pago-cuentas { grid-template-columns: 1fr; }
-    }
-
     /* RESULTADOS */
     .resultados-section { max-width: 960px; margin: 0 auto; padding: 0 1.5rem 1.75rem; }
     .card-resultados { gap: 1rem; padding: 1.2rem 1.2rem 1rem; }
@@ -635,22 +613,6 @@
         </div>
       </a>
 
-    </div>
-  </div>
-
-  <div class="pago-section">
-    <p class="section-label">Datos para el pago</p>
-    <div class="pago-cuentas">
-      <div class="pago-cuenta">
-        <span class="pago-moneda">Pesos</span>
-        <span class="pago-banco">BROU · Salto Automóvil Club</span>
-        <span class="pago-numero">CA $ 001540985-00003</span>
-      </div>
-      <div class="pago-cuenta">
-        <span class="pago-moneda">Dólares</span>
-        <span class="pago-banco">BROU · Salto Automóvil Club</span>
-        <span class="pago-numero">CA USD 001540985-00004</span>
-      </div>
     </div>
   </div>
 
