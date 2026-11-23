@@ -438,7 +438,9 @@
       let primeraHabilitada = null;
       Array.from(select.options).forEach(opt => {
         if (!opt.value) return;
-        const fecha = new Date(opt.value + 'T00:00:00');
+        // La 6ª fecha se guarda como 2026-11-21 pero se corre el 27/28 Nov
+        const FECHA_REAL = { '2026-11-21': '2026-11-28' };
+        const fecha = new Date((FECHA_REAL[opt.value] || opt.value) + 'T00:00:00');
         if (fecha >= hoy && fecha <= limite) {
           opt.disabled = false;
           if (!primeraHabilitada) primeraHabilitada = opt;
