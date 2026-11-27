@@ -483,7 +483,7 @@
     <div class="summary-cards">
       <div class="summary-card"><div class="num" id="sumTotalSalidas">—</div><div class="lbl">Total salidas</div></div>
       <div class="summary-card s-verde"><div class="num verde" id="sumPagadas">—</div><div class="lbl">Pagadas</div></div>
-      <div class="summary-card s-teal"><div class="num teal" id="sumBonificadas">—</div><div class="lbl">Bonificadas</div></div>
+      <div class="summary-card s-teal"><div class="num teal" id="sumBonificado">—</div><div class="lbl">Bonificado U$S<span id="sumBonificadas"></span></div></div>
       <div class="summary-card s-verde"><div class="num verde" id="sumRecaudado">—</div><div class="lbl">Recaudado U$S</div></div>
       <div class="summary-card s-amarillo"><div class="num amarillo" id="sumPendiente">—</div><div class="lbl">Pendiente U$S</div></div>
       <div class="summary-card"><div class="num" id="sumTotal">—</div><div class="lbl">Total U$S</div></div>
@@ -1103,13 +1103,16 @@
     const salidas = movs || [];
     const pagadas = salidas.filter(m => m.pago_confirmado && !esBonificado(m));
     const bonificadas = salidas.filter(esBonificado);
+    // Valor regalado: precio de lista × cantidad
+    const bonificado = bonificadas.reduce((s, m) => s + ((m.stock_articulos?.precio_usd || 0) * (m.cantidad || 0)), 0);
     const recaudado = pagadas.reduce((s, m) => s + (parseFloat(m.pago_monto) || 0), 0);
     const pendiente = salidas.filter(m => !m.pago_confirmado)
       .reduce((s, m) => s + ((m.stock_articulos?.precio_usd || 0) * (m.cantidad || 0)), 0);
 
     document.getElementById('sumTotalSalidas').textContent = salidas.length || '—';
     document.getElementById('sumPagadas').textContent = pagadas.length || '—';
-    document.getElementById('sumBonificadas').textContent = bonificadas.length || '—';
+    document.getElementById('sumBonificado').textContent = bonificado ? `U$S ${bonificado.toFixed(2)}` : '—';
+    document.getElementById('sumBonificadas').textContent = bonificadas.length ? ` · ${bonificadas.length} ${bonificadas.length === 1 ? 'salida' : 'salidas'}` : '';
     document.getElementById('sumRecaudado').textContent = recaudado ? `U$S ${recaudado.toFixed(2)}` : '—';
     document.getElementById('sumPendiente').textContent = pendiente ? `U$S ${pendiente.toFixed(2)}` : '—';
     const total = recaudado + pendiente;
