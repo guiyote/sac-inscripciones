@@ -109,6 +109,7 @@
     .badge-salida { background: rgba(204,0,0,0.15); color: #f87171; border: 1px solid rgba(204,0,0,0.3); }
     .badge-pagado { background: rgba(22,163,74,0.15); color: #4ade80; border: 1px solid rgba(22,163,74,0.3); }
     .badge-pendiente { background: rgba(234,179,8,0.12); color: #fde047; border: 1px solid rgba(234,179,8,0.25); }
+    .badge-bonificado { background: rgba(45,212,191,0.15); color: #2dd4bf; border: 1px solid rgba(45,212,191,0.3); }
     .badge-sin-solicitar { background: rgba(136,136,136,0.12); color: var(--texto-muted); border: 1px solid rgba(136,136,136,0.25); }
     .badge-cantidad { background: rgba(249,115,22,0.12); color: #fdba74; border: 1px solid rgba(249,115,22,0.3); }
     .pedido-item { display: flex; flex-direction: column; align-items: flex-start; gap: 0.25rem; }
@@ -161,6 +162,8 @@
     .summary-card.s-amarillo { border-top-color: var(--amarillo); }
     .summary-card .num { font-family: 'Barlow Condensed', sans-serif; font-size: 2rem; font-weight: 800; line-height: 1.1; }
     .summary-card .num.verde { color: #4ade80; }
+    .summary-card.s-teal { border-top-color: #2dd4bf; }
+    .summary-card .num.teal { color: #2dd4bf; }
     .summary-card .num.amarillo { color: #fde047; }
     .summary-card .lbl { font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--texto-muted); margin-top: 0.3rem; }
 
@@ -304,6 +307,7 @@
         <option value="">Seleccioná...</option>
         <option value="efectivo">Efectivo</option>
         <option value="transferencia">Transferencia</option>
+        <option value="bonificado">Bonificado (sin cargo)</option>
       </select>
       <label>Fecha de pago</label>
       <input type="date" id="salidaFechaPago">
@@ -352,6 +356,7 @@
       <option value="">Seleccioná...</option>
       <option value="efectivo">Efectivo</option>
       <option value="transferencia">Transferencia</option>
+      <option value="bonificado">Bonificado (sin cargo)</option>
     </select>
     <label>Fecha de pago</label>
     <input type="date" id="pagoMovFecha">
@@ -415,6 +420,7 @@
         <option value="">Seleccioná...</option>
         <option value="efectivo">Efectivo</option>
         <option value="transferencia">Transferencia</option>
+        <option value="bonificado">Bonificado (sin cargo)</option>
       </select>
     </div>
     <label>Notas <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
@@ -477,6 +483,7 @@
     <div class="summary-cards">
       <div class="summary-card"><div class="num" id="sumTotalSalidas">—</div><div class="lbl">Total salidas</div></div>
       <div class="summary-card s-verde"><div class="num verde" id="sumPagadas">—</div><div class="lbl">Pagadas</div></div>
+      <div class="summary-card s-teal"><div class="num teal" id="sumBonificadas">—</div><div class="lbl">Bonificadas</div></div>
       <div class="summary-card s-verde"><div class="num verde" id="sumRecaudado">—</div><div class="lbl">Recaudado U$S</div></div>
       <div class="summary-card s-amarillo"><div class="num amarillo" id="sumPendiente">—</div><div class="lbl">Pendiente U$S</div></div>
       <div class="summary-card"><div class="num" id="sumTotal">—</div><div class="lbl">Total U$S</div></div>
@@ -608,6 +615,7 @@
           <option value="">Todos los pagos</option>
           <option value="pagado">Pagos</option>
           <option value="pendiente">Pendientes</option>
+          <option value="bonificado">Bonificados</option>
         </select>
       </div>
       <div class="filter-group">
@@ -656,6 +664,7 @@
   function fmtDate(iso) { if (!iso) return '—'; const [y,m,d] = iso.split('T')[0].split('-'); return `${d}/${m}/${y}`; }
   function fmtDateSimple(iso) { if (!iso) return '—'; const [y,m,d] = iso.split('-'); return `${d}/${m}/${y}`; }
   function val(v) { return (v != null && v !== '') ? v : '—'; }
+  function esBonificado(m) { return !!m.pago_confirmado && m.pago_medio === 'bonificado'; }
   function capFirst(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : '—'; }
 
   let articulos = [];
@@ -798,6 +807,7 @@
     document.getElementById('salidaPagoDetalle').style.display = 'none';
     document.getElementById('salidaMonto').value = '';
     document.getElementById('salidaMedio').value = '';
+    document.getElementById('salidaMonto').disabled = false;
     document.getElementById('salidaFechaPago').value = new Date().toISOString().split('T')[0];
     document.getElementById('salidaNotas').value = '';
     montoEditadoManualmente = false;
@@ -830,6 +840,15 @@
     }
   }
 
+  // Bonificado: la salida se da sin cargo, importe 0 (no cuenta como recaudado)
+  [['salidaMedio', 'salidaMonto'], ['pagoMovMedio', 'pagoMovMonto']].forEach(([medioId, montoId]) => {
+    document.getElementById(medioId).addEventListener('change', e => {
+      const monto = document.getElementById(montoId);
+      monto.disabled = e.target.value === 'bonificado';
+      if (e.target.value === 'bonificado') monto.value = 0;
+    });
+  });
+
   let montoEditadoManualmente = false;
 
   document.getElementById('salidaMonto').addEventListener('input', () => { montoEditadoManualmente = true; });
@@ -845,7 +864,7 @@
   });
 
   document.getElementById('salidaCantidad').addEventListener('input', function() {
-    if (!montoEditadoManualmente && document.getElementById('salidaPago').value === 'si' && modalCtx) {
+    if (!montoEditadoManualmente && document.getElementById('salidaPago').value === 'si' && document.getElementById('salidaMedio').value !== 'bonificado' && modalCtx) {
       const cant = parseInt(this.value) || 1;
       document.getElementById('salidaMonto').value = (modalCtx.precioUsd * cant).toFixed(2);
     }
@@ -909,7 +928,8 @@
     const btn = document.getElementById('btnConfirmarSalida');
     btn.disabled = true; btn.textContent = 'Guardando...';
 
-    const monto = parseFloat(document.getElementById('salidaMonto').value);
+    const medioSalida = document.getElementById('salidaMedio').value;
+    const monto = medioSalida === 'bonificado' ? 0 : parseFloat(document.getElementById('salidaMonto').value);
     const { error: errMov } = await sb.from('stock_movimientos').insert([{
       articulo_id: modalCtx.artId,
       ubicacion_id: ubicacionId,
@@ -919,7 +939,7 @@
       fecha_carrera: document.getElementById('salidaFechaCarrera').value || null,
       pago_confirmado: pago,
       pago_monto: pago && !isNaN(monto) ? monto : null,
-      pago_medio: pago ? document.getElementById('salidaMedio').value || null : null,
+      pago_medio: pago ? medioSalida || null : null,
       pago_fecha: pago ? document.getElementById('salidaFechaPago').value || null : null,
       notas: document.getElementById('salidaNotas').value.trim() || null,
     }]);
@@ -949,6 +969,7 @@
     const precio = mov?.stock_articulos?.precio_usd;
     document.getElementById('pagoMovMonto').value = precio != null ? (precio * (mov.cantidad || 0)).toFixed(2) : '';
     document.getElementById('pagoMovMedio').value = '';
+    document.getElementById('pagoMovMonto').disabled = false;
     document.getElementById('pagoMovFecha').value = new Date().toISOString().split('T')[0];
     document.getElementById('modalPagoMov').classList.add('open');
   }
@@ -957,7 +978,7 @@
     if (!modalCtx) return;
     const medio = document.getElementById('pagoMovMedio').value;
     if (!medio) { alert('Seleccioná el medio de pago.'); return; }
-    const monto = parseFloat(document.getElementById('pagoMovMonto').value);
+    const monto = medio === 'bonificado' ? 0 : parseFloat(document.getElementById('pagoMovMonto').value);
     const fecha = document.getElementById('pagoMovFecha').value;
     const btn = document.getElementById('btnConfirmarPagoMov');
     btn.disabled = true; btn.textContent = 'Guardando...';
@@ -988,7 +1009,9 @@
     };
     document.getElementById('modalDevolucionNombre').textContent = `${mov.stock_articulos?.nombre} — ${mov.piloto}`;
     const aviso = document.getElementById('devolucionPagoAviso');
-    if (mov.pago_confirmado && mov.pago_monto) {
+    if (esBonificado(mov)) {
+      aviso.style.display = 'none';
+    } else if (mov.pago_confirmado && mov.pago_monto) {
       aviso.style.display = 'block';
       aviso.textContent = `⚠ El piloto pagó U$S ${Number(mov.pago_monto).toFixed(2)} por esta salida. Recordá gestionar el reembolso si corresponde.`;
     } else if (mov.pago_confirmado) {
@@ -1071,20 +1094,22 @@
   async function cargarResumenPagos() {
     const filtroFecha = document.getElementById('filtroResumenFecha').value;
     let q = sb.from('stock_movimientos')
-      .select('tipo, pago_confirmado, pago_monto, cantidad, stock_articulos(nombre, precio_usd)')
+      .select('tipo, pago_confirmado, pago_monto, pago_medio, cantidad, stock_articulos(nombre, precio_usd)')
       .eq('tipo', 'salida');
     if (filtroFecha === 'sin-fecha') q = q.is('fecha_carrera', null);
     else if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
     const { data: movs } = await q;
 
     const salidas = movs || [];
-    const pagadas = salidas.filter(m => m.pago_confirmado);
+    const pagadas = salidas.filter(m => m.pago_confirmado && !esBonificado(m));
+    const bonificadas = salidas.filter(esBonificado);
     const recaudado = pagadas.reduce((s, m) => s + (parseFloat(m.pago_monto) || 0), 0);
     const pendiente = salidas.filter(m => !m.pago_confirmado)
       .reduce((s, m) => s + ((m.stock_articulos?.precio_usd || 0) * (m.cantidad || 0)), 0);
 
     document.getElementById('sumTotalSalidas').textContent = salidas.length || '—';
     document.getElementById('sumPagadas').textContent = pagadas.length || '—';
+    document.getElementById('sumBonificadas').textContent = bonificadas.length || '—';
     document.getElementById('sumRecaudado').textContent = recaudado ? `U$S ${recaudado.toFixed(2)}` : '—';
     document.getElementById('sumPendiente').textContent = pendiente ? `U$S ${pendiente.toFixed(2)}` : '—';
     const total = recaudado + pendiente;
@@ -1096,7 +1121,9 @@
       const precio = m.stock_articulos?.precio_usd || 0;
       if (!porArt[nombre]) porArt[nombre] = { salidas: 0, pagadas: 0, recaudado: 0, pendiente: 0 };
       porArt[nombre].salidas++;
-      if (m.pago_confirmado) {
+      if (esBonificado(m)) {
+        // sin cargo: no suma a pagadas ni recaudado
+      } else if (m.pago_confirmado) {
         porArt[nombre].pagadas++;
         porArt[nombre].recaudado += parseFloat(m.pago_monto) || 0;
       } else {
@@ -1284,6 +1311,7 @@
     if (filtroTipo) q = q.eq('tipo', filtroTipo);
     if (filtroPago === 'pagado') q = q.eq('pago_confirmado', true).eq('tipo', 'salida');
     if (filtroPago === 'pendiente') q = q.eq('pago_confirmado', false).eq('tipo', 'salida');
+    if (filtroPago === 'bonificado') q = q.eq('pago_confirmado', true).eq('pago_medio', 'bonificado').eq('tipo', 'salida');
     if (filtroFecha === 'sin-fecha') q = q.is('fecha_carrera', null);
     else if (filtroFecha) q = q.eq('fecha_carrera', filtroFecha);
 
@@ -1341,7 +1369,7 @@
         <td style="white-space:nowrap">${valorCell}</td>
         <td>${esTransferencia ? '—' : (esSalida || esDevolucion) ? val(m.piloto) : val(m.proveedor)}</td>
         <td>${m.fecha_carrera ? FECHAS_HIST[m.fecha_carrera] || m.fecha_carrera : '—'}</td>
-        <td>${esSalida ? `<span class="badge ${m.pago_confirmado ? 'badge-pagado' : 'badge-pendiente'}">${m.pago_confirmado ? 'Pagado' : 'Pendiente'}</span>` : '—'}</td>
+        <td>${esSalida ? (esBonificado(m) ? '<span class="badge badge-bonificado">Bonificado</span>' : `<span class="badge ${m.pago_confirmado ? 'badge-pagado' : 'badge-pendiente'}">${m.pago_confirmado ? 'Pagado' : 'Pendiente'}</span>`) : '—'}</td>
         <td>${m.pago_monto != null ? `U$S ${Number(m.pago_monto).toFixed(2)}` : '—'}</td>
         <td>${capFirst(m.pago_medio)}</td>
         <td>${fmtDateSimple(m.pago_fecha)}</td>
@@ -1388,7 +1416,7 @@
         `Ubicación:   ${m.stock_ubicaciones?.nombre || '—'}`,
         `${esTransferencia ? 'Piloto/Prov:' : (esSalida || esDevolucion) ? 'Piloto:     ' : 'Proveedor:  '} ${esTransferencia ? '—' : (esSalida || esDevolucion) ? val(m.piloto) : val(m.proveedor)}`,
         `Carrera:     ${m.fecha_carrera ? (FECHAS_HIST[m.fecha_carrera] || m.fecha_carrera) : '—'}`,
-        ...(esSalida ? [`Pago:        ${m.pago_confirmado ? 'Pagado' : 'Pendiente'}${m.pago_monto != null ? ` — U$S ${Number(m.pago_monto).toFixed(2)}` : ''}${m.pago_medio ? ` (${capFirst(m.pago_medio)})` : ''}${m.pago_fecha ? ` — ${fmtDateSimple(m.pago_fecha)}` : ''}`] : []),
+        ...(esSalida ? [`Pago:        ${esBonificado(m) ? 'Bonificado' : m.pago_confirmado ? 'Pagado' : 'Pendiente'}${m.pago_monto != null ? ` — U$S ${Number(m.pago_monto).toFixed(2)}` : ''}${m.pago_medio ? ` (${capFirst(m.pago_medio)})` : ''}${m.pago_fecha ? ` — ${fmtDateSimple(m.pago_fecha)}` : ''}`] : []),
         ...(m.notas ? [`Notas:       ${m.notas}`] : []),
       ];
     }, 'historial_movimientos');
@@ -1699,7 +1727,16 @@
     if (esSalida || esDevolucion) update.piloto = document.getElementById('editarPiloto').value.trim() || null;
     if (esEntrada) update.proveedor = document.getElementById('editarPiloto').value.trim() || null;
     if (esSalida) update.fecha_carrera = document.getElementById('editarFechaCarrera').value || null;
-    if (esSalida && pagoConfirmado) update.pago_medio = document.getElementById('editarMedio').value || null;
+    if (esSalida && pagoConfirmado) {
+      update.pago_medio = document.getElementById('editarMedio').value || null;
+      const movPrev = movimientosCache.find(m => m.id === movId);
+      if (update.pago_medio === 'bonificado') update.pago_monto = 0;
+      else if (movPrev?.pago_medio === 'bonificado') {
+        // Deja de ser bonificado: precio de lista × cantidad
+        const precio = movPrev.stock_articulos?.precio_usd;
+        update.pago_monto = precio != null ? precio * nuevaCantidad : null;
+      }
+    }
 
     const { error } = await sb.from('stock_movimientos').update(update).eq('id', movId);
     if (error) {
